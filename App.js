@@ -5,18 +5,24 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Register from './component/Register';
 import Login from './component/Login';
 import Home from './component/Home';
+import Forum from './component/Forum';
+import { UserProvider } from './UserContext';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Register">
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Home" component={Home} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Register" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Forum" component={Forum} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserProvider>
+    
   );
 }
 

@@ -1,15 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import { SafeAreaView, Alert, StyleSheet, Text, View, Platform, TextInput, Button, TouchableOpacity } from 'react-native';
 import styles from '../styles';
 import { auth, database } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword} from "firebase/auth";
 import { useNavigation } from '@react-navigation/native';
+import { UserContext } from '../UserContext';
 
 export default function Login(){
-    const [email, setEmail] = useState('');
-    const [pw, setPw] = useState('');
+    console.log('Login page');
+
+    const [email, setEmail] = useState('test@gmail.com');
+    const [pw, setPw] = useState('test123');
     const navi = useNavigation();
+    const { setUser } = useContext(UserContext);
 
     const handleSubmit = async () => {
         try {
@@ -18,7 +22,10 @@ export default function Login(){
             }
     
             else{
-                await signInWithEmailAndPassword(auth, email, pw);
+                const userCredential = await signInWithEmailAndPassword(auth, email, pw);
+                const user = userCredential.user;
+                setUser(user);
+
                 console.log('Logged in');
                 navi.navigate('Home');
             }
@@ -35,7 +42,7 @@ export default function Login(){
 
     return (
         <View style={styles.container3}>
-            <SafeAreaView style={styles.container}>
+            <View style={styles.container}>
                 <Text style={styles.text}>
                     Welcome{"\n"}
                     to Our Apps!
@@ -59,6 +66,7 @@ export default function Login(){
                     <TextInput
                         style={styles.input}
                         placeholder="Enter your password"
+                        secureTextEntry={true}
                         value={pw}
                         onChangeText={setPw}
                     />
@@ -66,14 +74,14 @@ export default function Login(){
                     <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                         <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Log in</Text>
                     </TouchableOpacity>
-                    <Text style={styles.texttosignin}>Already have an account? 
-                        <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Register')}>Jump in to Sign in!</Text>
+                    <Text style={styles.texttosignin}>No account?  
+                        <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Register')}> Sign up now!</Text>
                     </Text>
                     <Text style={styles.texttosignin} onPress={() => navi.navigate('Home')}>
                         Forgot Password?
                     </Text>
                 </View>
-            </SafeAreaView>
+            </View>
         </View>
     );
 }

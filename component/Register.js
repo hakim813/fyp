@@ -27,6 +27,8 @@ export default function Register(){
     const [confirmPassword, setConfirmPassword] = useState('');
     const navi = useNavigation();
 
+    console.log('Signup page');
+
     const handleAuthentication = async () => {
         try {
             // const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -83,7 +85,10 @@ export default function Register(){
 
     return (
         <View style={styles.container3}>
-        <SafeAreaView style={styles.container}>
+          <View style={{}}>
+
+          </View>
+        <View style={styles.container}>
           <ScrollView>
             <Text style={styles.text}>Create Your
             Account
@@ -147,12 +152,12 @@ export default function Register(){
             <TouchableOpacity style={styles.button} onPress={handleAuthentication}>
                 <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Register</Text>
             </TouchableOpacity>
-            <Text style={styles.texttosignin}>Don't have any account?  
-                <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Login')}> Register Now!</Text>
+            <Text style={styles.texttosignin}>Already have an account?  
+                <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Login')}> Jump to Sign In!</Text>
             </Text>
             </View>
             </ScrollView>
-        </SafeAreaView>
+        </View>
         </View>
     );
 }

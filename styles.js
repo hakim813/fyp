@@ -6,7 +6,7 @@ container: {
     flex: 1,
     backgroundColor: '#00B32E',
     paddingTop: StatusBar.currentHeight+50,
-    marginBottom: '100',
+    // marginBottom: '100',
   },
 
   container2: {
@@ -61,6 +61,35 @@ container: {
     color: '#020202',
     textAlign: 'center',
     margin: 25
+  }
+});
+
+export const stylesHome = StyleSheet.create({
+
+  bg: {
+    flex: 1,
+    backgroundColor: '#d6ffa7',
+    paddingTop: StatusBar.currentHeight+50,
+    // marginBottom: '100',
+  },
+
+  welcomeText: {
+    fontWeight: 800,
+    color: '#00B32E',
+    fontSize: 40,
+    // marginTop: 20,
+    marginLeft: 30
+  },
+
+  button: {
+    backgroundColor: '#00B32E',
+    margin: 20,
+    padding: 15,
+    borderRadius: 15,
+    // marginHorizontal: 110,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center'
   }
 });
 
