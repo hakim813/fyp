@@ -46,7 +46,7 @@ container: {
     paddingHorizontal: 15,
     backgroundColor: '#dedede',
     marginTop: 10,
-    marginBottom: 30
+    marginBottom: 18
   },
 
   button: {
@@ -54,13 +54,20 @@ container: {
     padding: 15,
     borderRadius: 15,
     marginHorizontal: 110,
-    alignItems: 'center',
+    alignItems: 'center'
   },
 
   texttosignin: {
     color: '#020202',
     textAlign: 'center',
     margin: 25
+  },
+
+  containerAttachMedia: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    // backgroundColor: '#000000',
+    marginBottom: 20
   }
 });
 
@@ -71,6 +78,11 @@ export const stylesHome = StyleSheet.create({
     backgroundColor: '#d6ffa7',
     paddingTop: StatusBar.currentHeight+50,
     // marginBottom: '100',
+  },
+
+  context: {
+    backgroundColor: 'white',
+    marginHorizontal: 15
   },
 
   welcomeText: {

@@ -7,6 +7,7 @@ import Login from './component/Login';
 import Home from './component/Home';
 import Forum from './component/Forum';
 import { UserProvider } from './UserContext';
+import CreatePost from './component/CreatePost';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,7 @@ const App = () => {
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="Forum" component={Forum} />
+          <Stack.Screen name="CreatePost" component={CreatePost} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>
