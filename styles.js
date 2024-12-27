@@ -1,6 +1,27 @@
 import { StyleSheet,StatusBar } from 'react-native';
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
+
+  centeredView: {
+    position: 'absolute', // Position it absolutely on the screen
+    height: '75%',
+    bottom: 'auto',
+    // right: 120,
+    width: '100%',
+    // transform: [{ translateX: -100 }, { translateY: -50 }], // Adjust to center precisely
+    backgroundColor: '#fafafa',
+    borderRadius: 10,
+    elevation: 5, // Adds shadow on Android
+    shadowColor: '#000', // Shadow on iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 3,
+  },
+  centeredText: {
+    fontSize: 18,
+    color: '#333',
+    fontWeight: 'bold',
+  },
 
 container: {
     flex: 1,
@@ -68,28 +89,39 @@ container: {
     justifyContent: 'flex-start',
     // backgroundColor: '#000000',
     marginBottom: 20
-  }
+  },
+
+  submitComment : {marginBottom: 32, 
+    backgroundColor: 'green', 
+    position: 'absolute', 
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    right: 15 ,
+    bottom: 0,
+    borderRadius: 50}
 });
 
 export const stylesHome = StyleSheet.create({
 
   bg: {
     flex: 1,
-    backgroundColor: '#d6ffa7',
-    paddingTop: StatusBar.currentHeight+50,
-    // marginBottom: '100',
+    backgroundColor: 'green',
+    paddingTop: StatusBar.currentHeight+50
   },
 
   context: {
-    backgroundColor: 'white',
-    marginHorizontal: 15
+    
+    minHeight: 200,
+    borderRadius: 10,
+    padding: 10,
+    marginHorizontal: 15,
+    marginBottom: 10,
   },
 
   welcomeText: {
     fontWeight: 800,
     color: '#00B32E',
     fontSize: 40,
-    // marginTop: 20,
     marginLeft: 30
   },
 
