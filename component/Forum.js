@@ -7,7 +7,7 @@ import { auth, database } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword} from "firebase/auth";
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../UserContext';
-import { ref, set, push, getDatabase, get, child, onValue } from "firebase/database";
+import { ref, set,remove, push, getDatabase, get, child, onValue } from "firebase/database";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function Forum(){
@@ -15,7 +15,7 @@ export default function Forum(){
     const [selectedPost, setSelectedPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [comment, setComment] = useState("");
-    const { user, setUser } = useContext(UserContext);
+    const {user, setUser } = useContext(UserContext);
     const [isVisible, setIsVisible] = useState(false);
     const [comments, setComments] = useState([]);
     const [isEnabled, setIsEnabled] = useState(false);
@@ -75,7 +75,21 @@ export default function Forum(){
             console.error('Error writing comment data:', error);
           });
       };   
+
+    //deletePost
+      const deleteData = (id) => {
+        
+    const postRef = ref(database, `posts/${id}`);
       
+    remove(postRef)
+        .then(() => {
+        console.log('Data deleted successfully!');
+        })
+        .catch(error => {
+        console.error('Error deleting data: ', error);
+        });
+    };
+    
       const thumbsUp = (item) => {
         const postRef = ref(database, `posts/${item.id}`); // Reference to the specific post
       
@@ -261,8 +275,6 @@ export default function Forum(){
                     )}
                             
                         </View>
-                        
-
                         <View style={{marginTop: 'auto'}}>
                             <TextInput
                                 style={[styles.input, {position: 'absolute', marginBottom: 5, borderRadius: 20, width:'85%', left: 0 , bottom: 5}]}
@@ -279,78 +291,85 @@ export default function Forum(){
                         <Text style={{position: 'absolute', fontSize: 20, bottom: 20, right: 5}}>{item.upvoter?.length || 0}</Text>
                         </View>
                         
+                        {
+                            item.user == user.email ? 
+                            (<Text style={{fontSize: 20}} onPress={()=>{deleteData(item.id)}}>Delete Post</Text>) : (<></>)
+                        }
                     </View>
                         );
                 }
                 else if(item.user == user.email){
                     return(
-                        <View style={[stylesHome.context, {paddingVertical:10, backgroundColor: '#fafafa'}]}>
-                            <View>
-                                <Image source={{ uri: 'https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png' }} style={{potition: 'absolute', width: 30,
-                                    height: 30,
-                                    resizeMode: 'cover',
-                                    borderRadius: 75,
-                                    borderColor: 'black',
-                                    borderWidth: 1}} />
-                                <Text style = {{position: 'absolute', top: 5   , left: 40, fontWeight:'bold', fontSize: 25, marginBottom:10}}>
-                                    {item.title.length > 15 ? `${item.title.slice(0, 15)}...` : item.title}
-                                </Text>
-                                <Text style = {{position: 'absolute', top: 15   , right: 5, marginBottom:10, color: 'grey'}}>{new Date(item.date).toDateString()}</Text>
-                            </View>
-                            <View  style={{marginBottom: 60}}>
-                                
-                                <Text style={{marginTop: 10}}>
-                                    <Text style={{fontWeight: 'bold'}}>
-                                        Written by:{" "}
-                                    </Text>
-                                    {item.user}
-                                    </Text>
-                                <Text style={{marginTop: 10, marginBottom: 0, fontSize: 20}}>{item.content}</Text>
-                                {/* Display multiple images */}
-                            {item.imageUris && Array.isArray(item.imageUris) ? (
-                                <FlatList
-                                data={item.imageUris}
-                                keyExtractor={(uri, index) => `${item.id}-image-${index}`}
-                                horizontal
-                                renderItem={({ item: uri }) => (
-                                    <Image
-                                        source={{ uri }}
-                                        style={{
-                                            width: 200,
-                                            height: 200,
-                                            margin: 5,
-                                            resizeMode: 'cover',
-                                            borderRadius: 10,
-                                            borderWidth: 1,
-                                            borderColor: '#ccc',
-                                        }}
-                                    />
-                                )}
-                            />
-                        ) : (
-                            <Text style={{ marginTop: 10, color: 'gray' }}>No images attached</Text>
-                        )}
-                                
-                            </View>
-                            
-    
-                            <View style={{marginTop: 'auto'}}>
-                                <TextInput
-                                    style={[styles.input, {position: 'absolute', marginBottom: 5, borderRadius: 20, width:'85%', left: 0 , bottom: 5}]}
-                                    placeholder="Comment"
-                                    onPress={()=>{setSelectedPost(item),setIsVisible(true)}}
-                                />
-                                <TouchableOpacity onPress={()=>thumbsUp(item)} style={{position: 'absolute', bottom: 20, right: 20}} >
-                                <Icon
-                                name="thumbs-up"
-                                size={24}
-                                color={item.upvoter?.includes(user.uid) ? "green" : "gray"} // Change color based on isUpvoted
-                                />
-                            </TouchableOpacity>
-                            <Text style={{position: 'absolute', fontSize: 20, bottom: 20, right: 5}}>{item.upvoter?.length || 0}</Text>
-                            </View>
+                    <View style={[stylesHome.context, {paddingVertical:10, backgroundColor: '#fafafa'}]}>
+                        <View>
+                            <Image source={{ uri: 'https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png' }} style={{potition: 'absolute', width: 30,
+                                height: 30,
+                                resizeMode: 'cover',
+                                borderRadius: 75,
+                                borderColor: 'black',
+                                borderWidth: 1}} />
+                            <Text style = {{position: 'absolute', top: 5   , left: 40, fontWeight:'bold', fontSize: 25, marginBottom:10}}>
+                                {item.title.length > 15 ? `${item.title.slice(0, 15)}...` : item.title}
+                            </Text>
+                            <Text style = {{position: 'absolute', top: 15   , right: 5, marginBottom:10, color: 'grey'}}>{new Date(item.date).toDateString()}</Text>
                         </View>
-                            );
+                        <View  style={{marginBottom: 60}}>
+                            
+                            <Text style={{marginTop: 10}}>
+                                <Text style={{fontWeight: 'bold'}}>
+                                    Written by:{" "}
+                                </Text>
+                                {item.user}
+                                </Text>
+                            <Text style={{marginTop: 10, fontSize: 20}}>{item.content}</Text>
+                            {/* Display multiple images */}
+                        {item.imageUris && Array.isArray(item.imageUris) ? (
+                            <FlatList
+                            data={item.imageUris}
+                            keyExtractor={(uri, index) => `${item.id}-image-${index}`}
+                            horizontal
+                            renderItem={({ item: uri }) => (
+                                <Image
+                                    source={{ uri }}
+                                    style={{
+                                        width: 200,
+                                        height: 200,
+                                        marginBottom: 10,
+                                        resizeMode: 'cover',
+                                        borderRadius: 5,
+                                        borderWidth: 1,
+                                        borderColor: '#ccc',
+                                    }}
+                                />
+                            )}
+                        />
+                    ) : (
+                        <Text style={{ marginTop: 10, color: 'gray' }}>No images attached</Text>
+                    )}
+                            
+                        </View>
+                        <View style={{marginTop: 'auto'}}>
+                            <TextInput
+                                style={[styles.input, {position: 'absolute', marginBottom: 5, borderRadius: 20, width:'85%', left: 0 , bottom: 5}]}
+                                placeholder="Comment"
+                                onPress={()=>{setSelectedPost(item),setIsVisible(true)}}
+                            />
+                            <TouchableOpacity onPress={()=>thumbsUp(item)} style={{position: 'absolute', bottom: 20, right: 20}} >
+                            <Icon
+                            name="thumbs-up"
+                            size={24}
+                            color={item.upvoter?.includes(user.uid) ? "green" : "gray"} // Change color based on isUpvoted
+                            />
+                        </TouchableOpacity>
+                        <Text style={{position: 'absolute', fontSize: 20, bottom: 20, right: 5}}>{item.upvoter?.length || 0}</Text>
+                        </View>
+                        
+                            {/* (<Text style={{fontSize: 50}} onPress={()=>{deleteData(item.id)}}>Button</Text>) : (<></>) */}
+                        
+                        
+                        
+                    </View>
+                        );
                     
                 }
             }}

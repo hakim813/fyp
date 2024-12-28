@@ -78,17 +78,39 @@ export default function Home(){
     //   };
 
     return (
-        <View style={stylesHome.bg}>
+        <View style={[stylesHome.bg,{paddingTop: 0, backgroundColor: 'white', alignItems: 'center'}]}>
+          <View style={{width: '150%', height: 220, backgroundColor: 'pink', paddingVertical: 0, borderBottomLeftRadius: 350, borderBottomRightRadius: 350, alignItems: 'center', justifyContent: 'center',}}>
             {detail ? (
                 <>
-                <Text style={stylesHome.welcomeText}>{getGreeting()}, {detail.username}</Text>
-                <TouchableOpacity style={stylesHome.button} onPress={()=>navi.navigate('Forum')}>
-                    <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Forum</Text>
-                </TouchableOpacity>
+                <Text style={[stylesHome.welcomeText, {color: 'white'}]}>{getGreeting()},{"\n"}{detail.username}</Text>
                 </>
             ) : (
                 <Text>Home</Text>
             )}
+          </View>
+
+          <View style={{flexDirection: 'row', backgroundColor: 'red', width: '100%', height: 180, marginTop: 15, marginHorizontal: 30 }}>
+              <TouchableOpacity style={[stylesHome.button, {backgroundColor: 'pink'}]} onPress={()=>navi.navigate('Forum')}>
+                  <Text style={{color: '#030303', fontWeight: 'bold'}}>Forum</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[stylesHome.button, {backgroundColor: 'pink'}]} onPress={()=>console.log("Social Tracker")}>
+                  <Text style={{color: '#030303', fontWeight: 'bold'}}>SP</Text>
+              </TouchableOpacity>
+          </View>
+
+          <View style={{backgroundColor: 'yellow', width: '100%', height: 300, marginTop: 15, marginHorizontal: 30 }}>
+            <Text>Flatlist for image slider?</Text>
+          </View>
+
+          <View>
+            {/* <TouchableOpacity style={stylesHome.button} onPress={()=>navi.navigate('Forum')}>
+                <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Forum</Text>
+            </TouchableOpacity> */}
+          </View>
+
+          <View style={{marginTop: 'auto', height: 80, width: '100%', backgroundColor: 'pink'}}>
+            <Text>Bottom</Text>
+          </View>
         </View>
     );
 }

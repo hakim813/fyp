@@ -122,7 +122,7 @@ export const stylesHome = StyleSheet.create({
     fontWeight: 800,
     color: '#00B32E',
     fontSize: 40,
-    marginLeft: 30
+    // marginLeft: 30
   },
 
   button: {
