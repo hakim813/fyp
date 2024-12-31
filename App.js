@@ -8,6 +8,9 @@ import Home from './component/Home';
 import Forum from './component/Forum';
 import { UserProvider } from './UserContext';
 import CreatePost from './component/CreatePost';
+import FinanceManager from './component/FinanceManager';
+import CreateFinanceRecord from './component/CreateFinanceRecord';
+import FinancialRecord from './component/FinancialRecord';
 
 const Stack = createStackNavigator();
 
@@ -21,6 +24,9 @@ const App = () => {
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="Forum" component={Forum} />
           <Stack.Screen name="CreatePost" component={CreatePost} />
+          <Stack.Screen name="FinanceManager" component={FinanceManager} />
+          <Stack.Screen name="CreateFinanceRecord" component={CreateFinanceRecord} />
+          <Stack.Screen name="FinancialRecord" component={FinancialRecord} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>

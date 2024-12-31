@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import {stylesHome, styles} from '../styles';
 import React, { useContext, useState, useEffect } from 'react';
 import { ref, set, push, getDatabase, get, child } from "firebase/database";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export default function Home(){
     const { user, setUser } = useContext(UserContext);
@@ -93,7 +94,7 @@ export default function Home(){
               <TouchableOpacity style={[stylesHome.button, {backgroundColor: 'pink'}]} onPress={()=>navi.navigate('Forum')}>
                   <Text style={{color: '#030303', fontWeight: 'bold'}}>Forum</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[stylesHome.button, {backgroundColor: 'pink'}]} onPress={()=>console.log("Social Tracker")}>
+              <TouchableOpacity style={[stylesHome.button, {backgroundColor: 'pink'}]} onPress={()=>navi.navigate('FinanceManager')}>
                   <Text style={{color: '#030303', fontWeight: 'bold'}}>SP</Text>
               </TouchableOpacity>
           </View>
@@ -108,8 +109,23 @@ export default function Home(){
             </TouchableOpacity> */}
           </View>
 
-          <View style={{marginTop: 'auto', height: 80, width: '100%', backgroundColor: 'pink'}}>
-            <Text>Bottom</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingHorizontal: 25, marginTop: 'auto', height: 100, width: '100%', backgroundColor: 'pink'}}>
+            <TouchableOpacity style={{justifyContent: 'center', backgroundColor: 'yellow'}}>
+              <Icon
+              name="home"
+              size={40}
+              color={'red'} // Change color based on isUpvoted
+              />
+              <Text>Home</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{justifyContent: 'center', backgroundColor: 'yellow'}}>
+              <Icon
+              name="user"
+              size={40}
+              color={'red'} // Change color based on isUpvoted
+              />
+              <Text>Profile</Text>
+            </TouchableOpacity>
           </View>
         </View>
     );

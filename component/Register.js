@@ -84,7 +84,10 @@ export default function Register(){
       };
 
     return (
-        <View style={styles.container3}>
+        <KeyboardAvoidingView 
+          style={styles.container3}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          >
           <View style={{}}>
 
           </View>
@@ -158,6 +161,6 @@ export default function Register(){
             </View>
             </ScrollView>
         </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 }

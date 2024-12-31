@@ -35,9 +35,9 @@ container: {
     backgroundColor: '#fdfdfd',
     borderTopRightRadius: 25,
     borderTopLeftRadius: 25,
-    marginTop: 45,
+    marginTop: 25,
     padding: 15,
-    paddingTop: 35,
+    paddingTop: 15,
     alignContent: 'flex-start'
   },
 
@@ -71,10 +71,10 @@ container: {
   },
 
   button: {
-    backgroundColor: '#00B32E', // Set your desired background color
+    backgroundColor: '#296746', // Set your desired background color
     padding: 15,
     borderRadius: 15,
-    marginHorizontal: 110,
+    // marginHorizontal: 110,
     alignItems: 'center'
   },
 
@@ -88,7 +88,6 @@ container: {
     display: 'flex',
     justifyContent: 'flex-start',
     // backgroundColor: '#000000',
-    marginBottom: 20
   },
 
   submitComment : {marginBottom: 32, 

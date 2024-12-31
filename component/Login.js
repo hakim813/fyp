@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, {useState, useContext} from 'react';
-import { SafeAreaView, Alert, StyleSheet, Text, View, Platform, TextInput, Button, TouchableOpacity } from 'react-native';
+import { SafeAreaView, KeyboardAvoidingView, Alert, StyleSheet, Text, View, Platform, TextInput, Button, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import styles from '../styles';
 import { auth, database } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword} from "firebase/auth";
@@ -41,7 +41,10 @@ export default function Login(){
     // const [inputValue, setInputValue] = useState('');
 
     return (
-        <View style={styles.container3}>
+        <KeyboardAvoidingView 
+                  style={styles.container3}
+                  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
                 <Text style={styles.text}>
                     Welcome{"\n"}
@@ -75,13 +78,14 @@ export default function Login(){
                         <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Log in</Text>
                     </TouchableOpacity>
                     <Text style={styles.texttosignin}>No account?  
-                        <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Register')}> Sign up now!</Text>
+                        <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('FinancialRecord')}> Sign up now!</Text>
                     </Text>
-                    <Text style={styles.texttosignin} onPress={() => navi.navigate('Home')}>
+                    <Text style={styles.texttosignin}>
                         Forgot Password?
                     </Text>
                 </View>
             </View>
-        </View>
+            </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     );
 }
