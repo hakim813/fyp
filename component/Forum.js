@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../UserContext';
 import { ref, set,remove, push, getDatabase, get, onValue, child } from "firebase/database";
 import Icon from "react-native-vector-icons/FontAwesome";
+import BottomBar from './BottomBar';
 
 export default function Forum(){
     const [posts, setPosts] = useState([]);
@@ -201,29 +202,29 @@ export default function Forum(){
         <View style={[stylesHome.bg]} >
             <View style={{flex:1}}>
                 <Text style={[stylesHome.welcomeText, {color: '#fafafa', marginLeft: 15}]}>Community Forum</Text>
-                <TextInput
-                    style={[styles.input, {backgroundColor: '#fdfdfd', borderRadius: 20, marginHorizontal:15}]}
-                    placeholder="Search any content. . ."
-                    value={searchQuery}
-                    onChangeText={(text) => setSearchQuery(text)}
-                    // onPress={()=>{}}
-                />
+                    <TextInput
+                        style={[styles.input, {backgroundColor: '#fdfdfd', borderRadius: 20, marginHorizontal:15}]}
+                        placeholder="Search any content. . ."
+                        value={searchQuery}
+                        onChangeText={(text) => setSearchQuery(text)}
+                        // onPress={()=>{}}
+                    />
                 <View style={{flexDirection: 'row', marginHorizontal: 15, marginBottom: 15}}>
-                    <TouchableOpacity onPress={()=>setIsAll(true)} style={[{marginRight: 10, paddingVertical: 10, paddingHorizontal: 15, fontWeight: 'bold', borderRadius: 15},(isAll? {backgroundColor: '#d6ffa7'} : {backgroundColor: 'grey'})]}>
-                        <Text style={[{fontWeight: '650', fontWeight: 'bold', fontSize:15},(!isAll? {color: '#fdfdfd'} : {color: 'black'})]}>All</Text>
+                    <TouchableOpacity onPress={()=>setIsAll(true)} style={[{marginRight: 10, paddingVertical: 10, paddingHorizontal: 15, fontWeight: 'bold', borderRadius: 15},(isAll? {backgroundColor: '#05597D'} : {backgroundColor: 'grey'})]}>
+                        <Text style={[{fontWeight: '650', fontWeight: 'bold', fontSize:15, color: 'white'}]}>All</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>setIsAll(false)} style={[{marginRight: 80, paddingVertical: 10, paddingHorizontal: 15, fontWeight: 'bold', borderRadius: 15},(isAll? {backgroundColor: 'grey'} : {backgroundColor: '#d6ffa7'})]}>
-                        <Text style={[{fontWeight: '650', fontWeight: 'bold', fontSize:15},(isAll? {color: '#fdfdfd'} : {color: 'black'})]}>Your Post</Text>
+                    <TouchableOpacity onPress={()=>setIsAll(false)} style={[{marginRight: 80, paddingVertical: 10, paddingHorizontal: 15, fontWeight: 'bold', borderRadius: 15},(isAll? {backgroundColor: 'grey'} : {backgroundColor: '#05597D'})]}>
+                        <Text style={[{fontWeight: '650', fontWeight: 'bold', fontSize:15, color: 'white'}]}>Your Post</Text>
                     </TouchableOpacity>
-                    <Text style={{marginLeft: 'auto',  alignSelf: 'center', color: '#fdfdfd',fontWeight: 'bold'}}>Latest</Text>
+                    <Text style={{marginLeft: 'auto',  alignSelf: 'center', color: '#fdfdfd',fontWeight: 'bold'}}>Top</Text>
                     <Switch style={{marginLeft: 'auto', color: '#fdfdfd',fontWeight: 'bold'}}
-                            trackColor={{false: '#767577', true: '#81b0ff'}}
-                            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                            ios_backgroundColor="#3e3e3e"
-                            value={isEnabled}
-                            onValueChange={(value) => setIsEnabled(value)}
-                            />
-                    <Text style={{marginLeft: 'auto', alignSelf: 'center', color: '#fdfdfd',fontWeight: 'bold'}}>Top</Text>
+                        trackColor={{false: '#fdfdfd', true: '#81b0ff'}}
+                        thumbColor={isEnabled ? '#1b434d' : '#81b0ff'}
+                        ios_backgroundColor="#3e3e3e"
+                        value={isEnabled}
+                        onValueChange={(value) => setIsEnabled(value)}
+                    />
+                    <Text style={{marginLeft: 'auto', alignSelf: 'center', color: '#fdfdfd',fontWeight: 'bold'}}>Latest</Text>
                 </View>
 
             {filteredPosts.length === 0 ? (
@@ -233,7 +234,7 @@ export default function Forum(){
             ) : (
                 <FlatList  //d6ffa7
                                 
-                style={{paddingTop: 10, backgroundColor: '#e7ffcc'}}
+                style={{paddingTop: 10, backgroundColor: '#BCD4DE'}}
                 data={filteredPosts}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => {
@@ -299,7 +300,7 @@ export default function Forum(){
                                 <Icon
                                 name="thumbs-up"
                                 size={24}
-                                color={item.upvoter?.includes(user.uid) ? "green" : "gray"} // Change color based on isUpvoted
+                                color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
                                 />
                             </TouchableOpacity>
                         <Text style={{position: 'absolute', fontSize: 20, bottom: 20, right: 5}}>{item.upvoter?.length || 0}</Text>
@@ -360,7 +361,7 @@ export default function Forum(){
                                     </Text>
                                     {item.user}
                                     </Text>
-                                <Text style={{marginTop: 10, fontSize: 20}}>{item.content}</Text>
+                                <Text style={{marginVertical: 10, fontSize: 20}}>{item.content}</Text>
                                 {/* Display multiple images */}
                             {item.imageUris && Array.isArray(item.imageUris) ? (
                                 <FlatList
@@ -373,11 +374,11 @@ export default function Forum(){
                                         style={{
                                             width: 200,
                                             height: 200,
-                                            marginBottom: 10,
+                                            margin:10,
+                                            marginLeft:0,
                                             resizeMode: 'cover',
                                             borderRadius: 5,
                                             borderWidth: 1,
-                                            marginRight: 10,
                                             borderColor: '#ccc',
                                         }}
                                     />
@@ -398,7 +399,7 @@ export default function Forum(){
                                     <Icon
                                     name="thumbs-up"
                                     size={24}
-                                    color={item.upvoter?.includes(user.uid) ? "green" : "gray"} // Change color based on isUpvoted
+                                    color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
                                     />
                                 </TouchableOpacity>
                             <Text style={{position: 'absolute', fontSize: 20, bottom: 20, right: 5}}>{item.upvoter?.length || 0}</Text>
@@ -433,19 +434,25 @@ export default function Forum(){
                             : (<></>)
                             }
                         </View>
-                            ); 
+                            );
                 }
             }}
                 />
             )} 
             </View>
         
-        <TouchableOpacity onPress={()=>navi.navigate('CreatePost')} style={[ {position: 'absolute', bottom:20, right: '40%', alignSelf: 'center',paddingHorizontal: 25,marginTop: 10, paddingVertical: 15, backgroundColor: 'green', borderRadius: 100, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+        <TouchableOpacity onPress={()=>navi.navigate('CreatePost')} style={[ {position: 'absolute', bottom:20, right: '40%', alignSelf: 'center',paddingHorizontal: 25,marginTop: 10, paddingVertical: 15, backgroundColor: '#1b434d', borderRadius: 100, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.8,
                 shadowRadius: 3}]} >
                   <Text style={{color: '#fdfdfd', fontWeight: '800', fontSize:30}}>+</Text>
-              </TouchableOpacity>
+        </TouchableOpacity>
             
+            <BottomBar></BottomBar>
+            <TouchableOpacity onPress={()=>navi.navigate('CreatePost')} style={[ {position: 'absolute', bottom:20, right: '42%', alignSelf: 'center',paddingHorizontal: 25,marginTop: 10, paddingVertical: 15, backgroundColor: '#1b434d', borderRadius: 100, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.8,
+                shadowRadius: 3}]} >
+                  <Text style={{color: '#fdfdfd', fontWeight: '800', fontSize:30}}>+</Text>
+            </TouchableOpacity>
             {isVisible && (
                     <View style={[styles.centeredView]}>
                         <Text style={{position: 'absolute', left: 15, fontWeight: 'bold', fontSize: 30, marginLeft: 15, marginTop: 15}}>Comment</Text>

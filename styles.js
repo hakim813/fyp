@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
 
 container: {
     flex: 1,
-    backgroundColor: '#00B32E',
+    backgroundColor: '#1b434d',
     paddingTop: StatusBar.currentHeight+50,
     // marginBottom: '100',
   },
@@ -33,22 +33,22 @@ container: {
   container2: {
     flex: 1,
     backgroundColor: '#fdfdfd',
-    borderTopRightRadius: 25,
-    borderTopLeftRadius: 25,
-    marginTop: 25,
-    padding: 15,
-    paddingTop: 15,
-    alignContent: 'flex-start'
+    borderTopRightRadius: 25 ,
+    borderTopLeftRadius: 25 ,
+    marginTop: 25 ,
+    padding: 20 ,
+    paddingTop: 25 ,
+    // alignContent: 'flex-start'
   },
 
 
   container3: {
     flex: 1,
-    backgroundColor: '#fdfdfd',
+    backgroundColor: '#1b434d',
   },
 
   text: {
-    fontWeight: 800,
+    fontWeight: 700,
     color: '#fdfdfd',
     fontSize: 50,
     marginTop: 20,
@@ -71,17 +71,20 @@ container: {
   },
 
   button: {
-    backgroundColor: '#296746', // Set your desired background color
-    padding: 15,
-    borderRadius: 15,
+    backgroundColor: '#1b434d', // Set your desired background color
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 30,
+    marginVertical: 10,
     // marginHorizontal: 110,
-    alignItems: 'center'
+    alignItems: 'center',
+    alignSelf: 'center'
   },
 
   texttosignin: {
     color: '#020202',
     textAlign: 'center',
-    margin: 25
+    marginTop: 25
   },
 
   containerAttachMedia: {
@@ -91,7 +94,7 @@ container: {
   },
 
   submitComment : {marginBottom: 32, 
-    backgroundColor: 'green', 
+    backgroundColor: '#1b434d', 
     position: 'absolute', 
     paddingHorizontal: 20,
     paddingVertical: 10,
@@ -104,7 +107,7 @@ export const stylesHome = StyleSheet.create({
 
   bg: {
     flex: 1,
-    backgroundColor: 'green',
+    backgroundColor: '#1b434d',
     paddingTop: StatusBar.currentHeight+50
   },
 
@@ -125,15 +128,46 @@ export const stylesHome = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: '#00B32E',
-    margin: 20,
-    padding: 15,
-    borderRadius: 15,
-    // marginHorizontal: 110,
+    backgroundColor: '#1b434d',
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 30,
+    marginVertical: 10,
     alignItems: 'center',
-    justifyContent: 'center',
     alignSelf: 'center'
-  }
+  },
+
+  features: {
+    paddingVertical: 15,
+    paddingHorizontal: 15,
+    borderRadius: 30,
+    margin: 5,
+    height: 190,
+    width: 150,
+    opacity: 0.7,
+    borderWidth: 0.3,
+    alignSelf: 'center'
+  },
+
+  imageSlider: {
+    backgroundColor: '#1b434d',
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    borderRadius: 30,
+    margin: 5,
+    height: 150,
+    width: 230,
+    opacity: 0.5,
+
+
+    alignSelf: 'center'
+  },
+});
+
+export const home = StyleSheet.create({
+
+
+
 });
 
 export default styles;

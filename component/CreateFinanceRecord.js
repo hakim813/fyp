@@ -6,7 +6,7 @@ import { auth, database } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword} from "firebase/auth";
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../UserContext';
-import { ref, set, push, getDatabase, get, child, onValue, serverTimestamp } from "firebase/database";
+import { ref, set, push, getDatabase, get, child, onValue, serverTimestamp, update } from "firebase/database";
 import * as ImagePicker from 'expo-image-picker';
 
 export default function CreateFinanceRecord({route}){
@@ -17,6 +17,25 @@ export default function CreateFinanceRecord({route}){
     const [notes, setNotes] = useState("-");
     const { user} = useContext(UserContext);
     const navi = useNavigation();
+    const {id} = route.params || {};
+
+    const updateData = async(existingId) => {
+        
+        const recordRef = ref(database, `financeRecords/${existingId}`); // Parent path where data will be stored
+        // const newRecordRef = push(recordRef);
+
+        update(recordRef, {
+            email: user.email,
+            type: type,
+            value: value,
+            notes: notes,
+            date: serverTimestamp()
+        })
+            .then(() => {
+                (type == "Expense" ? console.log("Expense recorded.") : console.log("Income recorded.") )
+            })
+            .catch(error => console.error('Error writing data: ', error));
+    };
 
     const writeData = async() => {
         const recordRef = ref(database, 'financeRecords/'); // Parent path where data will be stored
@@ -78,7 +97,7 @@ export default function CreateFinanceRecord({route}){
                     </View>
                     
                     <View style={{flexDirection: 'row'}}>
-                        <TouchableOpacity onPress={()=>{writeData(), navi.navigate("FinancialRecord")}} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#296746', borderRadius: 25}]} >
+                        <TouchableOpacity onPress={()=>{(id == null ? writeData() : updateData(id)), navi.navigate("FinancialRecord")}} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#296746', borderRadius: 25}]} >
                             <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Record Expense</Text>
                         </TouchableOpacity>
                     </View>

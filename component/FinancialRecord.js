@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../UserContext';
 import { ref, set,remove, push, getDatabase, get, onValue, child } from "firebase/database";
 import Icon from "react-native-vector-icons/FontAwesome";
+import BottomBar from './BottomBar';
 import { PieChart } from 'react-native-gifted-charts';
 
 export default function FinancialRecord(){
@@ -20,6 +21,8 @@ export default function FinancialRecord(){
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredPosts, setFilteredPosts] = useState([]);
     const [detail, setDetail] = useState(null);
+    const [isDetailedView, setIsDetailedView] = useState(false);
+    const [monthChosen, setMonthChosen] = useState(null);
 
     const [values,setValues] = useState([1]);
     const [sliceColor,setSliceColor]=useState(['#333333'])
@@ -44,6 +47,13 @@ export default function FinancialRecord(){
       { key: "12", month: "Dec" }
     ];
     const navi = useNavigation();
+
+  
+    useEffect(() => {
+      if(!isDetailedView){
+        setMonthChosen(null);
+      }
+    }, [isDetailedView]);
 
     useEffect(() => {
         // Reference to the "posts" node in your Firebase Realtime Database
@@ -115,7 +125,7 @@ export default function FinancialRecord(){
             setData(dataList);
             setDataMonth(result);
             setDataDate(uniqueData);
-            console.log(user);
+            // console.log(user);
             // console.log("Unique data",uniqueData);
 
             // const filtj
@@ -134,9 +144,22 @@ export default function FinancialRecord(){
         };
       }, []);
 
+    const deleteData = (id) => {
+        
+      const recordRef = ref(database, `financeRecords/${id}`);
+      
+      remove(recordRef)
+          .then(() => {
+          console.log('Data deleted successfully!');
+          })
+          .catch(error => {
+          console.error('Error deleting data: ', error);
+          });
+    };
+
     return(
       <View style={styles.container3}>
-          <View style={styles.container}>
+          <View style={[styles.container]}>
               <Text style={[styles.text]}>Expense Record</Text>
               <StatusBar style="auto" />
               <View style={[styles.container2]}>
@@ -163,17 +186,95 @@ export default function FinancialRecord(){
                                     {item.month}
                                   </Text>
                                   {
-                                    (item.expense == 0 && item.income == 0) ? (
-                                      <View style={{ justifyContent: 'center', height: 80, padding: 10, backgroundColor: '#ededed', borderRadius: 10}}>
-                                        <Text style={{fontStyle: 'italic'}}>No data available yet.</Text>
-                                      </View>
-                                    ) : (
-                                      <View style={{ justifyContent: 'center', minHeight: 80, padding: 10, backgroundColor: '#ededed', borderRadius: 10}}>
-                                        <Text>Expense: {item.expense}</Text>
-                                        <Text>Income: {item.income}</Text>
-                                      </View>
-                                    )
-                                  }
+  (item.expense === 0 && item.income === 0) ? (
+    <View
+      style={{
+        justifyContent: 'center',
+        height: 80,
+        padding: 10,
+        backgroundColor: '#ededed',
+        borderRadius: 10,
+      }}
+    >
+      <Text style={{ fontStyle: 'italic' }}>No data available yet.</Text>
+    </View>
+  ) : (
+    <TouchableOpacity 
+  onPress={() => {
+    setMonthChosen((prev) => prev === item.month ? null : item.month);
+    setIsDetailedView((prev) => prev === true && monthChosen === item.month ? false : true);
+  }}
+  style={{
+    justifyContent: 'center',
+    minHeight: 80,
+    padding: 10,
+    backgroundColor: '#ededed',
+    borderRadius: 10,
+  }}
+>
+      <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Expense:</Text>
+      <Text style={{ fontSize: 20 }}>
+        {item.expense} {"\n"}
+      </Text>
+      <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Income:</Text>
+      <Text style={{ fontSize: 20 }}>{item.income}</Text>
+      {/* Nested conditional for FlatList */}
+      {isDetailedView ? (
+        <View style={{borderTopWidth: 0.3, marginTop: 15}}>
+          <Text style={{fontSize: 20, marginTop: 15}}>Detailed transactions for {item.month}</Text>
+          <FlatList
+          data={data}
+          keyExtractor={(i) => i.id}
+          renderItem={({ item: i }) => {
+            if (
+              new Date(i.date).toLocaleString('default', { month: 'short' }) ===
+                item.month &&
+              i.email === user.email
+            ) {
+              return (
+                <View
+                  style={{
+                    paddingLeft: 10,
+                    marginVertical: 5,
+                    backgroundColor:
+                      i.type === "Income" ? '#3282F6' : '#f44f4f',
+                    borderRadius: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                      padding: 10,
+                      backgroundColor: '#fdfdfd',
+                      borderTopRightRadius: 10,
+                      borderBottomRightRadius: 10,
+                    }}
+                  >
+                    <View style={{ height: 80 }}>
+                      <Text>Type: {i.type}</Text>
+                      <Text>Value: {i.value}</Text>
+                      <Text>Notes: {i.notes}</Text>
+                      <Text style={{marginTop: 'auto', fontStyle: 'italic'}}>
+                        {new Date(i.date).toDateString()}
+                      </Text>
+                    </View>
+
+                  </View>
+                </View>
+              );
+            }
+            return null; // Return null if condition isn't met
+          }}
+        />
+        </View>
+      ) : (
+        <></>
+      )}
+    </TouchableOpacity>
+  )
+}
+
                                 </View>
                               );
                           }
@@ -181,7 +282,6 @@ export default function FinancialRecord(){
                       /> 
                       : 
                       (<>
-                        <Text>Daily View</Text>
                         <FlatList
                           data={dataDate}
                           keyExtractor={(item) => item.date}
@@ -198,7 +298,7 @@ export default function FinancialRecord(){
                                       renderItem={({ item: i }) => {
                                           if(i.date == item.date && i.email === user.email){
                                             return (
-                                              <View style={{ paddingLeft: 10, marginVertical: 5, backgroundColor: i.type === "Income" ? 'blue' : 'red', borderRadius: 10}}>
+                                              <View style={{ paddingLeft: 10, marginVertical: 5, backgroundColor: i.type === "Income" ? '#3282F6' : '#f44f4f', borderRadius: 10}}>
                                                 <View style={{ alignItems: 'center', flexDirection: 'row', padding: 10, backgroundColor: '#ededed', borderTopRightRadius: 10, borderBottomRightRadius: 10}}>
                                                   <View style={{height: 80}}>
                                                     <Text>Type: {i.type}</Text>
@@ -206,14 +306,28 @@ export default function FinancialRecord(){
                                                     <Text>Notes: {i.notes}</Text>
                                                     {/* <Text>{user.email}</Text> */}
                                                   </View>
-                                                  <TouchableOpacity onPress={()=>console.log("Edit"+i.id)} style={{marginLeft: 'auto', marginRight: 20}} >
+                                                  <TouchableOpacity onPress={()=>{console.log("ID"), navi.navigate("CreateFinanceRecord", {type: i.type, id: i.id})}} style={{marginLeft: 'auto', marginRight: 20}} >
                                                       <Icon
                                                         name="pencil"
                                                         size={24}
                                                         color={item.upvoter?.includes(user.uid) ? "green" : "gray"} // Change color based on isUpvoted
                                                       />
                                                   </TouchableOpacity>
-                                                  <TouchableOpacity onPress={()=>console.log("Delete"+i.id)} style={{marginHorizontal: 10}} >
+                                                  <TouchableOpacity onPress={()=>
+                                                    Alert.alert('Delete Record',
+                                                      'Are you sure you want to delete this record?',
+                                                      [
+                                                          {
+                                                          text: 'Cancel',
+                                                          style: 'cancel', // Adds the "Cancel" style (button is usually grayed out)
+                                                          },
+                                                          {
+                                                          text: 'Delete',
+                                                          style: 'destructive', // Adds the "Delete" style (usually red)
+                                                          onPress: () => deleteData(i.id),
+                                                          },
+                                                      ])
+                                                  } style={{marginHorizontal: 10}} >
                                                       <Icon
                                                         name="trash"
                                                         size={24}
@@ -237,6 +351,9 @@ export default function FinancialRecord(){
                 </View>
               </View>
           </View>
+          <BottomBar></BottomBar>
       </View>
     );
 }
+
+

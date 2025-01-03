@@ -3,7 +3,7 @@ import React, {useState, useContext} from 'react';
 import { SafeAreaView, KeyboardAvoidingView, Alert, StyleSheet, Text, View, Platform, TextInput, Button, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import styles from '../styles';
 import { auth, database } from '../firebase';
-import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword} from "firebase/auth";
+import { signInWithEmailAndPassword} from "firebase/auth";
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../UserContext';
 
@@ -42,20 +42,17 @@ export default function Login(){
 
     return (
         <KeyboardAvoidingView 
-                  style={styles.container3}
-                  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            style={styles.container3}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
                 <Text style={styles.text}>
                     Welcome{"\n"}
-                    to Our Apps!
+                    to WeGig!
                 </Text>
                 <StatusBar style="auto" />
                 <View style={styles.container2}>
-
-                    <Text style={styles.labelInput}>
-                        Email Address
-                    </Text>
+                    <Text style={styles.labelInput}>Email Address</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Example : user123@mail.com"
@@ -63,9 +60,7 @@ export default function Login(){
                         onChangeText={setEmail}
                     />
 
-                    <Text style={styles.labelInput}>
-                        Password    
-                    </Text>
+                    <Text style={styles.labelInput}>Password</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Enter your password"
@@ -74,11 +69,11 @@ export default function Login(){
                         onChangeText={setPw}
                     />
                     {/* <Button title="Click Me"></Button> */}
-                    <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                    <TouchableOpacity style={styles.button} onPress={()=>{handleSubmit(), navi.navigate('LoginSuccessful')}}>
                         <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Log in</Text>
                     </TouchableOpacity>
                     <Text style={styles.texttosignin}>No account?  
-                        <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('FinancialRecord')}> Sign up now!</Text>
+                        <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Register')}> Sign up now!</Text>
                     </Text>
                     <Text style={styles.texttosignin}>
                         Forgot Password?

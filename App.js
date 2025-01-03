@@ -11,6 +11,8 @@ import CreatePost from './component/CreatePost';
 import FinanceManager from './component/FinanceManager';
 import CreateFinanceRecord from './component/CreateFinanceRecord';
 import FinancialRecord from './component/FinancialRecord';
+import LoginSuccessful from './component/LoginSuccessful';
+import SignupSuccessful from './component/SignupSuccessful';
 
 const Stack = createStackNavigator();
 
@@ -20,7 +22,9 @@ const App = () => {
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Register" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Register" component={Register} />
+          <Stack.Screen name="SignupSuccessful" component={SignupSuccessful} />
           <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="LoginSuccessful" component={LoginSuccessful} />
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="Forum" component={Forum} />
           <Stack.Screen name="CreatePost" component={CreatePost} />

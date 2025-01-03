@@ -88,78 +88,71 @@ export default function Register(){
           style={styles.container3}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           >
-          <View style={{}}>
-
-          </View>
         <View style={styles.container}>
-          <ScrollView>
             <Text style={styles.text}>Create Your
-            Account
+              Account
             </Text>
-
-            <StatusBar style="auto" />
+            <StatusBar style="auto"/>
             <View style={styles.container2}>
 
-            <Text style={styles.labelInput}>
-                Username
-            </Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Example : Ali bin Abu"
-                value={username}
-                onChangeText={setUsername}
-            />
+              <Text style={styles.labelInput}>
+                  Username
+              </Text>
+              <TextInput
+                  style={styles.input}
+                  placeholder="Example : Ali bin Abu"
+                  value={username}
+                  onChangeText={setUsername}
+              />
 
-            <Text style={styles.labelInput}>
-                Email Address
-            </Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Example : user123@mail.com"
-                value={email}
-                onChangeText={setEmail}
-            />
+              <Text style={styles.labelInput}>
+                  Email Address
+              </Text>
+              <TextInput
+                  style={styles.input}
+                  placeholder="Example : user123@mail.com"
+                  value={email}
+                  onChangeText={setEmail}
+              />
 
-            <Text style={styles.labelInput}>
-                NRIC ID
-            </Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Example : 030108011234"
-                value={idNo}
-                onChangeText={setIdNo}
-            /> 
+              <Text style={styles.labelInput}>
+                  NRIC ID
+              </Text>
+              <TextInput
+                  style={styles.input}
+                  placeholder="Example : 030108011234"
+                  value={idNo}
+                  onChangeText={setIdNo}
+              /> 
 
-            <Text style={styles.labelInput}>
-                Password    
-            </Text>
-            <TextInput
-                style={styles.input}
-                secureTextEntry={true} 
-                placeholder="Enter your password"
-                value={password}
-                onChangeText={setPassword}
-            /> 
+              <Text style={styles.labelInput}>
+                  Password    
+              </Text>
+              <TextInput
+                  style={styles.input}
+                  secureTextEntry={true} 
+                  placeholder="Enter your password"
+                  value={password}
+                  onChangeText={setPassword}
+              /> 
 
-            <Text style={styles.labelInput}>
-                        Confirm Password
-            </Text>
-            <TextInput
-                style={styles.input}
-                secureTextEntry={true} 
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-            />
-            {/* <Button title="Click Me"></Button> */}
-            <TouchableOpacity style={styles.button} onPress={handleAuthentication}>
-                <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Register</Text>
-            </TouchableOpacity>
-            <Text style={styles.texttosignin}>Already have an account?  
-                <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Login')}> Jump to Sign In!</Text>
-            </Text>
+              <Text style={styles.labelInput}>
+                          Confirm Password
+              </Text>
+              <TextInput
+                  style={styles.input}
+                  secureTextEntry={true} 
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+              />
+              <TouchableOpacity style={styles.button} onPress={()=>{handleAuthentication(), navi.navigate('LoginSuccessful')}}>
+                  <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Register</Text>
+              </TouchableOpacity>
+              <Text style={styles.texttosignin}>Already have an account?  
+                  <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Login')}> Jump to Sign In!</Text>
+              </Text>
             </View>
-            </ScrollView>
         </View>
         </KeyboardAvoidingView>
     );

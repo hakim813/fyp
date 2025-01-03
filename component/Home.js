@@ -1,4 +1,4 @@
-import { SafeAreaView, Alert, StyleSheet, Text, View, Platform, TextInput, Button, TouchableOpacity } from 'react-native';
+import { SafeAreaView, Alert, StyleSheet, Text, View, Platform, TextInput, Button, TouchableOpacity, ScrollView } from 'react-native';
 import { UserContext } from '../UserContext';
 import { auth } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
@@ -6,6 +6,7 @@ import {stylesHome, styles} from '../styles';
 import React, { useContext, useState, useEffect } from 'react';
 import { ref, set, push, getDatabase, get, child } from "firebase/database";
 import Icon from "react-native-vector-icons/FontAwesome";
+import BottomBar from './BottomBar';
 
 export default function Home(){
     const { user, setUser } = useContext(UserContext);
@@ -37,7 +38,7 @@ export default function Home(){
             setLoading(false); // Stop loading once data is fetched
           }
         };
-    
+
         if (user) {
           fetchUserName();
         }
@@ -80,53 +81,66 @@ export default function Home(){
 
     return (
         <View style={[stylesHome.bg,{paddingTop: 0, backgroundColor: 'white', alignItems: 'center'}]}>
-          <View style={{width: '150%', height: 220, backgroundColor: 'pink', paddingVertical: 0, borderBottomLeftRadius: 350, borderBottomRightRadius: 350, alignItems: 'center', justifyContent: 'center',}}>
+          <View style={{width: '150%', height: 300, backgroundColor: '#1b434d', paddingVertical: 0, borderBottomLeftRadius: 250, borderBottomRightRadius: 250, alignItems: 'center', justifyContent: 'center',}}>
             {detail ? (
                 <>
-                <Text style={[stylesHome.welcomeText, {color: 'white'}]}>{getGreeting()},{"\n"}{detail.username}</Text>
+                <Text style={[styles.text]}>{getGreeting()}, {"\n"}{detail.username}!</Text>
                 </>
             ) : (
                 <Text>Home</Text>
             )}
           </View>
-
-          <View style={{flexDirection: 'row', backgroundColor: 'red', width: '100%', height: 180, marginTop: 15, marginHorizontal: 30 }}>
-              <TouchableOpacity style={[stylesHome.button, {backgroundColor: 'pink'}]} onPress={()=>navi.navigate('Forum')}>
-                  <Text style={{color: '#030303', fontWeight: 'bold'}}>Forum</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[stylesHome.button, {backgroundColor: 'pink'}]} onPress={()=>navi.navigate('FinanceManager')}>
-                  <Text style={{color: '#030303', fontWeight: 'bold'}}>SP</Text>
-              </TouchableOpacity>
+          <View style={{ width: '100%', height: 280, paddingLeft: 10, marginTop: 15, marginHorizontal: 30 }}>
+              <Text style={{ fontWeight: 'bold', fontSize: 25}}>Features</Text>
+              <ScrollView horizontal>
+                <TouchableOpacity style={[stylesHome.features, {backgroundColor: '#D3C2F8'}]} onPress={()=>navi.navigate('Forum')}>
+                    <View style={{height: 60, width: 60, backgroundColor: '#fafafa', borderRadius: 15, alignItems:'center', justifyContent: 'center', marginBottom: 60}}>
+                      <Icon
+                        name="commenting"
+                        size={40}
+                        color={'#1b434d'}
+                      />
+                    </View>
+                    <View style={{alignItems: 'center'}}><Text style={{color: '#1b434d', fontWeight: 'bold', fontSize: 25}}>Forum</Text></View>
+                </TouchableOpacity>
+                <TouchableOpacity style={[stylesHome.features, {backgroundColor: '#FAE2C8'}]} onPress={()=>navi.navigate('FinanceManager')}>
+                  <View style={{height: 60, width: 60, backgroundColor: 'white', borderRadius: 15, alignItems:'center', justifyContent: 'center', marginBottom: 60}}>
+                        <Icon
+                          name="money"
+                          size={40}
+                          color={'#1b434d'}
+                        />
+                      </View>
+                      <View style={{alignItems: 'center'}}><Text style={{color: '#1b434d', fontWeight: 'bold', fontSize: 25}}>Finance</Text></View>
+                </TouchableOpacity>
+                <TouchableOpacity style={[stylesHome.features, {backgroundColor: '#CDF464'}]}>
+                  <View style={{height: 60, width: 60, backgroundColor: 'white', borderRadius: 15, alignItems:'center', justifyContent: 'center', marginBottom: 60}}>
+                      <Icon
+                        name="question-circle-o"
+                        size={40}
+                        color={'#1b434d'}
+                      />
+                    </View>
+                    <View style={{alignItems: 'center'}}><Text style={{color: '#1b434d', fontWeight: 'bold', fontSize: 25}}>Helpdesk</Text></View>
+                </TouchableOpacity>
+              </ScrollView>
+              
           </View>
 
-          <View style={{backgroundColor: 'yellow', width: '100%', height: 300, marginTop: 15, marginHorizontal: 30 }}>
-            <Text>Flatlist for image slider?</Text>
+          <View style={{ width: '100%', height: 200,  paddingLeft: 10, marginHorizontal: 30 }}>
+          <Text style={{ fontWeight: 'bold', fontSize: 25}}>Informations</Text>
+              <ScrollView horizontal>
+                <TouchableOpacity style={[stylesHome.imageSlider]} onPress={()=>navi.navigate('Forum')}>
+                    <View style={{alignItems: 'center'}}><Text style={{color: '#fdfdfd', fontWeight: 'bold', fontSize: 25}}>Image 1</Text></View>
+                </TouchableOpacity>
+                <TouchableOpacity style={[stylesHome.imageSlider]} onPress={()=>navi.navigate('FinanceManager')}>
+                  
+                      <View style={{alignItems: 'center'}}><Text style={{color: '#fdfdfd', fontWeight: 'bold', fontSize: 25}}>Image 2</Text></View>
+                </TouchableOpacity>
+              </ScrollView>
           </View>
-
-          <View>
-            {/* <TouchableOpacity style={stylesHome.button} onPress={()=>navi.navigate('Forum')}>
-                <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Forum</Text>
-            </TouchableOpacity> */}
-          </View>
-
-          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingHorizontal: 25, marginTop: 'auto', height: 100, width: '100%', backgroundColor: 'pink'}}>
-            <TouchableOpacity style={{justifyContent: 'center', backgroundColor: 'yellow'}}>
-              <Icon
-              name="home"
-              size={40}
-              color={'red'} // Change color based on isUpvoted
-              />
-              <Text>Home</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{justifyContent: 'center', backgroundColor: 'yellow'}}>
-              <Icon
-              name="user"
-              size={40}
-              color={'red'} // Change color based on isUpvoted
-              />
-              <Text>Profile</Text>
-            </TouchableOpacity>
-          </View>
+          
+          <BottomBar></BottomBar>
         </View>
     );
 }

@@ -134,10 +134,10 @@ export default function CreatePost(){
                     </View>
                     
                     <View style={{flexDirection: 'row'}}>
-                        <TouchableOpacity onPress={pickImage} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#296746', borderRadius: 25}]} >
+                        <TouchableOpacity onPress={pickImage} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#1b434d', borderRadius: 25}]} >
                             <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Attach Media</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity  onPress={writeData} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#296746', borderRadius: 25}]} >
+                        <TouchableOpacity  onPress={writeData} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#1b434d', borderRadius: 25}]} >
                             <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Submit Post</Text>
                         </TouchableOpacity>
                     </View>
