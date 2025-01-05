@@ -20,7 +20,7 @@ export default function BottomBar(){
                     />
                     <Text style={{color: 'white'}}>Home</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=>navi.navigate('Home')} style={{justifyContent: 'center', alignItems: 'center'}}>
+                <TouchableOpacity onPress={()=>navi.navigate('Profile')} style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Icon
                     name="user"
                     size={40}

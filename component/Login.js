@@ -27,7 +27,7 @@ export default function Login(){
                 setUser(user);
 
                 console.log('Logged in');
-                navi.navigate('Home');
+                navi.navigate('LoginSuccessful')
             }
           } catch (error) {
             console.error("Error during login:", error.message);
@@ -69,13 +69,13 @@ export default function Login(){
                         onChangeText={setPw}
                     />
                     {/* <Button title="Click Me"></Button> */}
-                    <TouchableOpacity style={styles.button} onPress={()=>{handleSubmit(), navi.navigate('LoginSuccessful')}}>
+                    <TouchableOpacity style={styles.button} onPress={()=>{handleSubmit()}}>
                         <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Log in</Text>
                     </TouchableOpacity>
                     <Text style={styles.texttosignin}>No account?  
                         <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Register')}> Sign up now!</Text>
                     </Text>
-                    <Text style={styles.texttosignin}>
+                    <Text style={styles.texttosignin} onPress={()=>{navi.navigate('ForgotPassword')}}>
                         Forgot Password?
                     </Text>
                 </View>

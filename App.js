@@ -13,6 +13,8 @@ import CreateFinanceRecord from './component/CreateFinanceRecord';
 import FinancialRecord from './component/FinancialRecord';
 import LoginSuccessful from './component/LoginSuccessful';
 import SignupSuccessful from './component/SignupSuccessful';
+import ForgotPassword from './component/ForgotPassword';
+import Profile from './component/Profile';
 
 const Stack = createStackNavigator();
 
@@ -24,6 +26,7 @@ const App = () => {
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="SignupSuccessful" component={SignupSuccessful} />
           <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
           <Stack.Screen name="LoginSuccessful" component={LoginSuccessful} />
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="Forum" component={Forum} />
@@ -31,6 +34,7 @@ const App = () => {
           <Stack.Screen name="FinanceManager" component={FinanceManager} />
           <Stack.Screen name="CreateFinanceRecord" component={CreateFinanceRecord} />
           <Stack.Screen name="FinancialRecord" component={FinancialRecord} />
+          <Stack.Screen name="Profile" component={Profile} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>

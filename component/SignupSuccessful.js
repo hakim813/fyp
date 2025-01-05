@@ -8,7 +8,7 @@ export default function SignupSuccessful(){
 
     useEffect(() => {
         const timer = setTimeout(() => {
-          navi.navigate('Home');
+          navi.navigate('Login');
         }, 5000);
     
         return () => clearTimeout(timer); // Cleanup timer

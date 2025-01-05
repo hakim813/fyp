@@ -72,12 +72,9 @@ export default function Register(){
               const userCredential = await createUserWithEmailAndPassword(auth, email, password);
               const user = userCredential.user;
               writeData(user, idNo, username);
-              navi.navigate('Login');
+              navi.navigate('SignupSuccessful')
             }
 
-            // await sendEmailVerification(user);
-            // console.log('Verification email sent to:', user.email);
-            // writeData(user, idNo);
         } catch (error) {
           console.error('Authentication error:', error.message);
         }
@@ -146,7 +143,7 @@ export default function Register(){
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
               />
-              <TouchableOpacity style={styles.button} onPress={()=>{handleAuthentication(), navi.navigate('LoginSuccessful')}}>
+              <TouchableOpacity style={styles.button} onPress={()=>{handleAuthentication()}}>
                   <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Register</Text>
               </TouchableOpacity>
               <Text style={styles.texttosignin}>Already have an account?  
