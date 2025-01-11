@@ -15,6 +15,7 @@ import LoginSuccessful from './component/LoginSuccessful';
 import SignupSuccessful from './component/SignupSuccessful';
 import ForgotPassword from './component/ForgotPassword';
 import Profile from './component/Profile';
+import SignoutSuccessful from './component/SignoutSuccessful';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,7 @@ const App = () => {
           <Stack.Screen name="CreateFinanceRecord" component={CreateFinanceRecord} />
           <Stack.Screen name="FinancialRecord" component={FinancialRecord} />
           <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen name="SignoutSuccessful" component={SignoutSuccessful} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>

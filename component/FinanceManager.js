@@ -156,6 +156,8 @@ export default function FinanceManager(){
                   textSize={16}
                   innerRadius={130}
                   radius={170}
+                  isAnimated={true}
+                    animationDuration={2000} 
                   />
                   <View style={{height: 100, position: 'absolute', alignItems: 'center', justifyContent: 'center'}}>
                     <Text style={{fontWeight: 'bold', fontSize: 25}}>Daily net profit</Text>
@@ -199,6 +201,8 @@ export default function FinanceManager(){
                     showText
                     textSize={16}
                     innerRadius={130}
+                    isAnimated
+                    animationDuration={2000} 
                     radius={170}
                     />
                     <View style={{height: 100, position: 'absolute', alignItems: 'center', justifyContent: 'center'}}>

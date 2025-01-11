@@ -1,14 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState, useContext} from 'react';
-import { SafeAreaView, KeyboardAvoidingView, Alert, StyleSheet, Text, View, Platform, TextInput, Button, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import React, {useState, useContext, useEffect} from 'react';
+import { Alert, Text, View, TextInput, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import styles from '../styles';
-import { auth, database } from '../firebase';
+import { auth } from '../firebase';
 import { signInWithEmailAndPassword} from "firebase/auth";
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../UserContext';
 
 export default function Login(){
-    console.log('Login page');
+
+    useEffect(() => { //verify only console log once when loggeed in
+        console.log('Login page');
+      }, []);
 
     const [email, setEmail] = useState('test@gmail.com');
     const [pw, setPw] = useState('test123');
@@ -17,11 +20,11 @@ export default function Login(){
 
     const handleSubmit = async () => {
         try {
+            //verify no missing 
             if(email == '' || pw == ''){
                 Alert.alert(`Please fill in the field.`);
             }
-    
-            else{
+            else{ //if okay, user can login
                 const userCredential = await signInWithEmailAndPassword(auth, email, pw);
                 const user = userCredential.user;
                 setUser(user);
@@ -32,23 +35,19 @@ export default function Login(){
           } catch (error) {
             console.error("Error during login:", error.message);
             Alert.alert("Error", error.message=="Firebase: Error (auth/invalid-credential)."? "Invalid credential" : error.message);
-          }
-        
-
-        
+          }        
     };
 
     // const [inputValue, setInputValue] = useState('');
 
     return (
-        <KeyboardAvoidingView 
+        <View 
             style={styles.container3}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
                 <Text style={styles.text}>
-                    Welcome{"\n"}
-                    to WeGig!
+                    Welcome{"\n"}to WeGig!
                 </Text>
                 <StatusBar style="auto" />
                 <View style={styles.container2}>
@@ -81,6 +80,6 @@ export default function Login(){
                 </View>
             </View>
             </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
+        </View>
     );
 }

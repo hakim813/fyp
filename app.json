@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "firebase_auth_tutorial",
-    "slug": "firebase_auth_tutorial",
+    "name": "we_gig",
+    "slug": "we_gig",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/favicon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/favicon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "assetBundlePatterns": [
       "**/*"

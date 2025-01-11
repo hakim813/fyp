@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {useState} from 'react';
-import { SafeAreaView, Alert, StyleSheet, Text, View, Platform, TextInput, Button, TouchableOpacity, KeyboardAvoidingView, ScrollView } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { Alert, Text, View, Platform, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView } from 'react-native';
 import styles from '../styles';
 import { useNavigation } from '@react-navigation/native';
 import { auth, database } from '../firebase';
-import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged } from "firebase/auth";
-import { ref, set, push, getDatabase, get, child } from "firebase/database";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { ref, set, getDatabase, get, child } from "firebase/database";
 
 const writeData = (user, idNo, username) => {
   const usersRef = ref(database, 'users/' + user.uid); // Parent path where data will be stored
@@ -27,14 +27,17 @@ export default function Register(){
     const [confirmPassword, setConfirmPassword] = useState('');
     const navi = useNavigation();
 
-    console.log('Signup page');
+    useEffect(() => {
+      console.log('Signup page');
+    }, []);
 
     const handleAuthentication = async () => {
         try {
             // const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             // const user = userCredential.user;
             
-            if(!username || !email || !idNo || !password || !confirmPassword){
+            //ensuring no missing field when submit
+            if(!username || !email || !idNo || !password || !confirmPassword){ 
               Alert.alert("Fill in the field.");
               console.log("Email:     ", email? email:'missing');
               console.log("NRIC:      ", idNo?idNo:'missing');
@@ -43,114 +46,181 @@ export default function Register(){
               return;
             }
 
+             //verify the password and confirm password match
             if(password!=confirmPassword){
-              Alert.alert("Password and confirmed password doesnt match.");
+              Alert.alert("Password doesn't match.");
               return;
             }
 
-            const db = getDatabase(); // Initialize Firebase Realtime Database
-            const dbRef = ref(db); // Reference to the database
+            //firebase config
+            const db = getDatabase();
+            const dbRef = ref(db);
             const snapshot = await get(child(dbRef, 'users'));
 
             if (snapshot.exists()) {
               const users = snapshot.val(); // Get all users from the database
-              const existingUser = Object.values(users).find(user => user.nricId === idNo); // Check if any user has the same NRIC
+              const idExist = Object.values(users).find(user => user.nricId === idNo); // Check if any user has the same NRIC
+              const emailExist = Object.values(users).find(user => user.email === email); // Check if any user has the same email
           
-              if (existingUser) {
-                // If a user with the same NRIC exists
-                Alert.alert("NRIC already exists. Please use a different one.");
+              // If a user with the same email exists
+              if (emailExist){
+                Alert.alert("Email already taken. Please use a different one.");
+                return;
+              }
+              // If a user with the same NRIC exists
+              else if (idExist) {
+                Alert.alert("NRIC already taken. Please use a different one.");
                 return;
               }
               else{
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password); //use firebase func to auth user
                 const user = userCredential.user;
                 writeData(user, idNo, username);
-                navi.navigate('Login');
+                navi.navigate('SignupSuccessful');
               }
             }
-            else{
-              const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-              const user = userCredential.user;
-              writeData(user, idNo, username);
-              navi.navigate('SignupSuccessful')
-            }
+            // else{
+            //   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            //   const user = userCredential.user;
+            //   writeData(user, idNo, username);
+            //   navi.navigate('SignupSuccessful')
+            // }
 
         } catch (error) {
           console.error('Authentication error:', error.message);
         }
       };
 
+    // return (
+    //       <View style={styles.container}>
+    //           <Text style={styles.text}>Create Your
+    //             Account
+    //           </Text>
+    //           <StatusBar style="auto"/>
+    //           <KeyboardAvoidingView style={styles.container2} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    //             <Text style={styles.labelInput}>
+    //               Username
+    //             </Text>
+    //             <TextInput
+    //               style={styles.input}
+    //               placeholder="Example : Ali bin Abu"
+    //               value={username}
+    //               onChangeText={setUsername}
+    //             />
+
+    //             <Text style={styles.labelInput}>
+    //               Email Address
+    //             </Text>
+    //             <TextInput
+    //               style={styles.input}
+    //               placeholder="Example : user123@mail.com"
+    //               value={email}
+    //               onChangeText={setEmail}
+    //             />
+
+    //             <Text style={styles.labelInput}>
+    //               NRIC ID
+    //             </Text>
+    //             <TextInput
+    //               style={styles.input}
+    //               placeholder="Example : 030108011234"
+    //               value={idNo}
+    //               onChangeText={setIdNo}
+    //             /> 
+
+    //             <Text style={styles.labelInput}>
+    //               Password    
+    //             </Text>
+    //             <TextInput
+    //               style={styles.input}
+    //               secureTextEntry={true} 
+    //               placeholder="Enter your password"
+    //               value={password}
+    //               onChangeText={setPassword}
+    //             /> 
+
+    //             <Text style={styles.labelInput}>
+    //                 Confirm Password
+    //             </Text>
+    //             <TextInput
+    //               style={styles.input}
+    //               secureTextEntry={true} 
+    //               placeholder="Confirm your password"
+    //               value={confirmPassword}
+    //               onChangeText={setConfirmPassword}
+    //             />
+    //             <TouchableOpacity style={styles.button} onPress={()=>{handleAuthentication()}}>
+    //                 <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Register</Text>
+    //             </TouchableOpacity>
+    //             <Text style={styles.texttosignin}>Already have an account?  
+    //                 <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Login')}> Jump to Sign In!</Text>
+    //             </Text>
+    //           </KeyboardAvoidingView>
+    //       </View>
+    // );
+
     return (
-        <KeyboardAvoidingView 
-          style={styles.container3}
+      <View style={styles.container}>
+        <Text style={styles.text}>Create Your Account</Text>
+        <StatusBar style="auto" />
+        <KeyboardAvoidingView
+          style={[styles.container2]}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          >
-        <View style={styles.container}>
-            <Text style={styles.text}>Create Your
-              Account
+        >
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+            <Text style={styles.labelInput}>Username</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Example : Ali bin Abu"
+              value={username}
+              onChangeText={setUsername}
+            />
+    
+            <Text style={styles.labelInput}>Email Address</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Example : user123@mail.com"
+              value={email}
+              onChangeText={setEmail}
+            />
+    
+            <Text style={styles.labelInput}>NRIC ID</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Example : 030108011234"
+              value={idNo}
+              onChangeText={setIdNo}
+            />
+    
+            <Text style={styles.labelInput}>Password</Text>
+            <TextInput
+              style={styles.input}
+              secureTextEntry={true}
+              placeholder="Enter your password"
+              value={password}
+              onChangeText={setPassword}
+            />
+    
+            <Text style={styles.labelInput}>Confirm Password</Text>
+            <TextInput
+              style={styles.input}
+              secureTextEntry={true}
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+    
+            <TouchableOpacity style={styles.button} onPress={() => handleAuthentication()}>
+              <Text style={{ color: '#fdfdfd', fontWeight: 'bold' }}>Register</Text>
+            </TouchableOpacity>
+            <Text style={styles.texttosignin}>
+              Already have an account?{' '}
+              <Text style={{ fontWeight: 'bold' }} onPress={() => navi.navigate('Login')}>
+                Jump to Sign In!
+              </Text>
             </Text>
-            <StatusBar style="auto"/>
-            <View style={styles.container2}>
-
-              <Text style={styles.labelInput}>
-                  Username
-              </Text>
-              <TextInput
-                  style={styles.input}
-                  placeholder="Example : Ali bin Abu"
-                  value={username}
-                  onChangeText={setUsername}
-              />
-
-              <Text style={styles.labelInput}>
-                  Email Address
-              </Text>
-              <TextInput
-                  style={styles.input}
-                  placeholder="Example : user123@mail.com"
-                  value={email}
-                  onChangeText={setEmail}
-              />
-
-              <Text style={styles.labelInput}>
-                  NRIC ID
-              </Text>
-              <TextInput
-                  style={styles.input}
-                  placeholder="Example : 030108011234"
-                  value={idNo}
-                  onChangeText={setIdNo}
-              /> 
-
-              <Text style={styles.labelInput}>
-                  Password    
-              </Text>
-              <TextInput
-                  style={styles.input}
-                  secureTextEntry={true} 
-                  placeholder="Enter your password"
-                  value={password}
-                  onChangeText={setPassword}
-              /> 
-
-              <Text style={styles.labelInput}>
-                          Confirm Password
-              </Text>
-              <TextInput
-                  style={styles.input}
-                  secureTextEntry={true} 
-                  placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-              />
-              <TouchableOpacity style={styles.button} onPress={()=>{handleAuthentication()}}>
-                  <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Register</Text>
-              </TouchableOpacity>
-              <Text style={styles.texttosignin}>Already have an account?  
-                  <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Login')}> Jump to Sign In!</Text>
-              </Text>
-            </View>
-        </View>
+          </ScrollView>
         </KeyboardAvoidingView>
-    );
+      </View>
+    );    
 }

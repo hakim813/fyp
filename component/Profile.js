@@ -1,11 +1,11 @@
-    import { SafeAreaView, Alert, StyleSheet, Text, View, Platform, TextInput, Button, TouchableOpacity, ScrollView } from 'react-native';
+    import { Text, View, TouchableOpacity, ScrollView } from 'react-native';
     import { UserContext } from '../UserContext';
     import { auth } from '../firebase';
     import { useNavigation } from '@react-navigation/native';
     import {stylesHome, styles} from '../styles';
     import React, { useContext, useState, useEffect } from 'react';
     import { ref, set, push, getDatabase, get, child } from "firebase/database";
-    import Icon from "react-native-vector-icons/FontAwesome";
+    // import Icon from "react-native-vector-icons/FontAwesome";
     import BottomBar from './BottomBar';
 
     export default function Profile(){
@@ -23,7 +23,7 @@
                 if (snapshot.exists()) {
                 const users = snapshot.val();
                 const existingUser = Object.values(users).find(u => u.email === user.email); // Match email
-                console.log('USer found!')
+                console.log('User found!')
                 setDetail(existingUser);
         
                 //   if (existingUser) {
@@ -42,10 +42,8 @@
             if (user) {
             fetchUserName();
             }
-        }, [user]); // Run the effect only when the `user` changes
+        }, [user]); 
 
-        
-        
         const handleLogout = () => {
             setUser(null); // Clear user data from context
             setDetail(null);
@@ -67,30 +65,28 @@
                 )}
                 
             </View>
-            
+        
 
-                <View style={{ width: '100%', height: 200, paddingLeft: 10, marginHorizontal: 30, alignItems: 'center' }}>
-                    {detail ? (
-                        <>
-                        <Text style={{ marginTop: 50, marginBottom: 15 }}>Username: {detail.username}</Text>
-                        <Text style={{ marginBottom: 15 }}>Email: {detail.email}</Text>
-                        </>
-                    ) : (
-                        <Text>Loading user details...</Text>
-                    )}
-                    <TouchableOpacity
-                        style={[styles.button, { backgroundColor: 'red' }]}
-                        onPress={() => {
-                        handleLogout();
-                        navi.navigate('Login'); // Correct navigation after logout
-                        }}
-                    >
-                        <Text style={{ color: '#fdfdfd', fontWeight: 'bold' }}>Sign Out</Text>
-                    </TouchableOpacity>
-                </View>
-
-            
-            <BottomBar></BottomBar>
+                    <View style={{ width: '100%', height: 200, paddingLeft: 10, marginHorizontal: 30, alignItems: 'center' }}>
+                        {detail ? (
+                            <>
+                            <Text style={{ marginTop: 50, marginBottom: 15 }}>Username: {detail.username}</Text>
+                            <Text style={{ marginBottom: 15 }}>Email: {detail.email}</Text>
+                            </>
+                        ) : (
+                            <Text>Loading user details...</Text>
+                        )}
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: 'red' }]}
+                            onPress={() => {
+                            handleLogout();
+                            navi.navigate('SignoutSuccessful'); // Correct navigation after logout
+                            }}
+                        >
+                            <Text style={{ color: '#fdfdfd', fontWeight: 'bold' }}>Sign Out</Text>
+                        </TouchableOpacity>
+                    </View>
+                <BottomBar></BottomBar>
             </View>
         );
     }

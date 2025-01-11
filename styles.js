@@ -62,10 +62,11 @@ container: {
 
   input: {
     height: 50,
-    borderWidth: 0.2,
+    borderWidth: 0.5,
     borderRadius: 15,
+    borderColor: 'grey',
     paddingHorizontal: 15,
-    backgroundColor: '#dedede',
+    backgroundColor: '#fdfdfd',
     marginTop: 10,
     marginBottom: 18
   },

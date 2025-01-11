@@ -13,7 +13,7 @@ export default function CreateFinanceRecord({route}){
 
 
     const {type} = route.params;
-    const [value, setValue] = useState(null);
+    const [value, setValue] = useState(0);
     const [notes, setNotes] = useState("-");
     const { user} = useContext(UserContext);
     const navi = useNavigation();
@@ -24,34 +24,60 @@ export default function CreateFinanceRecord({route}){
         const recordRef = ref(database, `financeRecords/${existingId}`); // Parent path where data will be stored
         // const newRecordRef = push(recordRef);
 
-        update(recordRef, {
-            email: user.email,
-            type: type,
-            value: value,
-            notes: notes,
-            date: serverTimestamp()
-        })
-            .then(() => {
-                (type == "Expense" ? console.log("Expense recorded.") : console.log("Income recorded.") )
+            // Parse and validate value
+        const numericValue = parseFloat(value);
+
+        if (isNaN(numericValue) || value.trim() === "") {
+            Alert.alert("Please enter a valid number.");
+            return;
+        } else if (numericValue <= 0) {
+            Alert.alert("Invalid value. Please enter a positive number.");
+            return;
+        } else {
+            update(recordRef, {
+                email: user.email,
+                type: type,
+                value: value,
+                notes: notes,
+                date: serverTimestamp()
             })
-            .catch(error => console.error('Error writing data: ', error));
+                .then(() => {
+                    (type == "Expense" ? console.log("Expense recorded.") : console.log("Income recorded.") )
+                })
+                .catch(error => console.error('Error writing data: ', error));
+
+            navi.navigate("FinanceManager")
+        }
     };
 
     const writeData = async() => {
         const recordRef = ref(database, 'financeRecords/'); // Parent path where data will be stored
         const newRecordRef = push(recordRef);
+        
+        // Parse and validate value
+    const numericValue = parseFloat(value);
 
+    if (isNaN(numericValue) || value.trim() === "") {
+        Alert.alert("Please enter a valid number.");
+        return;
+    } else if (numericValue <= 0) {
+        Alert.alert("Invalid value. Please enter a positive number.");
+        return;
+    } else {
         set(newRecordRef, {
             email: user.email,
             type: type,
-            value: value,
+            value: numericValue, // Use the parsed numeric value
             notes: notes,
             date: serverTimestamp()
         })
             .then(() => {
-                (type == "Expense" ? console.log("Expense recorded.") : console.log("Income recorded.") )
+                console.log(type === "Expense" ? "Expense recorded." : "Income recorded.");
             })
             .catch(error => console.error('Error writing data: ', error));
+
+        navi.navigate("FinanceManager");
+    }
     };
 
     return(
@@ -68,7 +94,7 @@ export default function CreateFinanceRecord({route}){
                             Type
                         </Text>
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, {fontWeight: 'bold'}]}
                             placeholder="Title"
                             value={type}
                         />
@@ -97,7 +123,7 @@ export default function CreateFinanceRecord({route}){
                     </View>
                     
                     <View style={{flexDirection: 'row'}}>
-                        <TouchableOpacity onPress={()=>{(id == null ? writeData() : updateData(id)), navi.navigate("FinancialRecord")}} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#296746', borderRadius: 25}]} >
+                        <TouchableOpacity onPress={()=>{(id == null ? writeData() : updateData(id))}} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#296746', borderRadius: 25}]} >
                             <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Record Expense</Text>
                         </TouchableOpacity>
                     </View>

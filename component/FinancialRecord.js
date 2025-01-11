@@ -163,11 +163,11 @@ export default function FinancialRecord(){
               <Text style={[styles.text]}>Expense Record</Text>
               <StatusBar style="auto" />
               <View style={[styles.container2]}>
-                <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                <View style={{flexDirection: 'row',  marginBottom: 15,  justifyContent: 'center', alignItems: 'center'}}>
                   <Text style={{marginLeft: 'auto', fontWeight: 'bold'}}>Daily</Text>
-                  <Switch style={{marginHorizontal: 10, color: '#fdfdfd',fontWeight: 'bold'}}
-                    trackColor={{false: '#767577', true: '#81b0ff'}}
-                    thumbColor={isMonthlyView ? '#f5dd4b' : '#f4f3f4'}
+                  <Switch style={{marginHorizontal: 10,color: '#fdfdfd',fontWeight: 'bold'}}
+                    trackColor={{false: '#fdfdfd', true: '#81b0ff'}}
+                    thumbColor={isMonthlyView ? '#1b434d' : '#81b0ff'}
                     ios_backgroundColor="#3e3e3e"
                     value={isMonthlyView}
                     onValueChange={(value) => setIsMonthlyView(value)}

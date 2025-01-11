@@ -448,10 +448,10 @@ export default function Forum(){
         </TouchableOpacity>
             
             <BottomBar></BottomBar>
-            <TouchableOpacity onPress={()=>navi.navigate('CreatePost')} style={[ {position: 'absolute', bottom:20, right: '42%', alignSelf: 'center',paddingHorizontal: 25,marginTop: 10, paddingVertical: 15, backgroundColor: '#1b434d', borderRadius: 100, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+            <TouchableOpacity onPress={()=>navi.navigate('CreatePost')} style={[ {position: 'absolute', bottom:20, right: '42%', alignSelf: 'center',paddingHorizontal: 25,marginTop: 10, paddingVertical: 15, backgroundColor: '#81b0ff', borderRadius: 100, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.8,
                 shadowRadius: 3}]} >
-                  <Text style={{color: '#fdfdfd', fontWeight: '800', fontSize:30}}>+</Text>
+                  <Text style={{color: '#1b434d', fontWeight: '800', fontSize:30}}>+</Text>
             </TouchableOpacity>
             {isVisible && (
                     <View style={[styles.centeredView]}>
