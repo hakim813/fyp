@@ -60,16 +60,16 @@ container: {
     color: 'black'
   },
 
-  input: {
-    height: 50,
-    borderWidth: 0.5,
-    borderRadius: 15,
-    borderColor: 'grey',
-    paddingHorizontal: 15,
-    backgroundColor: '#fdfdfd',
-    marginTop: 10,
-    marginBottom: 18
-  },
+
+  // input: {
+  //   height: 50,
+  //   borderWidth: 0.5,
+  //   borderRadius: 15,
+  //   borderColor: 'grey',
+  //   paddingHorizontal: 15,
+  //   backgroundColor: '#fdfdfd',
+  //   marginTop: 10,
+  //   marginBottom: 18
 
   button: {
     backgroundColor: '#1b434d', // Set your desired background color

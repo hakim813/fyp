@@ -79,8 +79,8 @@
                         <TouchableOpacity
                             style={[styles.button, { backgroundColor: 'red' }]}
                             onPress={() => {
-                            handleLogout();
                             navi.navigate('SignoutSuccessful'); // Correct navigation after logout
+                            handleLogout();
                             }}
                         >
                             <Text style={{ color: '#fdfdfd', fontWeight: 'bold' }}>Sign Out</Text>

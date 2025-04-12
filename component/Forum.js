@@ -144,7 +144,7 @@ export default function Forum(){
           const postsRef = ref(db, "posts");
   
           // Listen to data changes in the "posts" node
-          const unsubscribePost = onValue(postsRef, (snapshot) => {
+          onValue(postsRef, (snapshot) => {
           const data = snapshot.val();
   
           if (data) {

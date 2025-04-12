@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, {useState, useEffect} from 'react';
 import { Alert, Text, View, Platform, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView } from 'react-native';
 import styles from '../styles';
+import { general } from '../general';
 import { useNavigation } from '@react-navigation/native';
 import { auth, database } from '../firebase';
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -91,119 +92,51 @@ export default function Register(){
         }
       };
 
-    // return (
-    //       <View style={styles.container}>
-    //           <Text style={styles.text}>Create Your
-    //             Account
-    //           </Text>
-    //           <StatusBar style="auto"/>
-    //           <KeyboardAvoidingView style={styles.container2} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-    //             <Text style={styles.labelInput}>
-    //               Username
-    //             </Text>
-    //             <TextInput
-    //               style={styles.input}
-    //               placeholder="Example : Ali bin Abu"
-    //               value={username}
-    //               onChangeText={setUsername}
-    //             />
-
-    //             <Text style={styles.labelInput}>
-    //               Email Address
-    //             </Text>
-    //             <TextInput
-    //               style={styles.input}
-    //               placeholder="Example : user123@mail.com"
-    //               value={email}
-    //               onChangeText={setEmail}
-    //             />
-
-    //             <Text style={styles.labelInput}>
-    //               NRIC ID
-    //             </Text>
-    //             <TextInput
-    //               style={styles.input}
-    //               placeholder="Example : 030108011234"
-    //               value={idNo}
-    //               onChangeText={setIdNo}
-    //             /> 
-
-    //             <Text style={styles.labelInput}>
-    //               Password    
-    //             </Text>
-    //             <TextInput
-    //               style={styles.input}
-    //               secureTextEntry={true} 
-    //               placeholder="Enter your password"
-    //               value={password}
-    //               onChangeText={setPassword}
-    //             /> 
-
-    //             <Text style={styles.labelInput}>
-    //                 Confirm Password
-    //             </Text>
-    //             <TextInput
-    //               style={styles.input}
-    //               secureTextEntry={true} 
-    //               placeholder="Confirm your password"
-    //               value={confirmPassword}
-    //               onChangeText={setConfirmPassword}
-    //             />
-    //             <TouchableOpacity style={styles.button} onPress={()=>{handleAuthentication()}}>
-    //                 <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Register</Text>
-    //             </TouchableOpacity>
-    //             <Text style={styles.texttosignin}>Already have an account?  
-    //                 <Text style={{fontWeight: 'bold'}} onPress={()=>navi.navigate('Login')}> Jump to Sign In!</Text>
-    //             </Text>
-    //           </KeyboardAvoidingView>
-    //       </View>
-    // );
-
     return (
       <View style={styles.container}>
         <Text style={styles.text}>Create Your Account</Text>
         <StatusBar style="auto" />
         <KeyboardAvoidingView
-          style={[styles.container2]}
+          style={[styles.container2, { opacity: 0.5}]}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
           <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-            <Text style={styles.labelInput}>Username</Text>
+            <Text style={general.labelInput}>Username</Text>
             <TextInput
-              style={styles.input}
+              style={general.input}
               placeholder="Example : Ali bin Abu"
               value={username}
               onChangeText={setUsername}
             />
     
-            <Text style={styles.labelInput}>Email Address</Text>
+            <Text style={general.labelInput}>Email Address</Text>
             <TextInput
-              style={styles.input}
+              style={general.input}
               placeholder="Example : user123@mail.com"
               value={email}
               onChangeText={setEmail}
             />
     
-            <Text style={styles.labelInput}>NRIC ID</Text>
+            <Text style={general.labelInput}>NRIC ID</Text>
             <TextInput
-              style={styles.input}
+              style={general.input}
               placeholder="Example : 030108011234"
               value={idNo}
               onChangeText={setIdNo}
             />
     
-            <Text style={styles.labelInput}>Password</Text>
+            <Text style={general.labelInput}>Password</Text>
             <TextInput
-              style={styles.input}
+              style={general.input}
               secureTextEntry={true}
               placeholder="Enter your password"
               value={password}
               onChangeText={setPassword}
             />
     
-            <Text style={styles.labelInput}>Confirm Password</Text>
+            <Text style={general.labelInput}>Confirm Password</Text>
             <TextInput
-              style={styles.input}
+              style={general.input}
               secureTextEntry={true}
               placeholder="Confirm your password"
               value={confirmPassword}
