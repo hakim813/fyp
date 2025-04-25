@@ -1,11 +1,11 @@
 import React, {useState, useContext, useEffect} from 'react';
-import { StatusBar, Switch, Alert, Text, FlatList, Image, View, Dimensions,TextInput, Platform, KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import { StatusBar, ScrollView, Switch, Alert, Text, FlatList, Image, View, Dimensions,TextInput, Platform, KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import {styles, stylesHome} from '../styles';
-import { database } from '../firebase';
+// import { database } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../UserContext';
 import { ref, set,remove, push, getDatabase, get, onValue, child } from "firebase/database";
-import Icon from "react-native-vector-icons/FontAwesome";
+import {LinearGradient} from 'expo-linear-gradient';
 import { PieChart } from 'react-native-gifted-charts';
 import BottomBar from './BottomBar';
 
@@ -57,9 +57,9 @@ export default function FinanceManager(){
                   });
 
                   Object.values(data).forEach((transaction) => {
-                    if (transaction.type === 'Income' && transaction.email == user.email && new Date(transaction.date).getMonth == new Date().getMonth) {
+                    if (transaction.type === 'Income' && transaction.email == user.email && new Date(transaction.date).getMonth() == new Date().getMonth()) {
                       incomeM += parseFloat(transaction.value); // Assuming 'amount' is a number field
-                    } else if (transaction.type === 'Expense' && transaction.email == user.email && new Date(transaction.date).getMonth == new Date().getMonth) {
+                    } else if (transaction.type === 'Expense' && transaction.email == user.email && new Date(transaction.date).getMonth() == new Date().getMonth()) {
                       expenseM += parseFloat(transaction.value);
                     }
                   });
@@ -120,16 +120,29 @@ export default function FinanceManager(){
           }
         ];
 
+        const nullChart = [
+          {
+            value: 1,
+            color: '#ddd'
+          }
+        ];
+
     return(
       <View style={styles.container3}>
         <View style={styles.container}>
+          <LinearGradient
+              colors={['#03633a', '#95f6cc']} // start to end gradient
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.container, {paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight+50 : StatusBar.currentHeight}]}
+          >
           <Text style={[styles.text]}>
               Expense Manager
           </Text>
 
           <StatusBar style="auto" />
 
-          <View style={[styles.container2]}>
+          <ScrollView style={[styles.container2, {borderBottomRightRadius: 0, borderBottomLeftRadius: 0 , backgroundColor: '#fdfdfd'}]}>
             <View style={{paddingHorizontal: 10, marginBottom:5, flexDirection: 'row'}}>
                 <Text style={{marginLeft: 'auto',  marginRight: 15, alignSelf: 'center', color: '#030303',fontWeight: 'bold'}}>Daily</Text>
                   <Switch 
@@ -147,36 +160,67 @@ export default function FinanceManager(){
                   
               <>
                   {totalExpense > 0 || totalIncome > 0 ? 
-                  <View style={{height: 380, width: 360, justifyContent: 'center', alignItems: 'center'}}>
+                  <View style={{height: 325, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
 
-                  <PieChart 
-                  data = {pieChartDataDaily} 
-                  donut
-                  showText
-                  textSize={16}
-                  innerRadius={130}
-                  radius={170}
-                  isAnimated={true}
-                    animationDuration={2000} 
-                  />
+                    <PieChart 
+                      styles={{}}
+                      data = {pieChartDataDaily} 
+                      donut
+                      textSize={16}
+                      innerRadius={Platform.OS === 'ios' ? 120 : 110}
+                      radius={Platform.OS === 'ios' ? 160 : 140}
+                      isAnimated={true}
+                      animationDuration={2000} 
+                    />
                   <View style={{height: 100, position: 'absolute', alignItems: 'center', justifyContent: 'center'}}>
-                    <Text style={{fontWeight: 'bold', fontSize: 25}}>Daily net profit</Text>
                     <Text style={{fontWeight: 'bold', fontSize: 25}}>{new Date().toLocaleDateString('en-US', {day: 'numeric', month: 'short'})}</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 25}}>Net profit</Text>
                     {(totalIncome - totalExpense >= 0 ? 
                       <>
-                        <Text style={{fontSize: 35, color: 'green'}}>RM {totalIncome-totalExpense}</Text>
-                      </>: 
-                    <>
-                        <Text style={{fontSize: 35, color: '#F44F4F'}}>- RM {totalExpense-totalIncome}</Text>  
-                    </>
-                  )}
-                  </View>
-              </View>
+                        <Text style={{fontSize: 35, color: 'green'}}>
+                          RM {
+                            ((totalIncome - totalExpense).toFixed(2).length > 7)
+                              ? (totalIncome - totalExpense).toFixed(2).slice(0, 7) + '...'
+                              : (totalIncome - totalExpense).toFixed(2)
+                          }
+                        </Text>
+                      </>
+                      : 
+                      <>
+                        <Text style={{fontSize: 35, color: '#F44F4F'}}>
+                          - RM {
+                            ((totalExpense - totalIncome).toFixed(2).length > 7)
+                              ? (totalExpense - totalIncome).toFixed(2).slice(0, 7) + '...'
+                              : (totalExpense - totalIncome).toFixed(2)
+                          }
+                        </Text>  
+                      </>
+                    )}
+
+                    </View>
+                </View>
               :
-              <View style={{height: 380, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
-                  <Text>No  data available</Text>
-              </View>    
+              // <View style={{height: 325, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
+              //     <Text>No  data available</Text>
+              // </View>    
               
+              <View style={{height: 325, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
+
+                <PieChart 
+                  styles={{}}
+                  data = {nullChart} 
+                  donut
+                  textSize={16}
+                  innerRadius={Platform.OS === 'ios' ? 120 : 110}
+                  radius={Platform.OS === 'ios' ? 160 : 140}
+                  isAnimated={true}
+                  animationDuration={2000} 
+                />
+              <View style={{height: 100, position: 'absolute', alignItems: 'center', justifyContent: 'center'}}>
+                <Text>No  data available</Text>
+                </View>
+            </View>
+
               }
               <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 10,alignItems: 'center'}}>
               <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderColor: '#f44f4f', borderWidth: 3 ,backgroundColor: '#000f44f4f', padding: 10}}>
@@ -193,35 +237,62 @@ export default function FinanceManager(){
               :
               <>
                 {totalExpenseMonthly > 0 || totalIncomeMonthly > 0 ? 
-                <View style={{height: 380, width: 360, justifyContent: 'center', alignItems: 'center'}}>
+                <View style={{height: 325, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
 
-                    <PieChart 
-                    data = {pieChartDataMonthly} 
-                    donut
-                    showText
-                    textSize={16}
-                    innerRadius={130}
-                    isAnimated
-                    animationDuration={2000} 
-                    radius={170}
-                    />
+                <PieChart 
+                  styles={{}}
+                  data = {pieChartDataMonthly} 
+                  donut
+                  textSize={16}
+                  innerRadius={Platform.OS === 'ios' ? 120 : 110}
+                  radius={Platform.OS === 'ios' ? 160 : 140}
+                  isAnimated={true}
+                  animationDuration={2000} 
+                />
                     <View style={{height: 100, position: 'absolute', alignItems: 'center', justifyContent: 'center'}}>
-                    <Text style={{fontWeight: 'bold', fontSize: 25}}>Daily net profit</Text>
-                    <Text style={{fontWeight: 'bold', fontSize: 25}}>{new Date().toLocaleDateString('en-US', {month: 'short'})}</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 25}}>{new Date().toLocaleDateString('en-US', {month: 'long'})}</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 25}}>Net profit</Text>
                     {(totalIncomeMonthly - totalExpenseMonthly >= 0 ? 
                       <>
-                        <Text style={{fontSize: 35, color: 'green'}}>RM {totalIncomeMonthly - totalExpenseMonthly}</Text>
-                      </>: 
-                    <>
-                        <Text style={{fontSize: 35, color: '#F44F4F'}}>- RM {totalExpenseMonthly-totalIncomeMonthly}</Text>  
-                    </>
-                  )}
+                        <Text style={{fontSize: 35, color: 'green'}}>
+                          RM {
+                            ((totalIncomeMonthly - totalExpenseMonthly).toFixed(2).length > 7)
+                              ? (totalIncomeMonthly - totalExpenseMonthly).toFixed(2).slice(0, 7) + '...'
+                              : (totalIncomeMonthly - totalExpenseMonthly).toFixed(2)
+                          }
+                        </Text>
+                      </>
+                      : 
+                      <>
+                        <Text style={{fontSize: 35, color: '#F44F4F'}}>
+                          - RM {
+                            ((totalExpenseMonthly - totalIncomeMonthly).toFixed(2).length > 7)
+                              ? (totalExpenseMonthly - totalIncomeMonthly).toFixed(2).slice(0, 7) + '...'
+                              : (totalExpenseMonthly - totalIncomeMonthly).toFixed(2)
+                          }
+                        </Text>  
+                      </>
+                    )}
+
                   </View>
                 </View>
                 :
-                <View style={{height: 380, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
-                <Text>No data available</Text>
-                </View>    
+                <View style={{height: 325, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
+
+                    <PieChart 
+                      styles={{}}
+                      data = {nullChart} 
+                      donut
+                      textSize={16}
+                      innerRadius={Platform.OS === 'ios' ? 120 : 110}
+                      radius={Platform.OS === 'ios' ? 160 : 140}
+                      isAnimated={true}
+                      animationDuration={2000} 
+                    />
+                  <View style={{height: 100, position: 'absolute', alignItems: 'center', justifyContent: 'center'}}>
+                    <Text>No  data available</Text>
+                    </View>
+                </View>   
 
                 }
               <View style={{flexDirection: 'row', justifyContent: 'space-evenly', paddingVertical: 10,alignItems: 'center'}}>
@@ -232,7 +303,7 @@ export default function FinanceManager(){
                 <Text style={{fontSize: 20}}>RM {totalIncomeMonthly}</Text>
               </View>
               
-              <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderColor: '#3282F6', borderWidth: 3 ,backgroundColor: '#0003282F6', padding: 10}}>
+              <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 20, borderColor: '#3282F6', borderWidth: 3 , backgroundColor: '#0003282F6', padding: 10}}>
                   <Text style={{fontWeight: 'bold', fontSize: 20}}>Spent: </Text>
                   <Text style={{fontSize: 20}}>RM {totalExpenseMonthly}</Text>
               </View>
@@ -254,15 +325,18 @@ export default function FinanceManager(){
                 <TouchableOpacity onPress={()=>{console.log('This is the data : ',data),navi.navigate("FinancialRecord")}} style={[styles.button]}>
                   <Text style={{color: '#fdfdfd'}}>See Records</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.button, {marginBottom: 10}]}>
+                  <TouchableOpacity onPress={()=>navi.navigate('SPHome')} style={[styles.button, {marginBottom: 10}]}>
                     <Text style={{color: '#fdfdfd'}}>  Go to SP  </Text>
                   </TouchableOpacity>
                 </View>
             </View>
-          </View>
+            <View style={{height: 20}}></View>
+          </ScrollView>
 
           <BottomBar></BottomBar>
-        </View>
+        
+          </LinearGradient>
+          </View>
       </View>
     );
 }

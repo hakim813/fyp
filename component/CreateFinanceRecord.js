@@ -1,12 +1,13 @@
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import React, {useState, useContext, useEffect} from 'react';
-import { SafeAreaView, Alert, StyleSheet, TouchableWithoutFeedback, ScrollView, Keyboard, Text,FlatList, View, Platform, TextInput, Button, Image, TouchableOpacity,ActivityIndicator } from 'react-native';
+import { StatusBar, Alert, StyleSheet, TouchableWithoutFeedback, ScrollView, Keyboard, Text,FlatList, View, Platform, TextInput, Button, Image, TouchableOpacity,ActivityIndicator } from 'react-native';
 import styles from '../styles';
 import { auth, database } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword} from "firebase/auth";
 import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../UserContext';
 import { ref, set, push, getDatabase, get, child, onValue, serverTimestamp, update } from "firebase/database";
+import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function CreateFinanceRecord({route}){
@@ -83,14 +84,20 @@ export default function CreateFinanceRecord({route}){
     return(
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container3}>
-            <View style={styles.container}>
-                <Text style={[styles.text]}>
+            <View style={[styles.container]}>
+                <LinearGradient
+                    colors={['#03633a', '#95f6cc']} // start to end gradient
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={[styles.container, {paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight+50 : StatusBar.currentHeight}]}
+                >
+                <Text style={[styles.text,{backgroundColor: '', marginBottom: 30}]}>
                     Expense Form
                 </Text>
-                <StatusBar style="auto" />
-                <View style={[styles.container2]}>
-                    <View style={[styles.containerAttachMedia, {marginTop: 15}]}>
-                        <Text style={[styles.labelInput, {fontSize: 25, fontWeight: 'bold'}]}>
+                {/* <StatusBar style="auto" /> */}
+                <View style={[styles.container2, {borderRadius: 50,  marginTop: 30,margin: 15, flex: 0, paddingTop: 70, paddingBottom: 70}]}>
+                    <View style={[styles.containerAttachMedia, {backgroundColor: '', marginTop: 15}]}>
+                        <Text style={[styles.labelInput, {fontSize: 20, fontWeight: 'bold'}]}>
                             Type
                         </Text>
                         <TextInput
@@ -99,7 +106,7 @@ export default function CreateFinanceRecord({route}){
                             value={type}
                         />
 
-                        <Text style={[styles.labelInput, {fontSize: 25, fontWeight: 'bold'}]}>
+                        <Text style={[styles.labelInput, {fontSize: 20, fontWeight: 'bold'}]}>
                             Value    
                         </Text>
                         <TextInput
@@ -110,7 +117,7 @@ export default function CreateFinanceRecord({route}){
                             onChangeText={setValue}
                         />
 
-                        <Text style={[styles.labelInput, {fontSize: 25, fontWeight: 'bold'}]}>
+                        <Text style={[styles.labelInput, {fontSize: 20, fontWeight: 'bold'}]}>
                             Notes
                         </Text>
                         <TextInput
@@ -122,12 +129,16 @@ export default function CreateFinanceRecord({route}){
                         />
                     </View>
                     
-                    <View style={{flexDirection: 'row'}}>
+                    <View style={{flexDirection: 'row',  justifyContent: 'center'}}>
                         <TouchableOpacity onPress={()=>{(id == null ? writeData() : updateData(id))}} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#296746', borderRadius: 25}]} >
                             <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Record Expense</Text>
                         </TouchableOpacity>
+                        <TouchableOpacity onPress={()=>navi.navigate('ScanReceipt')} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#296746', borderRadius: 25}]} >
+                            <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Scan Receipt</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
+                </LinearGradient>
             </View>
         </View>
         </TouchableWithoutFeedback>

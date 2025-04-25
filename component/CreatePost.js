@@ -1,6 +1,6 @@
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import React, {useState, useContext, useEffect} from 'react';
-import { SafeAreaView, Alert, StyleSheet, TouchableWithoutFeedback, ScrollView, Keyboard, Text,FlatList, View, Platform, TextInput, Button, Image, TouchableOpacity,ActivityIndicator } from 'react-native';
+import { SafeAreaView, Alert, StyleSheet, TouchableWithoutFeedback, StatusBar, ScrollView, Keyboard, Text,FlatList, View, Platform, TextInput, Button, Image, TouchableOpacity,ActivityIndicator } from 'react-native';
 import styles from '../styles';
 import { auth, database } from '../firebase';
 import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword} from "firebase/auth";
@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { UserContext } from '../UserContext';
 import { ref, set, push, getDatabase, get, child, onValue, serverTimestamp } from "firebase/database";
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function CreatePost(){
 
@@ -84,82 +85,94 @@ export default function CreatePost(){
         const newPostRef = push(usersRef);
 
         set(newPostRef, {
-          user: existingUser.username,
-          email: user.email,
-          title: (title ? title : '***'),
-          content: content,
-          date: serverTimestamp(),
-          upvoter: [],
-          imageUris: imageUris.length > 0 ? imageUris : null
+        user: existingUser.username,
+        email: user.email,
+        title: (title ? title : '***'),
+        content: content,
+        date: serverTimestamp(),
+        upvoter: [],
+        imageUris: imageUris.length > 0 ? imageUris : null
         })
-          .then(() => {console.log('Data written successfully!');
+        .then(() => {console.log('Data written successfully!');
             navi.navigate('Forum');
-          })
-          .catch(error => console.error('Error writing data: ', error));
-      };
-
-
+        })
+        .catch(error => console.error('Error writing data: ', error));
+    };
 
     return(
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container3}>
-            <View style={styles.container}>
-                <Text style={[styles.text]}>
-                    Create Your Post
-                </Text>
-                <StatusBar style="auto" />
-                <View style={[styles.container2]}>
-                    <View style={[styles.containerAttachMedia]}>
-                        <Text style={[styles.labelInput, {fontSize: 25, fontWeight: 'bold'}]}>
-                            Title
-                        </Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Title"
-                            value={title}
-                            onChangeText={setTitle}
-                        />
+            
+                <View style={[styles.container, {flex : 0}]}>
+                    <LinearGradient
+                        colors={['#03633a', '#95f6cc']} // start to end gradient
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={[styles.container, {flex: 0, height: '100%', paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight+50 : StatusBar.currentHeight}]}
+                    >
+                    <Text style={[styles.text]}>
+                        Create Your Post
+                    </Text>
+                    <StatusBar style="auto" />
+                    <View style={[styles.container2,{flex: 0, height: '100%'}]}>
+                        <View style={[styles.containerAttachMedia]}>
+                            <Text style={[styles.labelInput, {fontSize: 25, fontWeight: 'bold'}]}>
+                                Title
+                            </Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Title"
+                                value={title}
+                                onChangeText={setTitle}
+                            />
 
-                        <Text style={[styles.labelInput, {fontSize: 25, fontWeight: 'bold'}]}>
-                            Content    
-                        </Text>
-                        <TextInput
-                            style={[styles.input, {paddingTop:10, height: 200}]}
-                            multiline={true}
-                            numberOfLines={10}
-                            placeholder="Write out your content"
-                            value={content}
-                            onChangeText={setContent}
-                        />
-                    </View>
-                    
-                    <View style={{flexDirection: 'row'}}>
-                        <TouchableOpacity onPress={pickImage} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#1b434d', borderRadius: 25}]} >
-                            <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Attach Media</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity  onPress={writeData} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#1b434d', borderRadius: 25}]} >
-                            <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Submit Post</Text>
-                        </TouchableOpacity>
-                    </View>
+                            <Text style={[styles.labelInput, {fontSize: 25, fontWeight: 'bold'}]}>
+                                Content    
+                            </Text>
+                            <TextInput
+                                style={[styles.input, {paddingTop:10, height: 200}]}
+                                multiline={true}
+                                numberOfLines={10}
+                                placeholder="Write out your content"
+                                value={content}
+                                onChangeText={setContent}
+                            />
+                        </View>
+                        
+                        {/* buttons submit post and attach media */}
+                        <View style={{flexDirection: 'row'}}>
+                            <TouchableOpacity onPress={pickImage} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#1b434d', borderRadius: 25}]} >
+                                <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Attach Media</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity  onPress={writeData} style={[styles.button, {marginRight: 15, paddingVertical: 15, backgroundColor: '#1b434d', borderRadius: 25}]} >
+                                <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Submit Post</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                    <Text style={{marginVertical: 10}}>Media selected: {imageUris?.length}</Text>
-                    <ScrollView horizontal>
+                        <Text style={{marginVertical: 10}}>Media selected: {imageUris?.length}</Text>
+                        
+                        <ScrollView horizontal>
                         {imageUris.map((uri, index) => (
                             <Image
-                                key={index}
-                                source={{ uri }}
-                                style={{width: 200, height: 200, marginRight: 10 }}
+                            key={index}
+                            source={{ uri }}
+                            style={{
+                                height: 200, // Fixed height
+                                aspectRatio: 1, // Default fallback
+                                // marginRight: 10,
+                            }}
+                            resizeMode="cover" // or "cover" depending on your need
+                            onLoad={(e) => {
+                                const { width, height } = e.nativeEvent.source;
+                                // Optionally you can store aspect ratios if you want to optimize
+                            }}
                             />
                         ))}
-                    </ScrollView>
-                    
-                    
-                    {/* <TouchableOpacity  onPress={writeData} style={[styles.button, {borderRadius: 25}]} >
-                        <Text style={{color: '#fdfdfd', fontWeight: 'bold'}}>Submit Post</Text>
-                    </TouchableOpacity> */}
-                </View>
-            </View>
-        </View>
+                        </ScrollView>
+
+                    </View>
+                    </LinearGradient>
+                    </View>
+            
         </TouchableWithoutFeedback>
     );
 }

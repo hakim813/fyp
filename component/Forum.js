@@ -2,7 +2,7 @@
 // import CustomSwitch from 'react-native-custom-switch';
 // import { createUserWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signInWithEmailAndPassword} from "firebase/auth";
 import React, {useState, useContext, useEffect} from 'react';
-import { Switch, Alert, Text, FlatList, Image, View, TextInput, Platform, KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import { StatusBar, Switch, Alert, Text, FlatList, Image, View, TextInput, Platform, KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import {styles, stylesHome} from '../styles';
 import { database } from '../firebase';
 import { useNavigation } from '@react-navigation/native';
@@ -10,6 +10,7 @@ import { UserContext } from '../UserContext';
 import { ref, set,remove, push, getDatabase, get, onValue, child } from "firebase/database";
 import Icon from "react-native-vector-icons/FontAwesome";
 import BottomBar from './BottomBar';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Forum(){
     const [posts, setPosts] = useState([]);
@@ -199,22 +200,28 @@ export default function Forum(){
     }, [searchQuery, posts]);
 
     return(
-        <View style={[stylesHome.bg]} >
+        <View style={[stylesHome.bg, {paddingRight:0}]} >
+            <LinearGradient
+                colors={['#03633a', '#95f6cc']} // start to end gradient
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[styles.container, {paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight+50 : StatusBar.currentHeight}]}
+            >
             <View style={{flex:1}}>
-                <Text style={[stylesHome.welcomeText, {color: '#fafafa', marginLeft: 15}]}>Community Forum</Text>
-                    <TextInput
-                        style={[styles.input, {backgroundColor: '#fdfdfd', borderRadius: 20, marginHorizontal:15}]}
-                        placeholder="Search any content. . ."
-                        value={searchQuery}
-                        onChangeText={(text) => setSearchQuery(text)}
-                        // onPress={()=>{}}
-                    />
+                <Text style={[stylesHome.welcomeText, {color: '#fafafa', marginHorizontal: 15}]}>Community Forum</Text>
+                <TextInput
+                    style={[styles.input, {backgroundColor: '#fdfdfd', borderRadius: 20, marginHorizontal:15}]}
+                    placeholder="Search any content. . ."
+                    value={searchQuery}
+                    onChangeText={(text) => setSearchQuery(text)}
+                    // onPress={()=>{}}
+                />
                 <View style={{flexDirection: 'row', marginHorizontal: 15, marginBottom: 15}}>
-                    <TouchableOpacity onPress={()=>setIsAll(true)} style={[{marginRight: 10, paddingVertical: 10, paddingHorizontal: 15, fontWeight: 'bold', borderRadius: 15},(isAll? {backgroundColor: '#05597D'} : {backgroundColor: 'grey'})]}>
-                        <Text style={[{fontWeight: '650', fontWeight: 'bold', fontSize:15, color: 'white'}]}>All</Text>
+                    <TouchableOpacity onPress={()=>setIsAll(true)} style={[{marginRight: 10, paddingVertical: 5, paddingHorizontal: 15, minWidth: 90, fontWeight: 'bold', borderRadius: 15, alignItems: 'center', justifyContent: 'center'},(isAll? {backgroundColor: '#fdfdfd'} : {backgroundColor: 'grey'})]}>
+                        <Text style={[{fontFamily: 'Nunito-Bold', fontSize:15},(isAll? {color: '#06a561'} : {color: '#020202'})]}>All</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>setIsAll(false)} style={[{marginRight: 80, paddingVertical: 10, paddingHorizontal: 15, fontWeight: 'bold', borderRadius: 15},(isAll? {backgroundColor: 'grey'} : {backgroundColor: '#05597D'})]}>
-                        <Text style={[{fontWeight: '650', fontWeight: 'bold', fontSize:15, color: 'white'}]}>Your Post</Text>
+                    <TouchableOpacity onPress={()=>setIsAll(false)} style={[{marginRight: 25, paddingVertical: 5, paddingHorizontal: 15, minWidth: 90, fontWeight: 'bold', borderRadius: 15, alignItems: 'center', justifyContent: 'center'},(isAll? {backgroundColor: 'grey'} : {backgroundColor: '#fdfdfd'})]}>
+                    <Text style={[{fontFamily: 'Nunito-Bold', fontSize:15},(isAll? {color: '#020202'} : {color: '#06a561'})]}>Your Post</Text>
                     </TouchableOpacity>
                     <Text style={{marginLeft: 'auto',  alignSelf: 'center', color: '#fdfdfd',fontWeight: 'bold'}}>Top</Text>
                     <Switch style={{marginLeft: 'auto', color: '#fdfdfd',fontWeight: 'bold'}}
@@ -224,7 +231,7 @@ export default function Forum(){
                         value={isEnabled}
                         onValueChange={(value) => setIsEnabled(value)}
                     />
-                    <Text style={{marginLeft: 'auto', alignSelf: 'center', color: '#fdfdfd',fontWeight: 'bold'}}>Latest</Text>
+                    <Text style={{marginLeft: 'auto', marginRight: 10, alignSelf: 'center', color: '#fdfdfd',fontWeight: 'bold'}}>Latest</Text>
                 </View>
 
             {filteredPosts.length === 0 ? (
@@ -234,41 +241,42 @@ export default function Forum(){
             ) : (
                 <FlatList  //d6ffa7
                                 
-                style={{paddingTop: 10, backgroundColor: '#BCD4DE'}}
+                style={{paddingVertical: 10, backgroundColor: '#dedede'}}
                 data={filteredPosts}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => {
+                    //for all posts
                     if(isAll){
                         return(
                     <View style={[stylesHome.context, {paddingVertical:10, backgroundColor: '#fafafa'}]}>
-                        <View>
-                            <Image source={{ uri: 'https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png' }} style={{potition: 'absolute', width: 30,
+                        <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+                            {/* <Image source={{ uri: 'https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png' }} style={{ width: 30,
                                 height: 30,
                                 resizeMode: 'cover',
                                 marginRight: 15,
                                 borderRadius: 75,
                                 borderColor: 'black',
-                                borderWidth: 1}} />
-                            <Text style = {{position: 'absolute', top: 5   , left: 40, fontWeight:'bold', fontSize: 25, marginBottom:10}}>
+                                borderWidth: 0}} /> */}
+                            <Text style = {{ fontFamily: 'Nunito-ExtraBold', fontSize: 25}}>
                                 {item.title.length > 15 ? `${item.title.slice(0, 15)}...` : item.title}
                             </Text>
-                            <Text style = {{position: 'absolute', top: 15   , right: 5, marginBottom:10, color: 'grey'}}>{new Date(item.date).toDateString()}</Text>
+                            <Text style = {{marginLeft: 'auto', color: 'grey', fontFamily: 'Nunito'}}>{new Date(item.date).toDateString()}</Text>
                         </View>
-                        <View  style={{marginBottom: 60}}>
-                            
-                            <Text style={{marginTop: 10}}>
-                                <Text style={{fontWeight: 'bold'}}>
+                        <View  style={{marginBottom: 0}}>
+                            <Text>
+                                <Text style={{fontFamily: 'Nunito-ExtraBold'}}>
                                     Written by:{" "}
                                 </Text>
                                 {item.user}
                                 </Text>
-                            <Text style={{marginVertical: 10, fontSize: 20}}>{item.content}</Text>
+                            <Text style={{marginTop: 5, fontSize: 20, fontFamily: 'Nunito'}}>{item.content}</Text>
                             {/* Display multiple images */}
                         {item.imageUris && Array.isArray(item.imageUris) ? (
                             <FlatList
                             data={item.imageUris}
                             keyExtractor={(uri, index) => `${item.id}-image-${index}`}
                             horizontal
+                            style={{}}
                             renderItem={({ item: uri }) => (
                                 <Image
                                     source={{ uri }}
@@ -290,26 +298,67 @@ export default function Forum(){
                     )}
                             
                         </View>
-                        <View style={{marginTop: 'auto'}}>
+                        {/* comment */}
+                        <View style={{marginTop: 0}}> 
                             <TextInput
-                                style={[styles.input, {position: 'absolute', marginBottom: 5, borderRadius: 20, width:'85%', left: 0 , bottom: 5}]}
+                                style={[styles.input, {marginBottom: 5, borderRadius: 20, width: '100%' , left: 0 , bottom: 5}]}
                                 placeholder="Comment"
                                 onPress={()=>{setSelectedPost(item),setIsVisible(true)}}
                             />
-                            <TouchableOpacity onPress={()=>thumbsUp(item)} style={{position: 'absolute', bottom: 20, right: 20}} >
+                            {/* <TouchableOpacity onPress={()=>thumbsUp(item)} style={{position: 'absolute', bottom: 27, right: 25}} >
                                 <Icon
                                 name="thumbs-up"
                                 size={24}
                                 color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
                                 />
                             </TouchableOpacity>
-                        <Text style={{position: 'absolute', fontSize: 20, bottom: 20, right: 5}}>{item.upvoter?.length || 0}</Text>
+                            <Text style={{position: 'absolute', fontSize: 20, bottom: 25, right: 10}}>{item.upvoter?.length || 0}</Text> */}
                         </View>
+                        {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                    <TouchableOpacity onPress={()=>thumbsUp(item)} style={{marginHorizontal: 10}} >
+                                    <Icon
+                                        name="thumbs-up"
+                                        size={24}
+                                        color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
+                                    />
+                                    </TouchableOpacity>
+                                    <Text style={{fontSize: 20}}>{item.upvoter?.length || 11110}</Text> */}
+
+                                    {/* <TouchableOpacity onPress={()=>Alert.alert('Delete Post',
+                                            'Are you sure you want to delete this post?',
+                                            [
+                                                {
+                                                text: 'Cancel',
+                                                style: 'cancel', // Adds the "Cancel" style (button is usually grayed out)
+                                                },
+                                                {
+                                                text: 'Delete',
+                                                style: 'destructive', // Adds the "Delete" style (usually red)
+                                                onPress: () => deleteData(item.id),
+                                                },
+                                            ])} 
+                                            style={{backgroundColor: 'red', marginLeft: 'auto', borderRadius: 50, paddingHorizontal: 25, paddingVertical: 5}} >
+                                        <Icon
+                                        name="trash"
+                                        size={20}
+                                        color={'#fdfdfd'} // Change color based on isUpvoted
+                                        />
+                                    </TouchableOpacity> */}
+                                {/* </View> */}
                         
                         {
                             item.email == user.email ? 
                             (
-                                <View style={{flexDirection: 'row',}}>
+                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                    <TouchableOpacity onPress={()=>thumbsUp(item)} style={{marginHorizontal: 10}} >
+                                    <Icon
+                                        name="thumbs-up"
+                                        size={24}
+                                        color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
+                                    />
+                                    </TouchableOpacity>
+                                    <Text style={{fontSize: 20}}>{item.upvoter?.length || 11110}</Text>
+
                                     <TouchableOpacity onPress={()=>Alert.alert('Delete Post',
                                             'Are you sure you want to delete this post?',
                                             [
@@ -323,7 +372,7 @@ export default function Forum(){
                                                 onPress: () => deleteData(item.id),
                                                 },
                                             ])} 
-                                            style={{backgroundColor: 'red', borderRadius: 50, paddingHorizontal: 25, paddingVertical: 5}} >
+                                            style={{backgroundColor: 'red', marginLeft: 'auto', borderRadius: 50, paddingHorizontal: 25, paddingVertical: 5}} >
                                         <Icon
                                         name="trash"
                                         size={20}
@@ -332,83 +381,222 @@ export default function Forum(){
                                     </TouchableOpacity>
                                 </View>
                             ) 
-                        : (<></>)
+                        : (<View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <TouchableOpacity onPress={()=>thumbsUp(item)} style={{marginHorizontal: 10}} >
+                            <Icon
+                                name="thumbs-up"
+                                size={24}
+                                color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
+                            />
+                            </TouchableOpacity>
+                            <Text style={{fontSize: 20}}>{item.upvoter?.length || 0}</Text>
+
+                            {/* <TouchableOpacity onPress={()=>Alert.alert('Delete Post',
+                                    'Are you sure you want to delete this post?',
+                                    [
+                                        {
+                                        text: 'Cancel',
+                                        style: 'cancel', // Adds the "Cancel" style (button is usually grayed out)
+                                        },
+                                        {
+                                        text: 'Delete',
+                                        style: 'destructive', // Adds the "Delete" style (usually red)
+                                        onPress: () => deleteData(item.id),
+                                        },
+                                    ])} 
+                                    style={{backgroundColor: 'red', marginLeft: 'auto', borderRadius: 50, paddingHorizontal: 25, paddingVertical: 5}} >
+                                <Icon
+                                name="trash"
+                                size={20}
+                                color={'#fdfdfd'} // Change color based on isUpvoted
+                                />
+                            </TouchableOpacity> */}
+                        </View>)
                         }
                     </View>
                         );
                 }
+                //for post by the acc owner
                 else if(item.email == user.email){
                     return(
+                        // <View style={[stylesHome.context, {paddingVertical:10, backgroundColor: '#fafafa'}]}>
+                        //     <View>
+                        //         <Image source={{ uri: 'https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png' }} style={{potition: 'absolute', width: 30,
+                        //             height: 30,
+                        //             resizeMode: 'cover',
+                        //             marginRight: 15,
+                        //             borderRadius: 75,
+                        //             borderColor: 'black',
+                        //             borderWidth: 1}} />
+                        //         <Text style = {{position: 'absolute', top: 5   , left: 40, fontWeight:'bold', fontSize: 25, marginBottom:10}}>
+                        //             {item.title.length > 15 ? `${item.title.slice(0, 15)}...` : item.title}
+                        //         </Text>
+                        //         <Text style = {{position: 'absolute', top: 15, right: 5, marginBottom:10, color: 'grey'}}>{new Date(item.date).toDateString()}</Text>
+                        //     </View>
+                        //     <View  style={{marginBottom: 60}}>
+                                
+                        //         <Text style={{marginTop: 10}}>
+                        //             <Text style={{fontWeight: 'bold'}}>
+                        //                 Written by:{" "}
+                        //             </Text>
+                        //             {item.user}
+                        //             </Text>
+                        //         <Text style={{marginVertical: 10, fontSize: 20}}>{item.content}</Text>
+                        //         {/* Display multiple images */}
+                        //     {item.imageUris && Array.isArray(item.imageUris) ? (
+                        //         <FlatList
+                        //         data={item.imageUris}
+                        //         keyExtractor={(uri, index) => `${item.id}-image-${index}`}
+                        //         horizontal
+                        //         renderItem={({ item: uri }) => (
+                        //             <Image
+                        //                 source={{ uri }}
+                        //                 style={{
+                        //                     width: 200,
+                        //                     height: 200,
+                        //                     margin:10,
+                        //                     marginLeft:0,
+                        //                     resizeMode: 'cover',
+                        //                     borderRadius: 5,
+                        //                     borderWidth: 1,
+                        //                     borderColor: '#ccc',
+                        //                 }}
+                        //             />
+                        //         )}
+                        //     />
+                        // ) : (
+                        //     <Text style={{ marginTop: 10, color: 'gray' }}>No images attached</Text>
+                        // )}
+                                
+                        //     </View>
+                        //     <View style={{marginTop: 'auto'}}>
+                        //         <TextInput
+                        //             style={[styles.input, {position: 'absolute', marginBottom: 5, borderRadius: 20, width:'100%', left: 0 , bottom: 5}]}
+                        //             placeholder="Comment"
+                        //             onPress={()=>{setSelectedPost(item),setIsVisible(true)}}
+                        //         />
+                        //         {/* <TouchableOpacity onPress={()=>thumbsUp(item)} style={{position: 'absolute', bottom: 20, right: 20}} >
+                        //             <Icon
+                        //             name="thumbs-up"
+                        //             size={24}
+                        //             color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
+                        //             />
+                        //         </TouchableOpacity>
+                        //         <Text style={{position: 'absolute', fontSize: 20, bottom: 20, right: 5}}>{item.upvoter?.length || 0}</Text> */}
+                        //     </View>
+
                         <View style={[stylesHome.context, {paddingVertical:10, backgroundColor: '#fafafa'}]}>
-                            <View>
-                                <Image source={{ uri: 'https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png' }} style={{potition: 'absolute', width: 30,
-                                    height: 30,
-                                    resizeMode: 'cover',
-                                    marginRight: 15,
-                                    borderRadius: 75,
-                                    borderColor: 'black',
-                                    borderWidth: 1}} />
-                                <Text style = {{position: 'absolute', top: 5   , left: 40, fontWeight:'bold', fontSize: 25, marginBottom:10}}>
-                                    {item.title.length > 15 ? `${item.title.slice(0, 15)}...` : item.title}
+                        <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+                            {/* <Image source={{ uri: 'https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png' }} style={{ width: 30,
+                                height: 30,
+                                resizeMode: 'cover',
+                                marginRight: 15,
+                                borderRadius: 75,
+                                borderColor: 'black',
+                                borderWidth: 0}} /> */}
+                            <Text style = {{ fontFamily: 'Nunito-ExtraBold', fontSize: 25}}>
+                                {item.title.length > 15 ? `${item.title.slice(0, 15)}...` : item.title}
+                            </Text>
+                            <Text style = {{marginLeft: 'auto', color: 'grey', fontFamily: 'Nunito'}}>{new Date(item.date).toDateString()}</Text>
+                        </View>
+                        <View  style={{marginBottom: 0}}>
+                            <Text>
+                                <Text style={{fontFamily: 'Nunito-ExtraBold'}}>
+                                    Written by:{" "}
                                 </Text>
-                                <Text style = {{position: 'absolute', top: 15   , right: 5, marginBottom:10, color: 'grey'}}>{new Date(item.date).toDateString()}</Text>
-                            </View>
-                            <View  style={{marginBottom: 60}}>
-                                
-                                <Text style={{marginTop: 10}}>
-                                    <Text style={{fontWeight: 'bold'}}>
-                                        Written by:{" "}
-                                    </Text>
-                                    {item.user}
-                                    </Text>
-                                <Text style={{marginVertical: 10, fontSize: 20}}>{item.content}</Text>
-                                {/* Display multiple images */}
-                            {item.imageUris && Array.isArray(item.imageUris) ? (
-                                <FlatList
-                                data={item.imageUris}
-                                keyExtractor={(uri, index) => `${item.id}-image-${index}`}
-                                horizontal
-                                renderItem={({ item: uri }) => (
-                                    <Image
-                                        source={{ uri }}
-                                        style={{
-                                            width: 200,
-                                            height: 200,
-                                            margin:10,
-                                            marginLeft:0,
-                                            resizeMode: 'cover',
-                                            borderRadius: 5,
-                                            borderWidth: 1,
-                                            borderColor: '#ccc',
-                                        }}
-                                    />
-                                )}
-                            />
-                        ) : (
-                            <Text style={{ marginTop: 10, color: 'gray' }}>No images attached</Text>
-                        )}
-                                
-                            </View>
-                            <View style={{marginTop: 'auto'}}>
-                                <TextInput
-                                    style={[styles.input, {position: 'absolute', marginBottom: 5, borderRadius: 20, width:'85%', left: 0 , bottom: 5}]}
-                                    placeholder="Comment"
-                                    onPress={()=>{setSelectedPost(item),setIsVisible(true)}}
+                                {item.user}
+                                </Text>
+                            <Text style={{marginTop: 5, fontSize: 20, fontFamily: 'Nunito'}}>{item.content}</Text>
+                            {/* Display multiple images */}
+                        {item.imageUris && Array.isArray(item.imageUris) ? (
+                            <FlatList
+                            data={item.imageUris}
+                            keyExtractor={(uri, index) => `${item.id}-image-${index}`}
+                            horizontal
+                            style={{}}
+                            renderItem={({ item: uri }) => (
+                                <Image
+                                    source={{ uri }}
+                                    style={{
+                                        width: 200,
+                                        height: 200,
+                                        margin:10,
+                                        marginLeft:0,
+                                        resizeMode: 'cover',
+                                        borderRadius: 5,
+                                        borderWidth: 1,
+                                        borderColor: '#ccc',
+                                    }}
                                 />
-                                <TouchableOpacity onPress={()=>thumbsUp(item)} style={{position: 'absolute', bottom: 20, right: 20}} >
+                            )}
+                        />
+                    ) : (
+                        <Text style={{ marginTop: 10, color: 'gray' }}>No images attached</Text>
+                    )}
+                            
+                        </View>
+                        {/* comment */}
+                        <View style={{marginTop: 0}}> 
+                            <TextInput
+                                style={[styles.input, {marginBottom: 5, borderRadius: 20, width: '100%' , left: 0 , bottom: 5}]}
+                                placeholder="Comment"
+                                onPress={()=>{setSelectedPost(item),setIsVisible(true)}}
+                            />
+                            {/* <TouchableOpacity onPress={()=>thumbsUp(item)} style={{position: 'absolute', bottom: 27, right: 25}} >
+                                <Icon
+                                name="thumbs-up"
+                                size={24}
+                                color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
+                                />
+                            </TouchableOpacity>
+                            <Text style={{position: 'absolute', fontSize: 20, bottom: 25, right: 10}}>{item.upvoter?.length || 0}</Text> */}
+                        </View>
+                        {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                    <TouchableOpacity onPress={()=>thumbsUp(item)} style={{marginHorizontal: 10}} >
                                     <Icon
-                                    name="thumbs-up"
-                                    size={24}
-                                    color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
+                                        name="thumbs-up"
+                                        size={24}
+                                        color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
                                     />
-                                </TouchableOpacity>
-                            <Text style={{position: 'absolute', fontSize: 20, bottom: 20, right: 5}}>{item.upvoter?.length || 0}</Text>
-                            </View>
+                                    </TouchableOpacity>
+                                    <Text style={{fontSize: 20}}>{item.upvoter?.length || 11110}</Text> */}
+
+                                    {/* <TouchableOpacity onPress={()=>Alert.alert('Delete Post',
+                                            'Are you sure you want to delete this post?',
+                                            [
+                                                {
+                                                text: 'Cancel',
+                                                style: 'cancel', // Adds the "Cancel" style (button is usually grayed out)
+                                                },
+                                                {
+                                                text: 'Delete',
+                                                style: 'destructive', // Adds the "Delete" style (usually red)
+                                                onPress: () => deleteData(item.id),
+                                                },
+                                            ])} 
+                                            style={{backgroundColor: 'red', marginLeft: 'auto', borderRadius: 50, paddingHorizontal: 25, paddingVertical: 5}} >
+                                        <Icon
+                                        name="trash"
+                                        size={20}
+                                        color={'#fdfdfd'} // Change color based on isUpvoted
+                                        />
+                                    </TouchableOpacity> */}
+                                {/* </View> */}
+                        
                             
                             {
                                 item.email == user.email ? 
                                 (
-                                    <View style={{flexDirection: 'row',}}>
+                                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                        <TouchableOpacity onPress={()=>thumbsUp(item)} style={{marginHorizontal: 10}} >
+                                        <Icon
+                                            name="thumbs-up"
+                                            size={24}
+                                            color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
+                                        />
+                                        </TouchableOpacity>
+                                        <Text style={{fontSize: 20}}>{item.upvoter?.length || 11110}</Text>
+
                                         <TouchableOpacity onPress={()=>Alert.alert('Delete Post',
                                                 'Are you sure you want to delete this post?',
                                                 [
@@ -422,7 +610,7 @@ export default function Forum(){
                                                     onPress: () => deleteData(item.id),
                                                     },
                                                 ])} 
-                                                style={{backgroundColor: 'red', borderRadius: 50, paddingHorizontal: 25, paddingVertical: 5}} >
+                                                style={{backgroundColor: 'red', marginLeft: 'auto', borderRadius: 50, paddingHorizontal: 25, paddingVertical: 5}} >
                                             <Icon
                                             name="trash"
                                             size={20}
@@ -431,7 +619,37 @@ export default function Forum(){
                                         </TouchableOpacity>
                                     </View>
                                 ) 
-                            : (<></>)
+                            : (<View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                <TouchableOpacity onPress={()=>thumbsUp(item)} style={{marginHorizontal: 10}} >
+                                <Icon
+                                    name="thumbs-up"
+                                    size={24}
+                                    color={item.upvoter?.includes(user.uid) ? "#1b434d" : "gray"} // Change color based on isUpvoted
+                                />
+                                </TouchableOpacity>
+                                <Text style={{fontSize: 20}}>{item.upvoter?.length || 11110}</Text>
+
+                                <TouchableOpacity onPress={()=>Alert.alert('Delete Post',
+                                        'Are you sure you want to delete this post?',
+                                        [
+                                            {
+                                            text: 'Cancel',
+                                            style: 'cancel', // Adds the "Cancel" style (button is usually grayed out)
+                                            },
+                                            {
+                                            text: 'Delete',
+                                            style: 'destructive', // Adds the "Delete" style (usually red)
+                                            onPress: () => deleteData(item.id),
+                                            },
+                                        ])} 
+                                        style={{backgroundColor: 'red', marginLeft: 'auto', borderRadius: 50, paddingHorizontal: 25, paddingVertical: 5}} >
+                                    <Icon
+                                    name="trash"
+                                    size={20}
+                                    color={'#fdfdfd'} // Change color based on isUpvoted
+                                    />
+                                </TouchableOpacity>
+                            </View>)
                             }
                         </View>
                             );
@@ -440,6 +658,7 @@ export default function Forum(){
                 />
             )} 
             </View>
+            </LinearGradient>
         
         <TouchableOpacity onPress={()=>navi.navigate('CreatePost')} style={[ {position: 'absolute', bottom:20, right: '40%', alignSelf: 'center',paddingHorizontal: 25,marginTop: 10, paddingVertical: 15, backgroundColor: '#1b434d', borderRadius: 100, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.8,

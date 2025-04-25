@@ -11,7 +11,7 @@ export default function BottomBar(){
     const navi = useNavigation();
 
     return (
-            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingHorizontal: 25, marginTop: 'auto', height: 100, width: '100%', backgroundColor: '#1b434d'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingHorizontal: 25, marginTop: 'auto', height: 100, width: '100%', backgroundColor: '#04844d'}}>
                 <TouchableOpacity onPress={()=>navi.navigate('Home')} style={{justifyContent: 'center', alignItems: 'center'}}>
                     <Icon
                     name="home"

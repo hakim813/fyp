@@ -7,22 +7,14 @@ import { UserContext } from '../UserContext';
 import { ref, set,remove, push, getDatabase, get, onValue, child } from "firebase/database";
 import Icon from "react-native-vector-icons/FontAwesome";
 import BottomBar from './BottomBar';
-import { PieChart } from 'react-native-gifted-charts';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function FinancialRecord(){
-    const [record, setRecord] = useState([]);
-    const [selectedPost, setSelectedPost] = useState(null);
-    const [comment, setComment] = useState("");
-    const {user, setUser } = useContext(UserContext);
-    const [isVisible, setIsVisible] = useState(false);
-    const [comments, setComments] = useState([]);
+    const { user } = useContext(UserContext);
     const [isMonthlyView, setIsMonthlyView] = useState(false);
-    const [isAll, setIsAll] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [filteredPosts, setFilteredPosts] = useState([]);
-    const [detail, setDetail] = useState(null);
     const [isDetailedView, setIsDetailedView] = useState(false);
     const [monthChosen, setMonthChosen] = useState(null);
+    const navi = useNavigation();
 
     const [values,setValues] = useState([1]);
     const [sliceColor,setSliceColor]=useState(['#333333'])
@@ -46,8 +38,6 @@ export default function FinancialRecord(){
       { key: "11", month: "Nov" },
       { key: "12", month: "Dec" }
     ];
-    const navi = useNavigation();
-
   
     useEffect(() => {
       if(!isDetailedView){
@@ -72,9 +62,12 @@ export default function FinancialRecord(){
               date: new Date(data[key].date).toDateString()
             }));
 
-            const uniqueData = dataList.filter((value, index, self) =>
-              index === self.findIndex((t) => t.date === value.date)
-            );
+            const uniqueData = dataList
+              .filter((value, index, self) =>
+                index === self.findIndex((t) => t.date === value.date)
+              )
+              .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort newest to oldest
+
 
             const groupByMonth = (items) => {
               // Group items by month using the logic provided
@@ -160,6 +153,12 @@ export default function FinancialRecord(){
     return(
       <View style={styles.container3}>
           <View style={[styles.container]}>
+            <LinearGradient
+                colors={['#03633a', '#95f6cc']} // start to end gradient
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[styles.container, {paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight+50 : StatusBar.currentHeight}]}
+            >
               <Text style={[styles.text]}>Expense Record</Text>
               <StatusBar style="auto" />
               <View style={[styles.container2]}>
@@ -284,6 +283,7 @@ export default function FinancialRecord(){
                       (<>
                         <FlatList
                           data={dataDate}
+                          style={{marginBottom: 50}}
                           keyExtractor={(item) => item.date}
                           renderItem={({ item }) => {
                                 return (
@@ -350,6 +350,7 @@ export default function FinancialRecord(){
                     }
                 </View>
               </View>
+            </LinearGradient>
           </View>
           <BottomBar></BottomBar>
       </View>

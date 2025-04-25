@@ -1,8 +1,7 @@
-import { StatusBar } from 'expo-status-bar';
 import React, {useState, useEffect} from 'react';
-import { Alert, Text, View, Platform, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { Alert, Text, View, Platform, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, StatusBar } from 'react-native';
 import styles from '../styles';
-import { general } from '../general';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { auth, database } from '../firebase';
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -15,145 +14,140 @@ const writeData = (user, idNo, username) => {
     email: user.email,
     nricId: idNo
   })
-    .then(() => console.log('Data written successfully!'))
+    .then(() => console.log('User registered successfully!'))
     .catch(error => console.error('Error writing data: ', error));
 };
 
 export default function Register(){
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [user,setUser] = useState(null);
-    const [idNo, setIdNo] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const navi = useNavigation();
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [idNo, setIdNo] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const navi = useNavigation();
 
-    useEffect(() => {
-      console.log('Signup page');
-    }, []);
+  // useEffect(() => {
+  //   console.log('Signup page');
+  // }, []);
 
-    const handleAuthentication = async () => {
-        try {
-            // const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            // const user = userCredential.user;
-            
-            //ensuring no missing field when submit
-            if(!username || !email || !idNo || !password || !confirmPassword){ 
-              Alert.alert("Fill in the field.");
-              console.log("Email:     ", email? email:'missing');
-              console.log("NRIC:      ", idNo?idNo:'missing');
-              console.log("Pass:      ", password?password:'missing');
-              console.log("ConfirmPW: ", confirmPassword?confirmPassword:'missing');
-              return;
-            }
+  const handleAuthentication = async () => {
+    try {
+      //ensuring no missing field when submit
+      if(!username || !email || !idNo || !password || !confirmPassword){ 
+        Alert.alert("Fill in the field.");
+        console.log("Email:     ", email? email:'missing');
+        console.log("NRIC:      ", idNo?idNo:'missing');
+        console.log("Pass:      ", password?password:'missing');
+        console.log("ConfirmPW: ", confirmPassword?confirmPassword:'missing');
+        return;
+      }
 
-             //verify the password and confirm password match
-            if(password!=confirmPassword){
-              Alert.alert("Password doesn't match.");
-              return;
-            }
+      //verify the password and confirm password match
+      if(password!=confirmPassword){
+        Alert.alert("Password doesn't match.");
+        return;
+      }
 
-            //firebase config
-            const db = getDatabase();
-            const dbRef = ref(db);
-            const snapshot = await get(child(dbRef, 'users'));
+      //firebase config
+      const db = getDatabase();
+      const dbRef = ref(db);
+      const snapshot = await get(child(dbRef, 'users'));
 
-            if (snapshot.exists()) {
-              const users = snapshot.val(); // Get all users from the database
-              const idExist = Object.values(users).find(user => user.nricId === idNo); // Check if any user has the same NRIC
-              const emailExist = Object.values(users).find(user => user.email === email); // Check if any user has the same email
-          
-              // If a user with the same email exists
-              if (emailExist){
-                Alert.alert("Email already taken. Please use a different one.");
-                return;
-              }
-              // If a user with the same NRIC exists
-              else if (idExist) {
-                Alert.alert("NRIC already taken. Please use a different one.");
-                return;
-              }
-              else{
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password); //use firebase func to auth user
-                const user = userCredential.user;
-                writeData(user, idNo, username);
-                navi.navigate('SignupSuccessful');
-              }
-            }
-            // else{
-            //   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            //   const user = userCredential.user;
-            //   writeData(user, idNo, username);
-            //   navi.navigate('SignupSuccessful')
-            // }
+      if (snapshot.exists()) {
+        const users = snapshot.val(); // Get all users from the database
+        const idExist = Object.values(users).find(user => user.nricId === idNo); // Check if any user has the same NRIC
+        const emailExist = Object.values(users).find(user => user.email === email); // Check if any user has the same email
 
-        } catch (error) {
-          console.error('Authentication error:', error.message);
+        if (emailExist){// If a user with the same email exists
+          Alert.alert("Email already taken. Please use a different one.");
+          return;
         }
-      };
+        
+        else if (idExist) { // If a user with the same NRIC exists
+          Alert.alert("NRIC already taken. Please use a different one.");
+          return;
+        }
+        else{
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password); //use firebase func to auth user
+          const user = userCredential.user;
+          writeData(user, idNo, username);
+          navi.navigate('SignupSuccessful');
+        }
+      }
 
-    return (
-      <View style={styles.container}>
-        <Text style={styles.text}>Create Your Account</Text>
-        <StatusBar style="auto" />
-        <KeyboardAvoidingView
-          style={[styles.container2, { opacity: 0.5}]}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-            <Text style={general.labelInput}>Username</Text>
-            <TextInput
-              style={general.input}
-              placeholder="Example : Ali bin Abu"
-              value={username}
-              onChangeText={setUsername}
-            />
-    
-            <Text style={general.labelInput}>Email Address</Text>
-            <TextInput
-              style={general.input}
-              placeholder="Example : user123@mail.com"
-              value={email}
-              onChangeText={setEmail}
-            />
-    
-            <Text style={general.labelInput}>NRIC ID</Text>
-            <TextInput
-              style={general.input}
-              placeholder="Example : 030108011234"
-              value={idNo}
-              onChangeText={setIdNo}
-            />
-    
-            <Text style={general.labelInput}>Password</Text>
-            <TextInput
-              style={general.input}
-              secureTextEntry={true}
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
-            />
-    
-            <Text style={general.labelInput}>Confirm Password</Text>
-            <TextInput
-              style={general.input}
-              secureTextEntry={true}
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
-    
-            <TouchableOpacity style={styles.button} onPress={() => handleAuthentication()}>
-              <Text style={{ color: '#fdfdfd', fontWeight: 'bold' }}>Register</Text>
-            </TouchableOpacity>
-            <Text style={styles.texttosignin}>
-              Already have an account?{' '}
-              <Text style={{ fontWeight: 'bold' }} onPress={() => navi.navigate('Login')}>
-                Jump to Sign In!
-              </Text>
+    } catch (error) {
+      console.error('Authentication error:', error.message);
+    }
+  };
+
+return (
+  <View style={styles.container}>
+    <LinearGradient
+      colors={['#03633a', '#95f6cc']} // start to end gradient
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={[styles.container, {paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight+50 : StatusBar.currentHeight}]}
+    >
+      <Text style={styles.text}>Create Your Account</Text>
+      <StatusBar style="auto" />
+      <KeyboardAvoidingView style={[styles.container2,{marginHorizontal: 15, flex: 0}]} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+          
+          <Text style={styles.labelInput}>Username</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Example : Ali bin Abu"
+            value={username}
+            onChangeText={setUsername}
+          />
+
+          <Text style={styles.labelInput}>Email Address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Example : user123@mail.com"
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          <Text style={styles.labelInput}>NRIC ID</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Example : 030108011234"
+            value={idNo}
+            onChangeText={setIdNo}
+          />
+
+          <Text style={styles.labelInput}>Password</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry={true}
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <Text style={styles.labelInput}>Confirm Password</Text>
+          <TextInput
+            style={styles.input}
+            secureTextEntry={true}
+            placeholder="Confirm your password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+
+          <TouchableOpacity style={styles.button} onPress={() => handleAuthentication()}>
+            <Text style={{ color: '#fdfdfd', fontFamily: 'Nunito', fontWeight: 'bold' }}>Register</Text>
+          </TouchableOpacity>
+          <Text style={styles.texttosignin}>
+            Already have an account?{' '}
+            <Text style={{ fontWeight: 'bold' }} onPress={() => navi.navigate('Login')}>
+              Jump to Sign In!
             </Text>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </View>
-    );    
+          </Text>
+        </ScrollView>
+
+      </KeyboardAvoidingView>
+    </LinearGradient>
+  </View>
+);    
 }

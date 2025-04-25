@@ -1,4 +1,4 @@
-import { StyleSheet,StatusBar } from 'react-native';
+import { Platform, StyleSheet,StatusBar } from 'react-native';
 
 export const styles = StyleSheet.create({
 
@@ -25,54 +25,61 @@ export const styles = StyleSheet.create({
 
 container: {
     flex: 1,
-    backgroundColor: '#1b434d',
-    paddingTop: StatusBar.currentHeight+50,
+    backgroundColor: '#50c878',
+    // paddingTop: StatusBar.currentHeight+50,
     // marginBottom: '100',
   },
 
   container2: {
     flex: 1,
     backgroundColor: '#fdfdfd',
-    borderTopRightRadius: 25 ,
-    borderTopLeftRadius: 25 ,
+    borderRadius: 25 ,
+    // borderTopLeftRadius: 25 ,
     marginTop: 25 ,
-    padding: 20 ,
-    paddingTop: 25 ,
-    // alignContent: 'flex-start'
+    padding: 20,
+    paddingTop: 25
   },
 
 
   container3: {
     flex: 1,
-    backgroundColor: '#1b434d',
+    backgroundColor: '#fdfdfd'
   },
 
   text: {
-    fontWeight: 700,
+    
+    fontFamily: 'Nunito-ExtraBold',
     color: '#fdfdfd',
-    fontSize: 50,
+    fontSize: Platform.OS === 'ios' ? 40 : 30,
     marginTop: 20,
-    marginLeft: 30
+    marginLeft: 20
   },
 
   labelInput: {
-    fontWeight: 'semibold',
+    fontFamily: 'Nunito',
+    fontWeight: 'bold',
     color: 'black'
   },
 
+  font:{
+    fontFamily: 'Nunito',
+    fontSize: 20
+  },
 
-  // input: {
-  //   height: 50,
-  //   borderWidth: 0.5,
-  //   borderRadius: 15,
-  //   borderColor: 'grey',
-  //   paddingHorizontal: 15,
-  //   backgroundColor: '#fdfdfd',
-  //   marginTop: 10,
-  //   marginBottom: 18
+  input: {
+    fontFamily: 'Nunito',
+    height: 50,
+    borderWidth: 0.5,
+    borderRadius: 15,
+    borderColor: 'grey',
+    paddingHorizontal: 15,
+    backgroundColor: '#fdfdfd',
+    marginTop: 10,
+    marginBottom: 18
+  },
 
   button: {
-    backgroundColor: '#1b434d', // Set your desired background color
+    backgroundColor: '#06a561', // Set your desired background color
     paddingVertical: 15,
     paddingHorizontal: 25,
     borderRadius: 30,
@@ -84,8 +91,9 @@ container: {
 
   texttosignin: {
     color: '#020202',
+    fontFamily: 'Nunito',
     textAlign: 'center',
-    marginTop: 25
+    marginVertical: 15
   },
 
   containerAttachMedia: {
@@ -108,23 +116,27 @@ export const stylesHome = StyleSheet.create({
 
   bg: {
     flex: 1,
-    backgroundColor: '#1b434d',
-    paddingTop: StatusBar.currentHeight+50
+    backgroundColor: '#50c878',
+    // paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight+50 : StatusBar.currentHeight,
+    
   },
 
   context: {
     
     minHeight: 200,
-    borderRadius: 10,
+    borderRadius: 20,
+    borderColor: '#222222',
+    borderWidth: 0.5,
     padding: 10,
     marginHorizontal: 15,
     marginBottom: 10,
   },
 
   welcomeText: {
-    fontWeight: 800,
+    fontWeight: 600,
     color: '#00B32E',
-    fontSize: 40,
+    fontSize: Platform.OS === 'ios' ? 40 : 30,
+    fontFamily: 'Nunito-ExtraBold',
     // marginLeft: 30
   },
 
@@ -139,15 +151,15 @@ export const stylesHome = StyleSheet.create({
   },
 
   features: {
-    paddingVertical: 15,
+    // paddingVertical: 15,
     paddingHorizontal: 15,
     borderRadius: 30,
-    margin: 5,
+    marginHorizontal: 5,
     height: 190,
     width: 150,
-    opacity: 0.7,
-    borderWidth: 0.3,
-    alignSelf: 'center'
+    // borderWidth: 0.3,
+    alignSelf: 'center',
+    fontFamily: 'Nunito-Bold'
   },
 
   imageSlider: {
@@ -159,8 +171,6 @@ export const stylesHome = StyleSheet.create({
     height: 150,
     width: 230,
     opacity: 0.5,
-
-
     alignSelf: 'center'
   },
 });
