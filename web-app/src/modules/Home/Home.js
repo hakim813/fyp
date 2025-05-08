@@ -1,6 +1,6 @@
 import React from 'react';
 import { signOut } from 'firebase/auth';  // Firebase sign-out function
-import { auth } from './firebase';  // Import Firebase auth
+import { auth, database, storage } from '../../firebase/firebase';  // Correct path for firebase.js
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for redirection
 
 function Home() {

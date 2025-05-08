@@ -1,10 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';  // Import Router components
-import { UserProvider } from './UserContext';  // Import UserProvider to manage user state
-import './App.css';  // Import styles
+import { UserProvider } from './utils/UserContext';  // Corrected path for UserContext
+import './styles/App.css';  // Corrected path for App.css
 
-import Login from './Login';  // Import Login component
-import Home from './Home';  // Import Home component
+import Login from './modules/Authentication/Login';
+import Home from './modules/Home/Home';
+
 
 function App() {
   return (

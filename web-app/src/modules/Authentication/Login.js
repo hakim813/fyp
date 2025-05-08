@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { auth } from './firebase';  // Import Firebase auth
+import { auth, database, storage } from '../../firebase/firebase';  // Correct path for firebase.js
 import { signInWithEmailAndPassword } from 'firebase/auth';  // Import Firebase Auth function
 import { useNavigate } from 'react-router-dom';  // Import useNavigate for redirection
 
