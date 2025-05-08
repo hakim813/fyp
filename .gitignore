@@ -1,0 +1,15 @@
+# Node.js dependencies
+node_modules/
+
+# Build output
+build/
+dist/
+
+# Log files
+*.log
+
+# VSCode settings
+.vscode/
+
+# .map and other temporary files
+*.map
