@@ -1,24 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';  // Import Router components
+import { UserProvider } from './UserContext';  // Import UserProvider to manage user state
+import './App.css';  // Import styles
+
+import Login from './Login';  // Import Login component
+import Home from './Home';  // Import Home component
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserProvider>  {/* Wrap everything inside UserProvider */}
+      <Router>  {/* Use Router to handle navigation */}
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} /> {/* Redirect from root to login */}
+          <Route path="/login" element={<Login />} />  {/* Route to Login page */}
+          <Route path="/home" element={<Home />} />   {/* Route to Home page */}
+        </Routes>
+      </Router>
+      <div className="App">
+        <header className="App-header">
+          <p>Welcome to the Web App!</p>
+        </header>
+      </div>
+    </UserProvider>
   );
 }
 
