@@ -28,28 +28,36 @@ body {
   border-radius: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 400px;
+  width: 450px;
   text-align: center;
 }
 
-h1 {
-  font-size: 36px;
+.login-box h1 {
+  font-size: 42px; /* Adjust the font size */
   font-weight: bold;
-  color: #000; /* Black color for "WeGig" logo */
+  color: #000; /* Set "We" to black */
   margin-bottom: 10px;
+  text-align: center; /* Center the text */
 }
 
-h1 span {
-  color: #00b16a; /* Green color for "Gig" */
+.login-box h1 span {
+  color: #00b16a; /* Set "Gig" to green */
+  font-size: inherit; /* Inherit the font size from h1 */
 }
 
 h2 {
-  font-size: 18px;
-  color: #000; /* Black color for "Login to Account" */
+  font-size: 24px;
+  color: #000;
   margin-bottom: 20px;
 }
 
-p {
+.login-box p {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 50px;
+}
+
+.signup-text p {
   color: #555;
   font-size: 14px;
   margin-bottom: 20px;
@@ -57,7 +65,7 @@ p {
 
 .input-field {
   text-align: left;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
 }
 
 .input-field label {
@@ -86,7 +94,7 @@ p {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 }
 
 .checkbox-field input {
@@ -96,6 +104,7 @@ p {
 .checkbox-field label {
   font-size: 12px;
   color: #333;
+  margin-bottom: auto;
 }
 
 .forgot-password {
@@ -103,7 +112,8 @@ p {
   color: #5a8cff;
   text-decoration: none;
   display: block;
-  margin-bottom: 12px;
+  margin-top: -20px;
+  margin-bottom: 20px;
   text-align: right; /* Align the link to the right */
 }
 
@@ -141,53 +151,4 @@ p {
 
 .signup-text a:hover {
   text-decoration: underline;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
-  text-align: center;
-}
-
-.modal-content h3 {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.modal-content p {
-  font-size: 1rem;
-  margin-bottom: 20px;
-}
-
-.modal-content button {
-  padding: 10px 20px;
-  background-color: #2ecc71;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.modal-content button:hover {
-  background-color: #27ae60;
-}
-
-.signup-text a {
-  color: #2980b9;
-  font-weight: bold;
 }

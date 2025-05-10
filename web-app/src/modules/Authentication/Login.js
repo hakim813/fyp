@@ -28,9 +28,9 @@ function Login() {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h1>
-          We<span>Gig</span>
-        </h1>
+
+        <h1>We<span>Gig</span></h1>
+
         <h2>Login to Account</h2>
         <p>Please enter your email and password to continue</p>
 
