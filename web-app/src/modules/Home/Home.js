@@ -1,28 +1,56 @@
 import React from 'react';
-import { signOut } from 'firebase/auth';  // Firebase sign-out function
-import { auth, database, storage } from '../../firebase/firebase';  // Correct path for firebase.js
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for redirection
+import Navbar from '../../components/Navbar'; // Import Navbar component
+import "../../styles/home.css"; // Import the CSS file for Home page
 
 function Home() {
-  const navigate = useNavigate();  // Initialize useNavigate for redirecting after logout
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);  // Sign out the user from Firebase
-      console.log("User logged out successfully");
-
-      // Redirect to the Login page after logging out
-      navigate('/login');
-    } catch (error) {
-      console.error("Error logging out:", error.message);
-    }
-  };
-
   return (
-    <div>
-      <h1>Welcome {auth.currentUser ? auth.currentUser.email : 'Guest'}</h1>
-      <button onClick={handleLogout}>Log Out</button>
-      <p>This is the Home page!</p>
+    <div className="home-container">
+      <Navbar />  {/* Display Navbar */}
+      <div className="main-content">
+        {/* Features Section */}
+        <section className="features">
+          <h2>Features</h2>
+          <div className="feature-boxes">
+            <div className="feature-box forum">
+              <h3>Forum</h3>
+            </div>
+            <div className="feature-box finance">
+              <h3>Finance</h3>
+            </div>
+            <div className="feature-box helpdesk">
+              <h3>Helpdesk</h3>
+            </div>
+            <div className="feature-box redeem">
+              <h3>Redeem</h3>
+            </div>
+          </div>
+        </section>
+
+        {/* Learn Section */}
+        <section className="learn">
+          <h2>Learn</h2>
+          <div className="cards">
+            <div className="card">
+              <img src="https://via.placeholder.com/300" alt="How to" />
+              <h3>How to</h3>
+              <p>This is just a sample text....</p>
+              <a href="/">Read More</a>
+            </div>
+            <div className="card">
+              <img src="https://via.placeholder.com/300" alt="How to" />
+              <h3>How to</h3>
+              <p>This is just a sample text....</p>
+              <a href="/">Read More</a>
+            </div>
+            <div className="card">
+              <img src="https://via.placeholder.com/300" alt="How to" />
+              <h3>How to</h3>
+              <p>This is just a sample text....</p>
+              <a href="/">Read More</a>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
