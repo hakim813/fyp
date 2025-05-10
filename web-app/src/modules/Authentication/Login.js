@@ -1,61 +1,83 @@
 import React, { useState } from 'react';
-import { auth, database, storage } from '../../firebase/firebase';  // Correct path for firebase.js
-import { signInWithEmailAndPassword } from 'firebase/auth';  // Import Firebase Auth function
-import { useNavigate } from 'react-router-dom';  // Import useNavigate for redirection
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../firebase/firebase'; // Firebase auth
+import { useNavigate } from 'react-router-dom'; // For navigation
+import '../../styles/login.css';  // Correct path to login.css
 
-function Login() {
-  const [email, setEmail] = useState('');  // State to hold the email input
-  const [password, setPassword] = useState('');  // State to hold the password input
-  const [error, setError] = useState('');  // State to hold any error messages
 
-  const navigate = useNavigate();  // Initialize useNavigate for redirecting after login
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberPassword, setRememberPassword] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
+  // Handle form submission for login
   const handleLogin = async (e) => {
-    e.preventDefault();  // Prevent the page from refreshing on form submit
-
+    e.preventDefault();
     try {
-      // Attempt to sign in with Firebase
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("User logged in successfully");
-
-      // Redirect to the Home page after successful login
-      navigate('/home');
+      await signInWithEmailAndPassword(auth, email, password); // Firebase authentication
+      navigate('/home'); // Redirect to home page after successful login
     } catch (error) {
-      // If an error occurs, display the error message
-      setError(error.message);
-      console.error("Error logging in:", error.message);
+      setError(error.message); // Display error if login fails
     }
   };
 
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            required
-          />
-        </div>
-        <div>
+    <div className="container">
+      <div className="login-box">
+        <h1>We<span className="highlight">Gig</span></h1>
+        <h2>Login to Account</h2>
+        <p>Please enter your email and password to continue</p>
+
+        <form onSubmit={handleLogin}>
+          <div className="input-field">
+            <label htmlFor="email">Email address:</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email Address"
+              required
+            />
+          </div>
+
+          <div className="input-field password-container">
+            <label htmlFor="password">Password:</label>
+            <a href="#" className="forgot-password">Forgot Password?</a>
+          </div>
+
           <input
             type="password"
+            id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
+            placeholder="Password"
             required
           />
-        </div>
-        <button type="submit">Log In</button>
-      </form>
 
-      {/* Display error message if login fails */}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+          <div className="remember-container">
+            <input
+              type="checkbox"
+              id="remember"
+              checked={rememberPassword}
+              onChange={() => setRememberPassword(!rememberPassword)}
+            />
+            <label htmlFor="remember">Remember Password</label>
+          </div>
+
+          {error && <div className="error-message">{error}</div>}
+
+          <button type="submit" className="btn">Sign In</button>
+        </form>
+
+        <div className="signup-text">
+          <p>Don't have an account? <a href="/signup">Create Account</a></p>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default Login;
