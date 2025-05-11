@@ -1,0 +1,105 @@
+/* Profile page layout */
+.profile-container {
+  display: flex;
+  min-height: 100vh;
+  margin-top: 200px;
+  width: 1500px;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-right: 1px solid #e1e1e1;
+}
+
+.sidebar-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 5px;
+  margin: 10px 0;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+}
+
+.sidebar-button:hover {
+  background-color: #00b16a;
+  color: white;
+}
+
+.profile-content {
+  flex-grow: 1;
+  padding: 30px;
+  background-color: #f9f9f9;
+}
+
+.profile-section {
+  margin-bottom: 30px;
+}
+
+.profile-section h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.profile-field {
+  margin-bottom: 20px;
+}
+
+.profile-field label {
+  font-size: 16px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.profile-field input, .profile-field select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.edit-profile-button, .verify-profile-button, .file-upload-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #00b16a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.edit-profile-button:hover, .verify-profile-button:hover, .file-upload-button:hover {
+  background-color: #27ae60;
+}
+
+.file-upload-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.file-upload-textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.verification-message {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #ff3333;
+}
+

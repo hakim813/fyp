@@ -13,11 +13,11 @@ body {
   justify-content: center;
   height: 100vh;
   margin: 0; /* Remove margin for full-width */
+  margin-top: 80px;
 }
 
 .home-container {
-  width: 100%;
-  max-width: 1200px;
+  width: 1200px;
   margin: 0 auto;
   background-color: white;
   border-radius: 20px; /* Rounded corners for the container */
@@ -49,8 +49,8 @@ body {
 .feature-box {
   background: #f0f0f0;
   border-radius: 10px;
-  padding: 20px;
-  width: 150px;
+  padding: 80px;
+  width: 200px;
   text-align: center;
   cursor: pointer;
   transition: 0.3s;
