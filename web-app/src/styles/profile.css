@@ -1,50 +1,67 @@
-/* Profile page layout */
+/* Profile Page Layout */
 .profile-container {
   display: flex;
-  min-height: 100vh;
-  margin-top: 200px;
-  width: 1500px;
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
 }
 
 .sidebar {
   width: 250px;
-  background-color: #ffffff;
+  background-color: #f4f4f4;
   padding: 20px;
-  border-right: 1px solid #e1e1e1;
+  border-radius: 10px;
+  margin-top: 300px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-button {
   display: block;
-  width: 100%;
-  padding: 10px;
-  text-align: left;
-  background-color: #f0f0f0;
+  background-color: white;
+  color: black;
   border: none;
-  border-radius: 5px;
-  margin: 10px 0;
-  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 10px;
+  text-align: left;
   font-size: 16px;
-  color: #333;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 .sidebar-button:hover {
-  background-color: #00b16a;
-  color: white;
+  background-color: #e1e1e1;
 }
 
-.profile-content {
-  flex-grow: 1;
-  padding: 30px;
-  background-color: #f9f9f9;
+/* Profile Photo */
+.profile-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
-.profile-section {
-  margin-bottom: 30px;
+.profile-photo-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  margin-right: 10px;
 }
 
-.profile-section h2 {
-  font-size: 24px;
-  font-weight: bold;
+/* Profile Form */
+.profile-main {
+  width: 1000px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 300px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
   margin-bottom: 20px;
 }
 
@@ -53,9 +70,10 @@
 }
 
 .profile-field label {
-  font-size: 16px;
-  margin-bottom: 8px;
   display: block;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
 }
 
 .profile-field input, .profile-field select {
@@ -63,43 +81,65 @@
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 16px;
+  font-size: 14px;
 }
 
-.edit-profile-button, .verify-profile-button, .file-upload-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #00b16a;
-  color: white;
+/* Edit / Save / Cancel Buttons */
+.edit-button,
+.save-button,
+.cancel-button {
+  padding: 10px 20px;
   border: none;
-  border-radius: 5px;
   font-size: 16px;
+  border-radius: 5px;
   cursor: pointer;
+  transition: 0.3s;
+  margin-right: 10px;
 }
 
-.edit-profile-button:hover, .verify-profile-button:hover, .file-upload-button:hover {
+.edit-button {
+  background-color: #3498db;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #2980b9;
+}
+
+.save-button {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.save-button:hover {
   background-color: #27ae60;
 }
 
-.file-upload-input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
+.cancel-button {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #c0392b;
+}
+
+.profile-status h3 {
+  font-size: 16px;
+  color: #2ecc71;
+  margin-top: 20px;
+}
+
+/* Progress Bar */
+.progress-bar {
+  margin-top: 20px;
+  height: 10px;
+  background-color: #e1e1e1;
   border-radius: 5px;
 }
 
-.file-upload-textarea {
-  width: 100%;
-  height: 100px;
-  padding: 10px;
-  border: 1px solid #ccc;
+.progress {
+  height: 100%;
+  background-color: #2ecc71;
   border-radius: 5px;
 }
-
-.verification-message {
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: #ff3333;
-}
-
