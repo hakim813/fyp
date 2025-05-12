@@ -11,6 +11,7 @@ import Login from './modules/Authentication/Login';
 import Signup from './modules/Authentication/Signup';
 import Home from './modules/Home/Home';
 import Profile from './modules/Profile/Profile';
+import Helpdesk from './modules/Helpdesk/Helpdesk';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/signup" element={<><Signup /></>} />  {/* Only show signup page */}
           <Route path="/home" element={<><Navbar /><Home /></>} />  {/* Show navbar only in Home page */}
           <Route path="/profile" element={<Profile />} />
+          <Route path="/helpdesk" element={<Helpdesk />} /> {/* Add this route */}
         </Routes>
       </Router>
     </UserProvider>
