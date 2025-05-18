@@ -7,7 +7,7 @@
 
 body {
   font-family: 'Arial', sans-serif;
-  background-color: #00b16a; /* Green background color */
+  background: linear-gradient(180deg, #00de85, #004b2d); /* WeGig Green */
   color: #333;
   display: flex;
   justify-content: center;

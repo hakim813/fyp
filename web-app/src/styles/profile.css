@@ -1,6 +1,4 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(180deg, #00de85, #004b2d); /* WeGig Green */
     min-height: 100vh;
     display: flex;
     align-items: center;
