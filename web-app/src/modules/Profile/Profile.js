@@ -1,168 +1,94 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { UserContext } from "../../utils/UserContext";
-import "../../styles/profile.css";
+import React, { useEffect, useState } from 'react';
+import { getAuth } from "firebase/auth";
+import { getDatabase, ref, get } from "firebase/database";
+import { Link } from "react-router-dom";
+import '../../styles/profile.css';
 import Navbar from '../../components/Navbar';
 
-
 const Profile = () => {
-  const [editMode, setEditMode] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: "John",
-    nric: "123456-12-1234",
-    email: "john.doe@example.com",
-    phone: "123-456-7890",
-    gender: "Male",
-    birthDate: "01/01/1990",
-    photo: null,  // Added photo state
-  });
-  const [isProfileVerified, setIsProfileVerified] = useState(false);
-  const [progress, setProgress] = useState(50); // Placeholder for progress bar
-  const navigate = useNavigate();
+    const [userData, setUserData] = useState({});
+    const [completionPercentage, setCompletionPercentage] = useState(0);
 
-  const handleEditProfile = () => {
-    setEditMode(true);
-  };
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const db = getDatabase();
 
-  const handleSaveProfile = () => {
-    setEditMode(false);
-    setIsProfileVerified(true); // For now, we will mark it as verified after save.
-    setProgress(100); // Set progress to 100% when profile is verified
-  };
+    const fetchData = () => {
+        if (user) {
+            const userRef = ref(db, `users/${user.uid}`);
+            get(userRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    
+                    // Include the authenticated email in the userData object
+                    setUserData({
+                        ...data,
+                        email: user.email // Fetch email directly from Firebase Auth
+                    });
 
-  const handleCancel = () => {
-    setEditMode(false);
-  };
+                    calculateCompletion({
+                        ...data,
+                        email: user.email
+                    });
+                }
+            }).catch((error) => {
+                console.error("Error fetching user data:", error);
+            });
+        }
+    };
 
-  // Handle Profile Photo Upload
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProfileData({ ...profileData, photo: URL.createObjectURL(file) }); // Preview the uploaded photo
-    }
-  };
+    useEffect(() => {
+        fetchData();
+    }, [user]); // Re-fetch data whenever `user` changes
 
-  return (
-    <div className="profile-container">
-      {/* Navbar Component */}
-      <Navbar />
+    const calculateCompletion = (data) => {
+        const fields = [
+            data.fullName, data.nric, data.email, data.phone, 
+            data.gender, data.dob, data.profilePhoto, data.verificationDocument
+        ];
+        const filledFields = fields.filter(field => field && field !== "").length;
+        const percentage = Math.round((filledFields / fields.length) * 100);
+        setCompletionPercentage(percentage);
+    };
 
-      {/* Sidebar */}
-      <div className="sidebar">
-        <button onClick={() => navigate("/profile")} className="sidebar-button">View Profile</button>
-        <button onClick={() => navigate("/profile/upload")} className="sidebar-button">Upload Documents</button>
-        <button onClick={() => navigate("/profile/verify")} className="sidebar-button">Verify Details</button>
-        <div className="progress-bar">
-          <div className="progress" style={{ width: `${progress}%` }}></div>
-        </div>
-      </div>
+    return (
+        <>
+            <Navbar />
 
-      {/* Main Profile Content */}
-      <div className="profile-main">
-        <div className="profile-header">
-          <h2>Personal Information</h2>
-        </div>
+            <div className="profile-container">
+                <h2>Profile</h2>
+                <div className="profile-content">
+                    <img 
+                        src={userData.profilePhoto || "/default-profile.png"} 
+                        alt="Profile" 
+                        className="profile-photo" 
+                    />
+                    <div className="profile-details">
+                        <p><strong>Full Name:</strong> {userData.fullName || "Not provided"}</p>
+                        <p><strong>NRIC:</strong> {userData.nric || "Not provided"}</p>
+                        <p><strong>Email:</strong> {user.email || "Not provided"}</p>
+                        <p><strong>Phone:</strong> {userData.phone || "Not provided"}</p>
+                        <p><strong>Gender:</strong> {userData.gender || "Not provided"}</p>
+                        <p><strong>Date of Birth:</strong> {userData.dob || "Not provided"}</p>
+                        <p><strong>Verification Status:</strong> {userData.verified ? "Verified" : "Pending"}</p>
+                    </div>
+                    <div className="profile-completion">
+                        <p>Profile Completion: {completionPercentage}%</p>
+                        <div className="progress-bar">
+                            <div 
+                                className="progress" 
+                                style={{ width: `${completionPercentage}%` }}
+                            ></div>
+                        </div>
+                    </div>
 
-        {/* Profile Form */}
-        <form>
-          <div className="profile-photo">
-            {/* Profile Photo Section */}
-            <label htmlFor="profilePhoto">
-              <img 
-                src={profileData.photo || "/path/to/default-photo.png"} 
-                alt="Profile"
-                className="profile-photo-circle"
-              />
-              <input 
-                type="file" 
-                id="profilePhoto" 
-                accept="image/*" 
-                onChange={handlePhotoChange} 
-                style={{ display: "none" }} 
-                disabled={!editMode} 
-              />
-            </label>
-          </div>
-
-          <div className="profile-field">
-            <label>Name:</label>
-            <input 
-              type="text" 
-              value={profileData.name} 
-              disabled={!editMode} 
-              onChange={(e) => setProfileData({ ...profileData, name: e.target.value })} 
-            />
-          </div>
-
-          <div className="profile-field">
-            <label>NRIC:</label>
-            <input 
-              type="text" 
-              value={profileData.nric} 
-              disabled={!editMode} 
-              onChange={(e) => setProfileData({ ...profileData, nric: e.target.value })} 
-            />
-          </div>
-
-          <div className="profile-field">
-            <label>Email:</label>
-            <input 
-              type="email" 
-              value={profileData.email} 
-              disabled={!editMode} 
-              onChange={(e) => setProfileData({ ...profileData, email: e.target.value })} 
-            />
-          </div>
-
-          <div className="profile-field">
-            <label>Phone Number:</label>
-            <input 
-              type="text" 
-              value={profileData.phone} 
-              disabled={!editMode} 
-              onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })} 
-            />
-          </div>
-
-          <div className="profile-field">
-            <label>Gender:</label>
-            <select 
-              value={profileData.gender} 
-              disabled={!editMode} 
-              onChange={(e) => setProfileData({ ...profileData, gender: e.target.value })}>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
-          </div>
-
-          <div className="profile-field">
-            <label>Date of Birth:</label>
-            <input 
-              type="text" 
-              value={profileData.birthDate} 
-              disabled={!editMode} 
-              onChange={(e) => setProfileData({ ...profileData, birthDate: e.target.value })} 
-            />
-          </div>
-
-          {/* Edit / Save / Cancel Buttons */}
-          {editMode ? (
-            <>
-              <button type="button" onClick={handleSaveProfile} className="save-button">Save</button>
-              <button type="button" onClick={handleCancel} className="cancel-button">Cancel</button>
-            </>
-          ) : (
-            <button type="button" onClick={handleEditProfile} className="edit-button">Edit Profile</button>
-          )}
-        </form>
-
-        {/* Profile Status */}
-        <div className="profile-status">
-          <h3>{isProfileVerified ? "Profile Verified" : "Profile Not Verified"}</h3>
-        </div>
-      </div>
-    </div>
-  );
+                    <Link to="/edit-profile">
+                        <button className="edit-btn">Edit Profile</button>
+                    </Link>
+                </div>
+            </div>
+        </>
+    );
 };
 
 export default Profile;

@@ -1,8 +1,10 @@
 import React from "react";
-import { NavLink } from "react-router-dom"; // Import NavLink for active styling
-import "../styles/navbar.css"; // Import navbar CSS for styling
+import { NavLink, useLocation } from "react-router-dom"; // Import useLocation
+import "../styles/navbar.css";
 
 function Navbar() {
+  const location = useLocation();
+
   return (
     <nav className="navbar">
       <div className="navbar-logo">
@@ -55,7 +57,10 @@ function Navbar() {
         <li>
           <NavLink
             to="/profile"
-            className={({ isActive }) => (isActive ? "active" : "")}
+            // Check isActive OR location.pathname === '/edit-profile'
+            className={({ isActive }) =>
+              isActive || location.pathname === "/edit-profile" ? "active" : ""
+            }
           >
             Profile
           </NavLink>
