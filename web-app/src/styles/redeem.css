@@ -1,0 +1,46 @@
+.redeem-container {
+  max-width: 600px;
+  margin: 40px auto;
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.redeem-btn {
+  margin-top: 20px;
+  background-color: #00de85;
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.redeem-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.redeem-btn:hover:not(:disabled) {
+  background-color: #009e5b;
+}
+
+.voucher-section {
+  margin-top: 30px;
+}
+
+.voucher-code {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #00de85;
+  margin: 15px 0;
+}
+
+.error-msg {
+  color: red;
+  margin-top: 15px;
+}

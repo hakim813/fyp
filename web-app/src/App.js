@@ -8,11 +8,17 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 
 import Login from './modules/Authentication/Login';
+
 import Signup from './modules/Authentication/Signup';
+
 import Home from './modules/Home/Home';
+
 import Profile from './modules/Profile/Profile';
 import EditProfile from "./modules/Profile/EditProfile";
+
 import Helpdesk from './modules/Helpdesk/Helpdesk';
+
+import Redeem from './modules/Redeem/Redeem';
 
 function App() {
   return (
@@ -29,7 +35,11 @@ function App() {
           {/* Add Navbar wrapper for Profile, EditProfile, Helpdesk */}
           <Route path="/profile" element={<><Navbar /><Profile /></>} />
           <Route path="/edit-profile" element={<><Navbar /><EditProfile /></>} />
+          
           <Route path="/helpdesk" element={<><Navbar /><Helpdesk /></>} />
+
+          <Route path="/redeem" element={<><Navbar /><Redeem /></>} />
+
         </Routes>
       </Router>
     </UserProvider>
