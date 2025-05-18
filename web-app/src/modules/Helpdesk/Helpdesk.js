@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../../styles/helpdesk.css'; // Import your CSS file for styling
 import Navbar from '../../components/Navbar'; // Import Navbar
 import Sidebar from '../../components/Sidebar'; // Import Sidebar
+import { useNavigate } from 'react-router-dom';
 
 const Helpdesk = () => {
   const [complaints, setComplaints] = useState([
@@ -12,6 +13,9 @@ const Helpdesk = () => {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [newComplaint, setNewComplaint] = useState({ title: '', description: '', file: null });
+  const navigate = useNavigate();
+  
+  
 
   const sidebarButtons = [
     { path: '/helpdesk', label: 'Dashboard' },
@@ -38,6 +42,7 @@ const Helpdesk = () => {
       <Navbar /> {/* Add Navbar */}
       <div className="helpdesk-container">
         <Sidebar buttons={sidebarButtons} /> {/* Pass buttons prop */}
+        
         <div className="helpdesk-content">
           <h2>Dashboard</h2>
           {isFormOpen ? (
