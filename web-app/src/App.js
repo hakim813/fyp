@@ -17,6 +17,7 @@ import Profile from './modules/Profile/Profile';
 import EditProfile from "./modules/Profile/EditProfile";
 
 import Helpdesk from './modules/Helpdesk/Helpdesk';
+import History from './modules/Helpdesk/History';
 
 import Redeem from './modules/Redeem/Redeem';
 
@@ -37,6 +38,7 @@ function App() {
           <Route path="/edit-profile" element={<><Navbar /><EditProfile /></>} />
           
           <Route path="/helpdesk" element={<><Navbar /><Helpdesk /></>} />
+          <Route path="/helpdesk/history" element={<><Navbar /><History /></>} />
 
           <Route path="/redeem" element={<><Navbar /><Redeem /></>} />
 

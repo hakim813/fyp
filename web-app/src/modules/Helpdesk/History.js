@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { getAuth } from 'firebase/auth';
-import { getDatabase, ref, query, orderByChild, equalTo, onValue, update } from 'firebase/database';
+import { getDatabase, ref, query, orderByChild, equalTo, onValue, remove } from 'firebase/database';
 import Navbar from '../../components/Navbar';
-import ComplaintForm from './ComplaintForm';
 import '../../styles/helpdesk.css';
 import { useNavigate } from 'react-router-dom';
 
-const Helpdesk = () => {
-  const [ongoingComplaints, setOngoingComplaints] = useState([]);
+const History = () => {
+  const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
 
   const auth = getAuth();
   const db = getDatabase();
@@ -20,48 +18,43 @@ const Helpdesk = () => {
     if (!user) return;
 
     const complaintsRef = ref(db, 'complaints');
-    const userComplaintsQuery = query(
-      complaintsRef,
-      orderByChild('userId'),
-      equalTo(user.uid)
-    );
+    const userComplaintsQuery = query(complaintsRef, orderByChild('userId'), equalTo(user.uid));
 
     const unsubscribe = onValue(userComplaintsQuery, snapshot => {
       const data = snapshot.val() || {};
-      const filtered = Object.entries(data)
-        .filter(([key, complaint]) => complaint.status === 'ongoing')
-        .map(([key, complaint]) => ({ id: key, ...complaint }));
-      setOngoingComplaints(filtered);
+      const complaintList = Object.entries(data).map(([key, value]) => ({ id: key, ...value }));
+      setComplaints(complaintList);
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, [user, db]);
 
-  const openForm = () => setShowForm(true);
-  const closeForm = () => setShowForm(false);
-
-  // Mark complaint as resolved
-  const handleResolve = (complaintId) => {
-    if (!complaintId) return;
-    if (!window.confirm('Are you sure you want to mark this complaint as resolved?')) return;
-
-    const complaintRef = ref(db, `complaints/${complaintId}`);
-    update(complaintRef, { status: 'resolved' })
-      .catch(err => {
-        alert('Failed to update complaint status.');
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this complaint?')) {
+      const complaintRef = ref(db, `complaints/${id}`);
+      remove(complaintRef).catch(err => {
+        alert('Failed to delete complaint.');
         console.error(err);
       });
+    }
   };
 
   return (
     <>
       <Navbar />
       <div className="helpdesk-container">
-        <h2>Ongoing Complaints</h2>
+        <h2>Complaint History</h2>
+
+        <button 
+          onClick={() => navigate('/helpdesk')} 
+          className="back-btn"
+        >
+          &larr; Back
+        </button>
 
         {loading && <p>Loading complaints...</p>}
-        
+
         <table className="complaints-table">
           <thead>
             <tr>
@@ -71,22 +64,22 @@ const Helpdesk = () => {
               <th>Status</th>
               <th>Date Submitted</th>
               <th>Photo</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {!loading && ongoingComplaints.length === 0 ? (
+            {!loading && complaints.length === 0 ? (
               <tr>
                 <td colSpan="7" style={{ textAlign: 'center', fontStyle: 'italic' }}>
-                  No ongoing complaints.
+                  No complaints submitted yet.
                 </td>
               </tr>
             ) : (
-              ongoingComplaints.map(c => (
+              complaints.map(c => (
                 <tr key={c.id}>
                   <td>{c.ticketNumber}</td>
                   <td>{c.title}</td>
-                  <td>{c.category || 'N/A'}</td> {/* Show category */}
+                  <td>{c.category || 'N/A'}</td> {/* Display category */}
                   <td>{c.status}</td>
                   <td>{new Date(c.createdAt).toLocaleDateString()}</td>
                   <td>
@@ -101,35 +94,16 @@ const Helpdesk = () => {
                     )}
                   </td>
                   <td>
-                    <button
-                      className="resolve-btn"
-                      onClick={() => handleResolve(c.id)}
-                    >
-                      Resolve
-                    </button>
+                    <button className="delete-btn" onClick={() => handleDelete(c.id)}>Delete</button>
                   </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-
-        <div style={{ marginTop: '20px' }}>
-          <button onClick={() => setShowForm(true)} className="submit-complaint-btn">
-            Submit Complaint
-          </button>{' '}
-          <button
-            onClick={() => navigate('/helpdesk/history')}
-            className="view-history-btn"
-          >
-            View History
-          </button>
-        </div>
-
-        {showForm && <ComplaintForm onClose={closeForm} />}
       </div>
     </>
   );
 };
 
-export default Helpdesk;
+export default History;
