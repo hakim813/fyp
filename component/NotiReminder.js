@@ -210,7 +210,7 @@ export default function NotiReminder({ route }) {
                 }}
               >
                 <Text style={{ color: "#fdfdfd", fontWeight: "bold" }}>
-                  {id}
+                  Set Remindernp
                 </Text>
               </TouchableOpacity>
             </View>

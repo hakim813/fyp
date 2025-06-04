@@ -17,6 +17,7 @@ import {
   getDatabase,
   get,
   child,
+  update,
   onValue,
   serverTimestamp,
 } from "firebase/database";
@@ -24,6 +25,7 @@ import { database } from "../firebase";
 import styles from "../styles";
 import { UserContext } from "../UserContext";
 import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
 
 export default function RecordContribution({ route }) {
   // useEffect(() => {
@@ -32,6 +34,7 @@ export default function RecordContribution({ route }) {
   // }, []);
 
   const { user, setUser } = useContext(UserContext);
+  const navi = useNavigation();
   const { scheme, chosenPlan, id } = route.params; //get data from previous page
   const [month, setMonth] = useState(0);
   const [total, setTotal] = useState(0);
@@ -50,10 +53,13 @@ export default function RecordContribution({ route }) {
     console.log("Fetching user data...");
 
     const sp = snapshot.val();
-    const existingUser = Object.values(sp).find((u) => u.email === sp.email); // Match email
+    const existingUser = Object.values(sp).find(
+      (u) => u.email === user.email && u.chosenPlan === chosenPlan
+    );
 
     // Fetch current totalContribution of the user (if exists)
-    const currentTotalContribution = existingUser.totalContribution || 0;
+    const currentTotalContribution =
+      parseFloat(existingUser.totalContribution) || 0.0;
 
     // New contribution value you want to add (could be from selectedValue or another source)
     const newContribution =
@@ -62,16 +68,18 @@ export default function RecordContribution({ route }) {
         : month * socsoMonthlyValue[chosenPlan];
     // Modify based on your logic for the new contribution
 
-    const newTotalContribution = currentTotalContribution + newContribution;
+    const newTotalContribution =
+      currentTotalContribution + parseFloat(newContribution);
 
     const spRef = ref(database, `socialplan/${id}`); // Parent path where data will be stored
-    const updatedSPRef = push(spRef);
+    // const updatedSPRef = push(spRef);
 
-    update(updatedSPRef, {
+    update(spRef, {
       totalContribution: newTotalContribution,
     })
       .then(() => {
         console.log("Done.");
+        navi.navigate("SPHome");
       })
       .catch((error) => console.error("Error writing data: ", error));
   };
@@ -95,7 +103,7 @@ export default function RecordContribution({ route }) {
             ]}
           >
             <Text style={styles.text}>
-              Record Your Soaacial{"\n"}Protection Contribution.
+              Record Your Social{"\n"}Protection Contribution.
             </Text>
             <StatusBar style="auto" />
             <View

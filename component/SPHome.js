@@ -30,6 +30,48 @@ export default function SPHome({ route }) {
   const flatListRef = useRef(null);
   const { pDate, pTime } = route.params || {};
 
+  const benefitKWSP = [
+    "Receive a special incentive of 20% (up to a maximum of RM500) of the total voluntary contribution in the current year",
+    "Enjoy annual dividends on retirement savings",
+    "Subject to EPF terms and conditions",
+    "Subject to LHDN terms and conditions",
+  ];
+
+  const benefitSocso = {
+    "Plan 1": [
+      "RM 30 per day",
+      "Lump Sum Payment : RM 32243.40",
+      "Lump Sum Payment : RM32243.40\nPeriodical Pension : RM 756.00 per month",
+      "RM 945 per month",
+      "RM 3000",
+      "RM 500 per month",
+    ],
+    "Plan 2": [
+      "RM 41.33 per day",
+      "Lump Sum Payment : RM 47957.40",
+      "Lump Sum Payment : RM 47957.40 & Periodical Pension : RM 1116.00 per month",
+      "RM 1395 per month",
+      "RM 3000",
+      "RM 500 per month",
+    ],
+    "Plan 3": [
+      "RM 78.67 per day",
+      "Lump Sum Payment : RM 90588.60",
+      "Lump Sum Payment : RM 90588.60 & Periodical Pension : RM 2124.00 per month",
+      "RM 2655 per month",
+      "RM 3000",
+      "RM 500 per month",
+    ],
+    "Plan 4": [
+      "RM 105.33 per day",
+      "Lump Sum Payment : RM 121296.60",
+      "Lump Sum Payment : RM 121296.60\nPeriodical Pension : RM 2844.00 per month",
+      "RM 3555 per month",
+      "RM3000",
+      "RM 500 per month",
+    ],
+  };
+
   const handleScrollEnd = (event) => {
     const offsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(offsetX / width);
@@ -161,7 +203,7 @@ export default function SPHome({ route }) {
                     <View style={[style.page]}>
                       <Text style={{ fontSize: 25 }}>{item.chosenPlan}</Text>
                       <Text style={{ fontSize: 50, marginVertical: 10 }}>
-                        RM {data[index].totalContribution}
+                        RM {data[index].totalContribution.toFixed(2).toString()}
                       </Text>
                       {/* <Text>{item.chosenPlan}</Text> */}
 
@@ -245,50 +287,260 @@ export default function SPHome({ route }) {
               ref={flatListRef}
             />
 
-            <View style={[{ backgroundColor: "red", height: 600 }]}>
-              <View
-                style={{
-                  padding: 10,
-                  width: 120,
-                  flex: 0,
-                  borderRadius: 15,
-                  backgroundColor: "green",
-                  alignContent: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "Nunito-Bold",
-                    fontSize: 25,
-                    textAlign: "center",
-                  }}
-                >
-                  Benefits
-                </Text>
-              </View>
-              {/* {data[currentIndex].email === user.email && ( */}
-              <Text
-                style={{
-                  fontSize: 15,
-                  marginVertical: 10,
-                  textAlign: "justify",
-                  fontFamily: "Nunito-Regular",
-                }}
-              >
-                {data[currentIndex].scheme} - {data[currentIndex].chosenPlan}
-                \naaLorem aaipsum dolor sit amet, consectetur adipiscing elit.
-                Nam sollicitudin imperdiet quam, vel vestibulum justo vestibulum
-                nec. In tincidunt magna felis, non gravida neque consectetur eu.
-                Fusce gravida sem in pellentesque mattis. Duis finibus ex at
-                lectus dignissim sollicitudin. Donec odio augue, sodales non
-                magna ac, ultrices ultricies mauris. Nullam cursus, lectus eu
-                pharetra suscipit, massa erat ultrices dolor, blandit facilisis
-                velit orci ut est. Ut eu arcu ut nulla gravida tincidunt.
-                Phasellus consectetur ultricies erat, et sollicitudin turpis
-                commodo at. Vivamus ipsum orci, porttitor sit amet elementum
-                volutpat, rutrum id elitaa
-              </Text>
+            <View style={[{ minHeight: 300 }]}>
+              {/* benefit for the chosen plan */}
+              {currentIndex !== data.length - 1 &&
+                (data[currentIndex].scheme === "i-Saraan KWSP" ? (
+                  <>
+                    <View
+                      style={{
+                        padding: 10,
+                        width: 120,
+                        flex: 0,
+                        borderRadius: 15,
+                        backgroundColor: "green",
+                        alignContent: "center",
+                        justifyContent: "center",
+                        marginBottom: "10",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: "Nunito-Bold",
+                          fontSize: 25,
+                          textAlign: "center",
+                          color: "#fdfdfd",
+                        }}
+                      >
+                        Benefits
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 20,
+                        // textAlign: "center",
+                      }}
+                    >
+                      Special Intencives
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: 10,
+                        textAlign: "justify",
+                        fontFamily: "Nunito-Regular",
+                      }}
+                    >
+                      {benefitKWSP[0]}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 20,
+                        // textAlign: "center",
+                      }}
+                    >
+                      Annual Dividend
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: 10,
+                        textAlign: "justify",
+                        fontFamily: "Nunito-Regular",
+                      }}
+                    >
+                      {benefitKWSP[1]}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 20,
+                        // textAlign: "center",
+                      }}
+                    >
+                      Death Beneficiaries
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: 10,
+                        textAlign: "justify",
+                        fontFamily: "Nunito-Regular",
+                      }}
+                    >
+                      {benefitKWSP[2]}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 20,
+                        // textAlign: "center",
+                      }}
+                    >
+                      Tax Relief
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: 10,
+                        textAlign: "justify",
+                        fontFamily: "Nunito-Regular",
+                      }}
+                    >
+                      {benefitKWSP[3]}
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <View
+                      style={{
+                        padding: 10,
+                        width: 120,
+                        flex: 0,
+                        borderRadius: 15,
+                        backgroundColor: "green",
+                        alignContent: "center",
+                        justifyContent: "center",
+                        marginBottom: "10",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontFamily: "Nunito-Bold",
+                          fontSize: 25,
+                          textAlign: "center",
+                          color: "#fdfdfd",
+                        }}
+                      >
+                        Benefits
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 20,
+                        // textAlign: "center",
+                      }}
+                    >
+                      Temporary Disablement Benefit
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: 10,
+                        textAlign: "justify",
+                        fontFamily: "Nunito-Regular",
+                      }}
+                    >
+                      {benefitSocso[data[currentIndex].chosenPlan][0]}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 20,
+                        // textAlign: "center",
+                      }}
+                    >
+                      Permanent Disablement Benefit
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: 10,
+                        textAlign: "justify",
+                        fontFamily: "Nunito-Regular",
+                      }}
+                    >
+                      {benefitSocso[data[currentIndex].chosenPlan][1]}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 20,
+                        // textAlign: "center",
+                      }}
+                    >
+                      Permanent Disablement Benefit
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: 10,
+                        textAlign: "justify",
+                        fontFamily: "Nunito-Regular",
+                      }}
+                    >
+                      {benefitSocso[data[currentIndex].chosenPlan][2]}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 20,
+                        // textAlign: "center",
+                      }}
+                    >
+                      Dependant Benefit
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: 10,
+                        textAlign: "justify",
+                        fontFamily: "Nunito-Regular",
+                      }}
+                    >
+                      {benefitSocso[data[currentIndex].chosenPlan][3]}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 20,
+                        // textAlign: "center",
+                      }}
+                    >
+                      Funeral Benefit
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: 10,
+                        textAlign: "justify",
+                        fontFamily: "Nunito-Regular",
+                      }}
+                    >
+                      {benefitSocso[data[currentIndex].chosenPlan][4]}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 20,
+                        // textAlign: "center",
+                      }}
+                    >
+                      Constant Attendance Allowance
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        marginVertical: 10,
+                        textAlign: "justify",
+                        fontFamily: "Nunito-Regular",
+                      }}
+                    >
+                      {benefitSocso[data[currentIndex].chosenPlan][5]}
+                    </Text>
+                  </>
+                ))}
             </View>
 
             {/* for adding space at bottom */}

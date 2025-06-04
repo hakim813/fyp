@@ -9,6 +9,7 @@ import Home from "./component/Home";
 import Forum from "./component/Forum";
 import SPHome from "./component/SPHome";
 import AddPlan from "./component/AddPlan";
+import HelpdeskHome from "./component/HelpdeskHome";
 import { UserProvider } from "./UserContext";
 import CreatePost from "./component/CreatePost";
 import ScanReceipt from "./component/ScanReceipt";
@@ -18,6 +19,7 @@ import FinancialRecord from "./component/FinancialRecord";
 import LoginSuccessful from "./component/Auth/LoginSuccessful";
 import SignupSuccessful from "./component/Auth/SignupSuccessful";
 import NotiReminder from "./component/NotiReminder";
+import AddComplaint from "./component/AddComplaint";
 import ForgotPassword from "./component/Auth/ForgotPassword";
 import Profile from "./component/Auth/Profile";
 import SignoutSuccessful from "./component/Auth/SignoutSuccessful";
@@ -57,11 +59,13 @@ const App = () => {
           <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
           <Stack.Screen name="LoginSuccessful" component={LoginSuccessful} />
           <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="AddComplaint" component={AddComplaint} />
           <Stack.Screen
             name="RecordContribution"
             component={RecordContribution}
           />
           <Stack.Screen name="ScanReceipt" component={ScanReceipt} />
+          <Stack.Screen name="HelpdeskHome" component={HelpdeskHome} />
           <Stack.Screen name="AddPlan" component={AddPlan} />
           <Stack.Screen name="Forum" component={Forum} />
           <Stack.Screen name="CreatePost" component={CreatePost} />

@@ -906,6 +906,7 @@ export default function Forum() {
         <View style={[styles.centeredView]}>
           <Text
             style={{
+              // backgroundColor: "red",
               position: "absolute",
               left: 15,
               fontWeight: "bold",
@@ -983,6 +984,7 @@ export default function Forum() {
                 bottom: 20,
                 margin: 10,
                 marginTop: "auto",
+                marginBottom: 70,
               },
             ]}
             placeholder="Comment"
@@ -994,9 +996,20 @@ export default function Forum() {
             onPress={() => {
               writeData(selectedPost);
             }}
-            style={[styles.submitComment]}
+            style={[
+              styles.submitComment,
+              {
+                marginBottom: 90,
+              },
+            ]}
           >
-            <Text style={{ color: "#fdfdfd", fontWeight: "800", fontSize: 30 }}>
+            <Text
+              style={{
+                color: "#fdfdfd",
+                fontWeight: "800",
+                fontSize: 30,
+              }}
+            >
               +
             </Text>
           </TouchableOpacity>

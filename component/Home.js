@@ -230,7 +230,7 @@ export default function Home() {
 
           <TouchableOpacity
             style={[stylesHome.features, { backgroundColor: "#CDF464" }]}
-            onPress={() => console.log()}
+            onPress={() => navi.navigate("HelpdeskHome")}
           >
             <View
               style={{
