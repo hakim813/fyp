@@ -52,6 +52,8 @@ export default function NotiReminder({ route }) {
       const data = {
         rdate: formatDate(date),
         rtime: formatTime(time),
+        notes: notes,
+        sent: false, // Default to false, will be updated when notification is sent
       };
 
       // Use set() instead of update() if you want to create/update no matter what
@@ -210,7 +212,7 @@ export default function NotiReminder({ route }) {
                 }}
               >
                 <Text style={{ color: "#fdfdfd", fontWeight: "bold" }}>
-                  Set Remindernp
+                  Set Reminder
                 </Text>
               </TouchableOpacity>
             </View>

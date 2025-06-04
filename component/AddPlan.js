@@ -113,8 +113,10 @@ export default function AddPlan() {
       scheme: selectedLabel,
       chosenPlan: selectedValue,
       totalContribution: 0,
+      sent: false,
       rtime: 0,
       rdate: 0,
+      notes: "",
     })
       .then(() => {
         navi.navigate("SPHome");
