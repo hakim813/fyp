@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "we_gig",
+    "slug": "we_gig",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/WeGig.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/WeGig (1).png",
+      "resizeMode": "cover",
+
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "assets": ["./assets/fonts/"],
+    "plugins": ["expo-font"]
+  }
+}
