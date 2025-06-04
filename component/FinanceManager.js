@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { Modal } from "react-native";
 import {
   StatusBar,
   ScrollView,
@@ -29,29 +30,31 @@ import {
   child,
 } from "firebase/database";
 import { LinearGradient } from "expo-linear-gradient";
-import { PieChart } from "react-native-gifted-charts";
+import { PieChart, LineChart } from "react-native-gifted-charts";
 import BottomBar from "./BottomBar";
 
 export default function FinanceManager() {
   // const [record, setRecord] = useState([]);
   // const [selectedPost, setSelectedPost] = useState(null);
   // const [comment, setComment] = useState("");
-  const { user } = useContext(UserContext);
   // const [isVisible, setIsVisible] = useState(false);
   // const [comments, setComments] = useState([]);
-  const [isMonthly, setIsMonthly] = useState(false);
   // const [isAll, setIsAll] = useState(true);
   // const [searchQuery, setSearchQuery] = useState('');
   // const [filteredPosts, setFilteredPosts] = useState([]);
-  const [data, setData] = useState(null);
-
   // const [values,setValues] = useState([1]);
   // const [sliceColor,setSliceColor]=useState(['#333333'])
   // const [data, setData] = useState([{value:0},{value:0}]);
+  const { user } = useContext(UserContext);
+  const [showLineChart, setShowLineChart] = useState(false);
+  const [isMonthly, setIsMonthly] = useState(false);
+  const [data, setData] = useState(null);
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [totalIncomeMonthly, setTotalIncomeMonthly] = useState(0);
   const [totalExpenseMonthly, setTotalExpenseMonthly] = useState(0);
+
+  const { width } = Dimensions.get("window");
 
   const navi = useNavigation();
 
@@ -135,6 +138,113 @@ export default function FinanceManager() {
     //     return grouped;
     //   };
   }, []);
+
+  //to get data for weekly graph
+  const getLast7Days = () => {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      days.push(d);
+    }
+    return days;
+  };
+
+  const getWeeklyData = () => {
+    const days = getLast7Days();
+    const incomeData = [];
+    const expenseData = [];
+
+    days.forEach((date) => {
+      let income = 0;
+      let expense = 0;
+      if (data) {
+        Object.values(data).forEach((transaction) => {
+          const tDate = new Date(transaction.date);
+          if (
+            transaction.email === user.email &&
+            tDate.toDateString() === date.toDateString()
+          ) {
+            if (transaction.type === "Income") {
+              income += parseFloat(transaction.value);
+            } else if (transaction.type === "Expense") {
+              expense += parseFloat(transaction.value);
+            }
+          }
+        });
+      }
+      // Use short day name for x-axis
+      incomeData.push({
+        value: income,
+        label: date.toLocaleDateString("en-US", { weekday: "short" }),
+      });
+      expenseData.push({
+        value: expense,
+        label: date.toLocaleDateString("en-US", { weekday: "short" }),
+      });
+    });
+
+    return { incomeData, expenseData };
+  };
+
+  //to get graph data for 6-month graph
+  const getLast6Months = () => {
+    const months = [];
+    const today = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      months.push(d);
+    }
+    return months;
+  };
+
+  const getMonthlyData = () => {
+    const months = getLast6Months();
+    const incomeData = [];
+    const expenseData = [];
+
+    months.forEach((date) => {
+      let income = 0;
+      let expense = 0;
+      if (data) {
+        Object.values(data).forEach((transaction) => {
+          const tDate = new Date(transaction.date);
+          if (
+            transaction.email === user.email &&
+            tDate.getMonth() === date.getMonth() &&
+            tDate.getFullYear() === date.getFullYear()
+          ) {
+            if (transaction.type === "Income") {
+              income += parseFloat(transaction.value);
+            } else if (transaction.type === "Expense") {
+              expense += parseFloat(transaction.value);
+            }
+          }
+        });
+      }
+      // Use short month name for x-axis
+      incomeData.push({
+        value: income,
+        label: date.toLocaleDateString("en-US", { month: "short" }),
+      });
+      expenseData.push({
+        value: expense,
+        label: date.toLocaleDateString("en-US", { month: "short" }),
+      });
+    });
+
+    return { incomeData, expenseData };
+  };
+
+  const { incomeData, expenseData } = getWeeklyData();
+  const { incomeData: monthlyIncomeData, expenseData: monthlyExpenseData } =
+    getMonthlyData();
+
+  const allValues = [
+    ...incomeData.map((d) => d.value),
+    ...expenseData.map((d) => d.value),
+  ];
+  const maxY = Math.max(10, ...allValues);
 
   const pieChartDataDaily = [
     {
@@ -242,63 +352,147 @@ export default function FinanceManager() {
                 {totalExpense > 0 || totalIncome > 0 ? (
                   <View
                     style={{
-                      height: 325,
+                      height: 350,
+                      // backgroundColor: "red",
                       width: "100%",
                       justifyContent: "center",
                       alignItems: "center",
+                      paddingTop: 10,
                     }}
                   >
-                    <PieChart
-                      styles={{}}
-                      data={pieChartDataDaily}
-                      donut
-                      textSize={16}
-                      innerRadius={Platform.OS === "ios" ? 120 : 110}
-                      radius={Platform.OS === "ios" ? 160 : 140}
-                      isAnimated={true}
-                      animationDuration={2000}
-                    />
-                    <View
-                      style={{
-                        height: 100,
-                        position: "absolute",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                    <ScrollView
+                      horizontal
+                      // backgroundColor="#00ff00"
+                      height={350}
                     >
-                      <Text style={{ fontWeight: "bold", fontSize: 25 }}>
-                        {new Date().toLocaleDateString("en-US", {
-                          day: "numeric",
-                          month: "short",
-                        })}
-                      </Text>
-                      <Text style={{ fontWeight: "bold", fontSize: 25 }}>
-                        Net profit
-                      </Text>
-                      {totalIncome - totalExpense >= 0 ? (
-                        <>
-                          <Text style={{ fontSize: 35, color: "green" }}>
-                            RM{" "}
-                            {(totalIncome - totalExpense).toFixed(2).length > 7
-                              ? (totalIncome - totalExpense)
-                                  .toFixed(2)
-                                  .slice(0, 7) + "..."
-                              : (totalIncome - totalExpense).toFixed(2)}
+                      <View
+                        style={{
+                          backgroundColor: "#eeeeee",
+                          borderRadius: 30,
+                          height: Platform.OS === "ios" ? 340 : 300,
+                          width: width - 50,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingVertical: 30,
+                          marginRight: 50,
+                          flex: 1,
+                        }}
+                      >
+                        <PieChart
+                          styles={{}}
+                          data={pieChartDataDaily}
+                          donut
+                          textSize={16}
+                          innerRadius={Platform.OS === "ios" ? 120 : 110}
+                          radius={Platform.OS === "ios" ? 160 : 140}
+                          isAnimated={true}
+                          animationDuration={2000}
+                        />
+                        <View
+                          style={{
+                            height: 100,
+                            position: "absolute",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold", fontSize: 25 }}>
+                            {new Date().toLocaleDateString("en-US", {
+                              day: "numeric",
+                              month: "short",
+                            })}
                           </Text>
-                        </>
-                      ) : (
-                        <>
-                          <Text style={{ fontSize: 35, color: "#F44F4F" }}>
-                            - RM{" "}
-                            {(totalExpense - totalIncome).toFixed(2).length > 7
-                              ? (totalExpense - totalIncome)
-                                  .toFixed(2)
-                                  .slice(0, 7) + "..."
-                              : (totalExpense - totalIncome).toFixed(2)}
+                          <Text style={{ fontWeight: "bold", fontSize: 25 }}>
+                            Net profit
                           </Text>
-                        </>
-                      )}
-                    </View>
+                          {totalIncome - totalExpense >= 0 ? (
+                            <>
+                              <Text style={{ fontSize: 35, color: "green" }}>
+                                RM{" "}
+                                {(totalIncome - totalExpense).toFixed(2)
+                                  .length > 7
+                                  ? (totalIncome - totalExpense)
+                                      .toFixed(2)
+                                      .slice(0, 7) + "..."
+                                  : (totalIncome - totalExpense).toFixed(2)}
+                              </Text>
+                            </>
+                          ) : (
+                            <>
+                              <Text style={{ fontSize: 35, color: "#F44F4F" }}>
+                                - RM{" "}
+                                {(totalExpense - totalIncome).toFixed(2)
+                                  .length > 7
+                                  ? (totalExpense - totalIncome)
+                                      .toFixed(2)
+                                      .slice(0, 7) + "..."
+                                  : (totalExpense - totalIncome).toFixed(2)}
+                              </Text>
+                            </>
+                          )}
+                        </View>
+                      </View>
+
+                      <View
+                        style={{
+                          backgroundColor: "#eeeeee",
+                          borderRadius: 30,
+                          height: Platform.OS === "ios" ? 340 : 300,
+                          width: width - 50,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingVertical: 30,
+                          flex: 1,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontWeight: "bold",
+                            fontSize: 20,
+                            marginBottom: 10,
+                            color: "#03633a",
+                          }}
+                        >
+                          Weekly Income vs Expense
+                        </Text>
+                        <LineChart
+                          data={incomeData}
+                          data2={expenseData}
+                          // backgroundColor={"yellow"}
+                          height={220}
+                          // width={Dimensions.get("window").width * 0.8}
+                          spacing={40}
+                          initialSpacing={30}
+                          color1="#3282F6"
+                          color2="#F44F4F"
+                          textColor1="#222"
+                          textColor2="#222"
+                          thickness={2}
+                          thickness2={2}
+                          hideDataPoints={false}
+                          dataPointsColor1="#3282F6"
+                          dataPointsColor2="#F44F4F"
+                          yAxisColor="#aaa"
+                          xAxisColor="#aaa"
+                          yAxisTextStyle={{
+                            color: "#222",
+                            paddingRight: 10,
+                            marginHorizontal: 50,
+                            width: 50,
+                          }}
+                          xAxisLabelTextStyle={{ color: "#222" }}
+                          noOfSections={5}
+                          yAxisLabelPrefix="RM "
+                          showLegend={true}
+                          legendLabel1="Income"
+                          legendLabel2="Expense"
+                          showXAxisIndices
+                          showYAxisIndices
+                          showDataPointText={true}
+                          maxValue={maxY}
+                        />
+                      </View>
+                    </ScrollView>
                   </View>
                 ) : (
                   // <View style={{height: 325, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
@@ -349,7 +543,7 @@ export default function FinanceManager() {
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: 20,
-                      borderColor: "#f44f4f",
+                      borderColor: "#3282F6",
                       borderWidth: 3,
                       backgroundColor: "#000f44f4f",
                       padding: 10,
@@ -367,7 +561,7 @@ export default function FinanceManager() {
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: 20,
-                      borderColor: "#3282F6",
+                      borderColor: "#f44f4f",
                       borderWidth: 3,
                       backgroundColor: "#0003282F6",
                       padding: 10,
@@ -385,70 +579,154 @@ export default function FinanceManager() {
                 {totalExpenseMonthly > 0 || totalIncomeMonthly > 0 ? (
                   <View
                     style={{
-                      height: 325,
+                      height: 350,
+                      // backgroundColor: "red",
                       width: "100%",
                       justifyContent: "center",
                       alignItems: "center",
+                      paddingTop: 10,
                     }}
                   >
-                    <PieChart
-                      styles={{}}
-                      data={pieChartDataMonthly}
-                      donut
-                      textSize={16}
-                      innerRadius={Platform.OS === "ios" ? 120 : 110}
-                      radius={Platform.OS === "ios" ? 160 : 140}
-                      isAnimated={true}
-                      animationDuration={2000}
-                    />
-                    <View
-                      style={{
-                        height: 100,
-                        position: "absolute",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
+                    <ScrollView
+                      horizontal
+                      // backgroundColor="#00ff00"
+                      height={350}
                     >
-                      <Text style={{ fontWeight: "bold", fontSize: 25 }}>
-                        {new Date().toLocaleDateString("en-US", {
-                          month: "long",
-                        })}
-                      </Text>
-                      <Text style={{ fontWeight: "bold", fontSize: 25 }}>
-                        Net profit
-                      </Text>
-                      {totalIncomeMonthly - totalExpenseMonthly >= 0 ? (
-                        <>
-                          <Text style={{ fontSize: 35, color: "green" }}>
-                            RM{" "}
-                            {(totalIncomeMonthly - totalExpenseMonthly).toFixed(
-                              2
-                            ).length > 7
-                              ? (totalIncomeMonthly - totalExpenseMonthly)
-                                  .toFixed(2)
-                                  .slice(0, 7) + "..."
-                              : (
+                      <View
+                        style={{
+                          backgroundColor: "#eeeeee",
+                          borderRadius: 30,
+                          height: Platform.OS === "ios" ? 340 : 300,
+                          width: width - 50,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingVertical: 30,
+                          marginRight: 50,
+                          flex: 1,
+                        }}
+                      >
+                        <PieChart
+                          styles={{}}
+                          data={pieChartDataMonthly}
+                          donut
+                          textSize={16}
+                          innerRadius={Platform.OS === "ios" ? 120 : 110}
+                          radius={Platform.OS === "ios" ? 160 : 140}
+                          isAnimated={true}
+                          animationDuration={2000}
+                        />
+                        <View
+                          style={{
+                            height: 100,
+                            position: "absolute",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text style={{ fontWeight: "bold", fontSize: 25 }}>
+                            {new Date().toLocaleDateString("en-US", {
+                              month: "long",
+                            })}
+                          </Text>
+                          <Text style={{ fontWeight: "bold", fontSize: 25 }}>
+                            Net profit
+                          </Text>
+                          {totalIncomeMonthly - totalExpenseMonthly >= 0 ? (
+                            <>
+                              <Text style={{ fontSize: 35, color: "green" }}>
+                                RM{" "}
+                                {(
                                   totalIncomeMonthly - totalExpenseMonthly
-                                ).toFixed(2)}
-                          </Text>
-                        </>
-                      ) : (
-                        <>
-                          <Text style={{ fontSize: 35, color: "#F44F4F" }}>
-                            - RM{" "}
-                            {(totalExpenseMonthly - totalIncomeMonthly).toFixed(
-                              2
-                            ).length > 7
-                              ? (totalExpenseMonthly - totalIncomeMonthly)
-                                  .toFixed(2)
-                                  .slice(0, 7) + "..."
-                              : (
-                                  totalExpenseMonthly - totalIncomeMonthly
-                                ).toFixed(2)}
-                          </Text>
-                        </>
-                      )}
-                    </View>
+                                ).toFixed(2).length > 7
+                                  ? (totalIncomeMonthly - totalExpenseMonthly)
+                                      .toFixed(2)
+                                      .slice(0, 7) + "..."
+                                  : (
+                                      totalIncomeMonthly - totalExpenseMonthly
+                                    ).toFixed(2)}
+                              </Text>
+                            </>
+                          ) : (
+                            <>
+                              <Text style={{ fontSize: 35, color: "#F44F4F" }}>
+                                - RM{" "}
+                                {(totalExpense - totalIncome).toFixed(2)
+                                  .length > 7
+                                  ? (totalExpense - totalIncome)
+                                      .toFixed(2)
+                                      .slice(0, 7) + "..."
+                                  : (totalExpense - totalIncome).toFixed(2)}
+                              </Text>
+                            </>
+                          )}
+                        </View>
+                      </View>
+
+                      <View
+                        style={{
+                          backgroundColor: "#eeeeee",
+                          borderRadius: 30,
+                          height: Platform.OS === "ios" ? 340 : 300,
+                          width: width - 50,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingVertical: 30,
+                          flex: 1,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontWeight: "bold",
+                            fontSize: 20,
+                            marginBottom: 10,
+                            color: "#03633a",
+                          }}
+                        >
+                          6-Months Income vs Expense
+                        </Text>
+                        <LineChart
+                          data={monthlyIncomeData}
+                          data2={monthlyExpenseData}
+                          height={220}
+                          // backgroundColor={'#0000ff'}
+                          spacing={45}
+                          initialSpacing={30}
+                          color1="#3282F6"
+                          color2="#F44F4F"
+                          textColor1="#222"
+                          textColor2="#222"
+                          thickness={2}
+                          thickness2={2}
+                          hideDataPoints={false}
+                          dataPointsColor1="#3282F6"
+                          dataPointsColor2="#F44F4F"
+                          yAxisColor="#aaa"
+                          xAxisColor="#aaa"
+                          yAxisTextStyle={{
+                            color: "#222",
+                            paddingRight: 10,
+                            // marginHorizontal: 50,
+                            // width: 50,
+                          }}
+                          xAxisLabelTextStyle={{ color: "#222" }}
+                          noOfSections={5}
+                          yAxisLabelPrefix="RM "
+                          yAxisLabelWidth={50}
+                          yAxisTextNumberOfLines={2}
+                          showLegend={true}
+                          legendLabel1="Income"
+                          legendLabel2="Expense"
+                          showXAxisIndices
+                          showYAxisIndices
+                          showDataPointText={true}
+                          maxValue={Math.max(
+                            10,
+                            ...monthlyIncomeData.map((d) => d.value),
+                            ...monthlyExpenseData.map((d) => d.value)
+                          )}
+                        />
+                      </View>
+                    </ScrollView>
                   </View>
                 ) : (
                   <View
@@ -495,7 +773,7 @@ export default function FinanceManager() {
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: 20,
-                      borderColor: "#f44f4f",
+                      borderColor: "#3282F6",
                       borderWidth: 3,
                       backgroundColor: "#000f44f4f",
                       padding: 10,
@@ -515,7 +793,7 @@ export default function FinanceManager() {
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: 20,
-                      borderColor: "#3282F6",
+                      borderColor: "#f44f4f",
                       borderWidth: 3,
                       backgroundColor: "#0003282F6",
                       padding: 10,
@@ -569,16 +847,108 @@ export default function FinanceManager() {
                   <Text style={{ color: "#fdfdfd" }}>See Records</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => navi.navigate("SPHome")}
-                  style={[styles.button, { marginBottom: 10 }]}
+                  onPress={() => setShowLineChart(true)}
+                  style={[styles.button]}
                 >
-                  <Text style={{ color: "#fdfdfd" }}> Go to SP </Text>
+                  <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                    Weekly Graph
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
             <View style={{ height: 20 }}></View>
           </ScrollView>
-
+          <Modal
+            visible={showLineChart}
+            transparent
+            animationType="slide"
+            onRequestClose={() => setShowLineChart(false)}
+          >
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(0,0,0,0.5)",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  borderRadius: 20,
+                  padding: 20,
+                  width: "90%",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: 20,
+                    marginBottom: 10,
+                    color: "#03633a",
+                  }}
+                >
+                  Weekly Income vs Expense
+                </Text>
+                <LineChart
+                  data={incomeData}
+                  data2={expenseData}
+                  height={220}
+                  // backgroundColor={'#0000ff'}
+                  spacing={45}
+                  initialSpacing={30}
+                  color1="#3282F6"
+                  color2="#F44F4F"
+                  textColor1="#222"
+                  textColor2="#222"
+                  thickness={2}
+                  thickness2={2}
+                  hideDataPoints={false}
+                  dataPointsColor1="#3282F6"
+                  dataPointsColor2="#F44F4F"
+                  yAxisColor="#aaa"
+                  xAxisColor="#aaa"
+                  yAxisTextStyle={{
+                    color: "#222",
+                    paddingRight: 10,
+                    // marginHorizontal: 50,
+                    // width: 50,
+                  }}
+                  xAxisLabelTextStyle={{ color: "#222" }}
+                  noOfSections={5}
+                  yAxisLabelPrefix="RM "
+                  yAxisLabelWidth={50}
+                  yAxisTextNumberOfLines={2}
+                  showLegend={true}
+                  legendLabel1="Income"
+                  legendLabel2="Expense"
+                  showXAxisIndices
+                  showYAxisIndices
+                  showDataPointText={true}
+                  maxValue={Math.max(
+                    10,
+                    ...incomeData.map((d) => d.value),
+                    ...expenseData.map((d) => d.value)
+                  )}
+                />
+                <TouchableOpacity
+                  onPress={() => setShowLineChart(false)}
+                  style={{
+                    marginTop: 20,
+                    backgroundColor: "#03633a",
+                    borderRadius: 10,
+                    paddingHorizontal: 20,
+                    paddingVertical: 10,
+                  }}
+                >
+                  <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                    Close
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
           <BottomBar></BottomBar>
         </LinearGradient>
       </View>
