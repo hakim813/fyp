@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import {
+  Alert,
   StyleSheet,
   Text,
   View,
@@ -81,6 +82,7 @@ export default function AddPlan() {
     const db = getDatabase(); // Initialize Firebase Realtime Database
     const dbRef = ref(db); // Reference to the database
     const snapshot = await get(child(dbRef, "users")); // Fetch all users from the database
+    const snapshotSP = await get(child(dbRef, "socialplan")); // Fetch all social plans
     console.log("Fetching user data...");
 
     const users = snapshot.val();
@@ -90,6 +92,20 @@ export default function AddPlan() {
 
     const usersRef = ref(database, "socialplan/"); // Parent path where data will be stored
     const newPostRef = push(usersRef);
+
+    const sp = snapshotSP.val();
+    const existingSP =
+      sp && Object.keys(sp).length > 0
+        ? Object.values(sp).find(
+            (u) => u.email === user.email && u.chosenPlan === selectedValue
+          )
+        : null;
+
+    if (existingSP) {
+      console.log("This plan already exists for the user.");
+      navi.navigate("SPHome");
+      return;
+    }
 
     set(newPostRef, {
       user: existingUser.username,
@@ -198,10 +214,12 @@ export default function AddPlan() {
             />
 
             <TouchableOpacity
-              onPress={() => [
-                console.log("New plan has been added successfully!"),
-                writeData(),
-              ]}
+              onPress={() => {
+                console.log("New plan has been added successfully!");
+                if (selectedValue !== null && selectedLabel !== null) {
+                  writeData();
+                }
+              }}
               style={[
                 styles.button,
                 {
