@@ -17,6 +17,8 @@ import { styles, stylesHome } from "../styles";
 import { database } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../UserContext";
+import { Modal } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import {
   ref,
   set,
@@ -44,6 +46,8 @@ export default function Forum() {
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [detail, setDetail] = useState(null);
   const [imageLoad, setImageLoad] = useState(true);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("General");
 
   //to write data into database
   const writeData = async (item) => {
@@ -174,6 +178,7 @@ export default function Forum() {
           title: data[key].title,
           content: data[key].content,
           date: data[key].date,
+          category: data[key].category,
           comment: data[key].commentId,
           upvoter: data[key].upvoter || [],
           imageURL: data[key].imageURL || [],
@@ -207,15 +212,28 @@ export default function Forum() {
   }, [isEnabled]);
 
   useEffect(() => {
-    //for filtering posts based on query in search bar
     const lowercasedQuery = searchQuery.toLowerCase();
-    const results = posts.filter(
+    let results = posts.filter(
       (post) =>
         post.title.toLowerCase().includes(lowercasedQuery) ||
         post.content.toLowerCase().includes(lowercasedQuery)
     );
+    if (selectedCategory !== "All") {
+      results = results.filter((post) => post.category === selectedCategory);
+    }
     setFilteredPosts(results);
-  }, [searchQuery, posts]);
+  }, [searchQuery, posts, selectedCategory]);
+
+  // useEffect(() => {
+  //   //for filtering posts based on query in search bar
+  //   const lowercasedQuery = searchQuery.toLowerCase();
+  //   const results = posts.filter(
+  //     (post) =>
+  //       post.title.toLowerCase().includes(lowercasedQuery) ||
+  //       post.content.toLowerCase().includes(lowercasedQuery)
+  //   );
+  //   setFilteredPosts(results);
+  // }, [searchQuery, posts]);
 
   return (
     <View style={[stylesHome.bg, { paddingRight: 0 }]}>
@@ -386,33 +404,52 @@ export default function Forum() {
                       <View
                         style={{ flexDirection: "row", alignItems: "flex-end" }}
                       >
-                        <Text
-                          style={{
-                            fontFamily: "Nunito-ExtraBold",
-                            fontSize: 25,
-                          }}
-                        >
-                          {item.title.length > 15
-                            ? `${item.title.slice(0, 15)}...`
-                            : item.title}
-                        </Text>
-                        <Text
+                        <View>
+                          <Text
+                            style={{
+                              fontFamily: "Nunito-ExtraBold",
+                              fontSize: 25,
+                            }}
+                          >
+                            {item.title.length > 15
+                              ? `${item.title.slice(0, 15)}...`
+                              : item.title}
+                          </Text>
+
+                          <Text>
+                            <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
+                              Written by:{" "}
+                            </Text>
+                            {item.user}
+                          </Text>
+                        </View>
+
+                        <View
                           style={{
                             marginLeft: "auto",
-                            color: "grey",
-                            fontFamily: "Nunito",
                           }}
                         >
-                          {new Date(item.date).toDateString()}
-                        </Text>
+                          <Text
+                            style={{
+                              marginLeft: "auto",
+                              color: "grey",
+                              fontFamily: "Nunito-Bold",
+                            }}
+                          >
+                            {item.category}
+                          </Text>
+                          <Text
+                            style={{
+                              marginLeft: "auto",
+                              color: "grey",
+                              fontFamily: "Nunito",
+                            }}
+                          >
+                            {new Date(item.date).toDateString()}
+                          </Text>
+                        </View>
                       </View>
                       <View style={{ marginBottom: 0 }}>
-                        <Text>
-                          <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
-                            Written by:{" "}
-                          </Text>
-                          {item.user}
-                        </Text>
                         <Text
                           style={{
                             marginTop: 5,
@@ -604,33 +641,52 @@ export default function Forum() {
                       <View
                         style={{ flexDirection: "row", alignItems: "flex-end" }}
                       >
-                        <Text
-                          style={{
-                            fontFamily: "Nunito-ExtraBold",
-                            fontSize: 25,
-                          }}
-                        >
-                          {item.title.length > 15
-                            ? `${item.title.slice(0, 15)}...`
-                            : item.title}
-                        </Text>
-                        <Text
+                        <View>
+                          <Text
+                            style={{
+                              fontFamily: "Nunito-ExtraBold",
+                              fontSize: 25,
+                            }}
+                          >
+                            {item.title.length > 15
+                              ? `${item.title.slice(0, 15)}...`
+                              : item.title}
+                          </Text>
+
+                          <Text>
+                            <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
+                              Written by:{" "}
+                            </Text>
+                            {item.user}
+                          </Text>
+                        </View>
+
+                        <View
                           style={{
                             marginLeft: "auto",
-                            color: "grey",
-                            fontFamily: "Nunito",
                           }}
                         >
-                          {new Date(item.date).toDateString()}
-                        </Text>
+                          <Text
+                            style={{
+                              marginLeft: "auto",
+                              color: "grey",
+                              fontFamily: "Nunito-Bold",
+                            }}
+                          >
+                            {item.category}
+                          </Text>
+                          <Text
+                            style={{
+                              marginLeft: "auto",
+                              color: "grey",
+                              fontFamily: "Nunito",
+                            }}
+                          >
+                            {new Date(item.date).toDateString()}
+                          </Text>
+                        </View>
                       </View>
                       <View style={{ marginBottom: 0 }}>
-                        <Text>
-                          <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
-                            Written by:{" "}
-                          </Text>
-                          {item.user}
-                        </Text>
                         <Text
                           style={{
                             marginTop: 5,
@@ -848,6 +904,66 @@ export default function Forum() {
         </View>
       </LinearGradient>
 
+      <Modal
+        visible={filterModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setFilterModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: 20,
+              padding: 20,
+              width: "80%",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ fontWeight: "bold", fontSize: 20, marginBottom: 10 }}
+            >
+              Select Category
+            </Text>
+            <Picker
+              selectedValue={selectedCategory}
+              style={{ width: "100%" }}
+              onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+            >
+              <Picker.Item label="All" value="All" color="black" />
+              <Picker.Item label="General" value="General" color="black" />
+              <Picker.Item
+                label="Announcement"
+                value="Announcement"
+                color="black"
+              />
+              <Picker.Item label="Question" value="Question" color="black" />
+              <Picker.Item label="Event" value="Event" color="black" />
+              {/* Add more categories as needed */}
+            </Picker>
+            <TouchableOpacity
+              onPress={() => setFilterModalVisible(false)}
+              style={{
+                marginTop: 20,
+                backgroundColor: "#1b434d",
+                borderRadius: 10,
+                paddingHorizontal: 20,
+                paddingVertical: 10,
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>Apply</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <TouchableOpacity
         onPress={() => navi.navigate("CreatePost")}
         style={[
@@ -871,6 +987,31 @@ export default function Forum() {
       >
         <Text style={{ color: "#fdfdfd", fontWeight: "800", fontSize: 30 }}>
           +
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => setFilterModalVisible(true)}
+        style={[
+          {
+            position: "absolute",
+            bottom: 120,
+            right: "5%",
+            paddingHorizontal: 25,
+            marginTop: 10,
+            paddingVertical: 15,
+            backgroundColor: "#03633a",
+            borderRadius: 120,
+            elevation: 5,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.8,
+            shadowRadius: 3,
+          },
+        ]}
+      >
+        <Text style={{ color: "#fdfdfd", fontWeight: "20", fontSize: 30 }}>
+          Filter
         </Text>
       </TouchableOpacity>
 

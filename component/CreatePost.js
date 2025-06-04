@@ -19,6 +19,7 @@ import { database } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../UserContext";
 import { firebase } from "../firebase";
+import { Picker } from "@react-native-picker/picker";
 import {
   ref,
   set,
@@ -47,29 +48,9 @@ export default function CreatePost() {
   const [image, setImage] = useState([]);
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState([]);
+  const [category, setCategory] = useState("General");
   const navi = useNavigation();
   const storage = getStorage(); // Initialize Firebase Storage
-
-  // const pickImage = async () => {
-  //   try {
-  //     let result = await ImagePicker.launchImageLibraryAsync({
-  //       mediaTypes: ImagePicker.MediaTypeOptions.Images, // Only images
-  //       allowsMultipleSelection: true,
-  //       allowsEditing: true,
-  //       quality: 1, // High quality
-  //     });
-
-  //     if (!result.canceled) {
-  //       const selectedUris = result.assets.map((asset) => asset.uri); // Extract URIs
-  //       console.log(selectedUris); // Log selected URIs
-  //       setImageUris([...imageUris, ...selectedUris]);
-  //     } else {
-  //       console.log("Image picking canceled.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error picking image: ", error);
-  //   }
-  // };
 
   const pickImage = async () => {
     let results = await ImagePicker.launchImageLibraryAsync({
@@ -83,46 +64,6 @@ export default function CreatePost() {
     setImage(selectedUris); // save array of URIs
     // console.log("Selected images: ", selectedUris);
   };
-
-  // const uploadMedia = async () => {
-  //   setLoading(true);
-  //   console.log("Uploading media...");
-
-  //   try {
-  //     const { uri } = await FileSystem.getInfoAsync(image);
-  //     const blob = await new Promise((resolve, reject) => {
-  //       const xhr = new XMLHttpRequest();
-  //       xhr.onload = function () {
-  //         resolve(xhr.response);
-  //       };
-  //       xhr.onerror = function (e) {
-  //         console.log(e);
-  //         reject(new TypeError("Network request failed"));
-  //       };
-  //       xhr.responseType = "blob";
-  //       xhr.open("GET", uri, true);
-  //       xhr.send(null);
-  //     });
-
-  //     const filename = image.substring(image.lastIndexOf("/") + 1);
-  //     const storageRef = ref(storage, filename);
-
-  //     await uploadBytes(storageRef, blob); // Use uploadBytes!
-
-  //     blob.close(); // Free up memory
-
-  //     setLoading(false);
-  //     Alert.alert("Image uploaded successfully!");
-  //     setImage(null);
-  //   } catch (error) {
-  //     console.error("Error uploading image:", error);
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const uploadMedia = async () => {
-
-  // };
 
   const writeData = async (idNo, username) => {
     console.log("Writing data to Firebase...");
@@ -143,12 +84,6 @@ export default function CreatePost() {
 
     const usersRef = ref(database, "posts/"); // Parent path where data will be stored
     const newPostRef = push(usersRef);
-
-    // uploadMedia();
-
-    // if (image.length === 0) {
-    //   return;
-    // }
 
     const imgUrl = [];
 
@@ -204,6 +139,7 @@ export default function CreatePost() {
         email: user.email,
         title: title ? title : "No title attached",
         content: content,
+        category: category,
         date: serverTimestamp(),
         upvoter: [],
         // imageUris: imageUris.length > 0 ? imageUris : null,
@@ -302,7 +238,7 @@ export default function CreatePost() {
         >
           <Text style={[styles.text]}>Create Your Post</Text>
           <StatusBar style="auto" />
-          <View style={[styles.container2, { flex: 0, height: "100%" }]}>
+          <ScrollView style={[styles.container2, { flex: 0, height: "100%" }]}>
             <View style={[styles.containerAttachMedia]}>
               <Text
                 style={[
@@ -335,6 +271,34 @@ export default function CreatePost() {
                 value={content}
                 onChangeText={setContent}
               />
+
+              {/* --- Add Category Dropdown Here --- */}
+              <Text
+                style={[
+                  styles.labelInput,
+                  {
+                    fontSize: 25,
+                    fontWeight: "bold",
+                  },
+                ]}
+              >
+                Category
+              </Text>
+              <Picker
+                selectedValue={category}
+                style={{
+                  height: 150,
+                  width: "100%",
+                  marginBottom: 10,
+                }}
+                onValueChange={(itemValue) => setCategory(itemValue)}
+              >
+                <Picker.Item label="General" value="General" />
+                <Picker.Item label="Announcement" value="Announcement" />
+                <Picker.Item label="Question" value="Question" />
+                <Picker.Item label="Event" value="Event" />
+                {/* Add more categories as needed */}
+              </Picker>
             </View>
 
             {/* buttons submit post and attach media */}
@@ -346,7 +310,7 @@ export default function CreatePost() {
                   {
                     marginRight: 15,
                     paddingVertical: 15,
-                    backgroundColor: "#1b434d",
+                    backgroundColor: "#03633a",
                     borderRadius: 25,
                   },
                 ]}
@@ -363,7 +327,7 @@ export default function CreatePost() {
                   {
                     marginRight: 15,
                     paddingVertical: 15,
-                    backgroundColor: "#1b434d",
+                    backgroundColor: "#03633a",
                     borderRadius: 25,
                   },
                 ]}
@@ -411,7 +375,7 @@ export default function CreatePost() {
                   />
                 ))}
             </ScrollView>
-          </View>
+          </ScrollView>
         </LinearGradient>
       </View>
     </TouchableWithoutFeedback>
