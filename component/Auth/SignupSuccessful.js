@@ -1,5 +1,6 @@
-import { Text, View } from "react-native";
+import { Text, View, ImageBackground } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import styles from "../../styles";
 import React, { useEffect } from "react";
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -15,15 +16,20 @@ export default function SignupSuccessful() {
   }, [navi]);
 
   return (
-    <View
-      style={{
-        alignItems: "center",
-        justifyContent: "center",
-        paddingHorizontal: 25,
-        height: "100%",
-        width: "100%",
-        backgroundColor: "#1b434d",
-      }}
+    <ImageBackground
+      source={require("../../assets/bg-hibiscus.png")} // Your image path
+      style={[
+        styles.background,
+        {
+          alignItems: "center",
+          justifyContent: "center",
+          // paddingHorizontal: 25,
+          height: "100%",
+          width: "100%",
+          backgroundColor: "#1b434d",
+        },
+      ]}
+      resizeMode="cover"
     >
       <Icon
         name="check-circle-o"
@@ -38,6 +44,6 @@ export default function SignupSuccessful() {
       <Text style={{ color: "white", fontSize: 20 }}>
         Now redirecting you to Login page.
       </Text>
-    </View>
+    </ImageBackground>
   );
 }

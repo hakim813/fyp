@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   StatusBar,
-  Image,
+  ImageBackground,
 } from "react-native";
 import styles from "../../styles";
 import { auth } from "../../firebase"; // Going up one folder to access firebase.js
@@ -60,12 +60,10 @@ export default function Login() {
     <View style={styles.container3}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <LinearGradient
-            colors={["#03633a", "#95f6cc"]} // start to end gradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+          <ImageBackground
+            source={require("../../assets/bg-hibiscus.png")} // Your image path
             style={[
-              styles.container,
+              styles.background,
               {
                 paddingTop:
                   Platform.OS === "ios"
@@ -73,14 +71,12 @@ export default function Login() {
                     : StatusBar.currentHeight,
               },
             ]}
+            resizeMode="cover"
           >
             <Text style={styles.text}>Login to your{"\n"}WeGig account!</Text>
             <StatusBar style="auto" />
             <View
-              style={[
-                styles.container2,
-                { marginHorizontal: 15, minHeight: 550, flex: 0 },
-              ]}
+              style={[styles.container2, { marginHorizontal: 15, flex: 0 }]}
             >
               <Text style={styles.labelInput}>Email Address</Text>
               <TextInput
@@ -100,17 +96,24 @@ export default function Login() {
               />
               {/* <Button title="Click Me"></Button> */}
               <TouchableOpacity
-                style={styles.button}
+                style={[styles.button, { paddingHorizontal: 40 }]}
                 onPress={() => {
                   handleSubmit();
                 }}
               >
-                <Text style={{ color: "#fdfdfd", fontWeight: "bold" }}>
+                <Text
+                  style={{
+                    color: "#fdfdfd",
+                    fontFamily: "Nunito-Bold",
+                    fontWeight: "bold",
+                    fontSize: 15,
+                  }}
+                >
                   Log in
                 </Text>
               </TouchableOpacity>
-              <Text style={styles.texttosignin}>
-                No account?
+              <Text style={[styles.texttosignin, { marginTop: 100 }]}>
+                No account yet?
                 <Text
                   style={{ fontWeight: "bold" }}
                   onPress={() => navi.navigate("Register")}
@@ -120,7 +123,7 @@ export default function Login() {
                 </Text>
               </Text>
               <Text
-                style={styles.texttosignin}
+                style={[styles.texttosignin, { marginTop: 5 }]}
                 onPress={() => {
                   navi.navigate("ForgotPassword");
                 }}
@@ -143,7 +146,7 @@ export default function Login() {
                 /> */}
               </View>
             </View>
-          </LinearGradient>
+          </ImageBackground>
         </View>
       </TouchableWithoutFeedback>
     </View>

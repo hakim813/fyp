@@ -99,6 +99,7 @@ export const styles = StyleSheet.create({
     fontFamily: "Nunito",
     textAlign: "center",
     marginVertical: 15,
+    fontSize: 15,
   },
 
   containerAttachMedia: {

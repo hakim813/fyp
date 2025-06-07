@@ -3,6 +3,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  ImageBackground,
   Platform,
   StatusBar,
 } from "react-native";
@@ -84,20 +85,20 @@ export default function Home() {
           justifyContent: "center",
         }}
       >
-        <LinearGradient
-          colors={["#03633a", "#95f6cc80"]} // start to end gradient
-          start={{ x: 1, y: 0.5 }}
-          end={{ x: 0, y: 0 }}
+        <ImageBackground
+          source={require("../assets/bg-hibiscus.png")} // Your image path
           style={[
-            styles.container,
+            styles.background,
             {
+              // alignItems: "center",
+              justifyContent: "center",
+              // paddingHorizontal: 25,
+              height: "100%",
               width: "100%",
-              paddingTop:
-                Platform.OS === "ios"
-                  ? StatusBar.currentHeight + 50
-                  : StatusBar.currentHeight,
+              backgroundColor: "#1b434d",
             },
           ]}
+          resizeMode="cover"
         >
           {detail ? (
             <>
@@ -109,7 +110,7 @@ export default function Home() {
           ) : (
             <Text>Home</Text>
           )}
-        </LinearGradient>
+        </ImageBackground>
       </View>
       <View
         style={{
@@ -134,39 +135,41 @@ export default function Home() {
           showsHorizontalScrollIndicator={false}
           style={{ marginLeft: 10 }}
         >
-          <TouchableOpacity
-            style={[stylesHome.features, { backgroundColor: "#D3C2F8" }]}
-            onPress={() => navi.navigate("Forum")}
-          >
-            <LinearGradient
-              colors={["#03633a", "#95f6cc"]} // start to end gradient
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0.5, y: 1.5 }}
-              // style={[{width: '100%', height: '100%', paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight+50 : StatusBar.currentHeight, borderBottomLeftRadius: 50, borderBottomRightRadius: 50}]}
-              style={[
-                stylesHome.features,
-                { alignItems: "center", justifyContent: "center" },
-              ]}
+          <View style={{ alignItems: "center", backgroundColor: "yellow" }}>
+            <TouchableOpacity
+              style={[stylesHome.features, { backgroundColor: "#D3C2F8" }]}
+              onPress={() => navi.navigate("Forum")}
             >
-              <Icon
-                name="commenting"
-                size={80}
-                color={"#fefefe"}
-                style={{ marginBottom: 25 }}
-              />
-              <View style={{ alignItems: "center" }}>
-                <Text
-                  style={{
-                    fontFamily: "Nunito-Bold",
-                    color: "#fefefe",
-                    fontSize: 25,
-                  }}
-                >
-                  Forum
-                </Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={["#03633a", "#95f6cc"]} // start to end gradient
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0.5, y: 1.5 }}
+                // style={[{width: '100%', height: '100%', paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight+50 : StatusBar.currentHeight, borderBottomLeftRadius: 50, borderBottomRightRadius: 50}]}
+                style={[
+                  stylesHome.features,
+                  { alignItems: "center", justifyContent: "center" },
+                ]}
+              >
+                <Icon
+                  name="commenting"
+                  size={80}
+                  color={"#fefefe"}
+                  // style={{ marginBottom: 25 }}
+                />
+                <View style={{ alignItems: "center" }}></View>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <Text
+              style={{
+                fontFamily: "Nunito-Bold",
+                color: "#090909",
+                fontSize: 25,
+              }}
+            >
+              Forum
+            </Text>
+          </View>
 
           <TouchableOpacity
             style={[stylesHome.features, { backgroundColor: "#FAE2C8" }]}

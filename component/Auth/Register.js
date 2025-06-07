@@ -185,14 +185,15 @@ export default function Register() {
             />
 
             <TouchableOpacity
-              style={styles.button}
+              style={[styles.button, { paddingHorizontal: 40 }]}
               onPress={() => handleAuthentication()}
             >
               <Text
                 style={{
                   color: "#fdfdfd",
-                  fontFamily: "Nunito",
+                  fontFamily: "Nunito-Bold",
                   fontWeight: "bold",
+                  fontSize: 15,
                 }}
               >
                 Register
@@ -202,7 +203,7 @@ export default function Register() {
               Already have an account?{" "}
               <Text
                 style={{ fontWeight: "bold" }}
-                onPress={() => navi.navigate("LandingPage")}
+                onPress={() => navi.navigate("Login")}
               >
                 Jump to Sign In!
               </Text>
