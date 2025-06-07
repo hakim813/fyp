@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   StatusBar,
-  Image,
+  ImageBackground,
 } from "react-native";
 import styles from "../../styles";
 import { LinearGradient } from "expo-linear-gradient";
@@ -102,7 +102,20 @@ export default function Register() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
+      <ImageBackground
+        source={require("../../assets/bg-hibiscus.png")} // Your image path
+        style={[
+          styles.background,
+          {
+            paddingTop:
+              Platform.OS === "ios"
+                ? StatusBar.currentHeight + 50
+                : StatusBar.currentHeight,
+          },
+        ]}
+        resizeMode="cover"
+      >
+        {/* <LinearGradient
         colors={["#03633a", "#95f6cc"]} // start to end gradient
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -115,7 +128,7 @@ export default function Register() {
                 : StatusBar.currentHeight,
           },
         ]}
-      >
+      > */}
         <Text style={styles.text}>Create Your Account</Text>
         <StatusBar style="auto" />
         <KeyboardAvoidingView
@@ -189,7 +202,7 @@ export default function Register() {
               Already have an account?{" "}
               <Text
                 style={{ fontWeight: "bold" }}
-                onPress={() => navi.navigate("Login")}
+                onPress={() => navi.navigate("LandingPage")}
               >
                 Jump to Sign In!
               </Text>
@@ -212,7 +225,7 @@ export default function Register() {
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
-      </LinearGradient>
+      </ImageBackground>
     </View>
   );
 }

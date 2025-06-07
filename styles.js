@@ -1,6 +1,11 @@
 import { Platform, StyleSheet, StatusBar } from "react-native";
 
 export const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    // justifyContent: "center",
+  },
+
   centeredView: {
     position: "absolute", // Position it absolutely on the screen
     height: "100%",
@@ -32,7 +37,7 @@ export const styles = StyleSheet.create({
 
   container2: {
     flex: 1,
-    backgroundColor: "#fdfdfd",
+    backgroundColor: "rgba(255,255,255,0.6)",
     borderRadius: 25,
     // borderTopLeftRadius: 25 ,
     marginTop: 25,
@@ -54,9 +59,10 @@ export const styles = StyleSheet.create({
   },
 
   labelInput: {
-    fontFamily: "Nunito",
-    fontWeight: "bold",
-    color: "black",
+    fontFamily: "Nunito-Bold",
+    color: "#222",
+    fontSize: 15,
+    marginLeft: 10,
   },
 
   font: {
@@ -68,12 +74,13 @@ export const styles = StyleSheet.create({
     fontFamily: "Nunito",
     height: 50,
     borderWidth: 0.5,
-    borderRadius: 15,
+    borderRadius: 20,
     borderColor: "grey",
     paddingHorizontal: 15,
     backgroundColor: "#fdfdfd",
-    marginTop: 10,
-    marginBottom: 18,
+    marginTop: 0,
+    marginBottom: 26,
+    backgroundColor: "rgba(255,255,255,0.6)",
   },
 
   button: {
@@ -152,8 +159,8 @@ export const stylesHome = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 30,
     marginHorizontal: 5,
-    height: 190,
-    width: 150,
+    height: 120,
+    width: 120,
     // borderWidth: 0.3,
     alignSelf: "center",
     fontFamily: "Nunito-Bold",

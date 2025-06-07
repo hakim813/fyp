@@ -25,6 +25,7 @@ import Profile from "./component/Auth/Profile";
 import SignoutSuccessful from "./component/Auth/SignoutSuccessful";
 import { useFonts } from "expo-font";
 import RecordContribution from "./component/RecordContribution";
+import LandingPage from "./component/LandingPage";
 
 const Stack = createStackNavigator();
 
@@ -49,9 +50,10 @@ const App = () => {
     <UserProvider>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Register"
+          initialRouteName="LandingPage"
           screenOptions={{ headerShown: false }}
         >
+          <Stack.Screen name="LandingPage" component={LandingPage} />
           <Stack.Screen name="NotiReminder" component={NotiReminder} />
           <Stack.Screen name="Register" component={Register} />
           <Stack.Screen name="SignupSuccessful" component={SignupSuccessful} />
