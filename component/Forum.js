@@ -12,6 +12,7 @@ import {
   Platform,
   TouchableOpacity,
   ActivityIndicator,
+  ImageBackground,
 } from "react-native";
 import { styles, stylesHome } from "../styles";
 import { database } from "../firebase";
@@ -47,7 +48,7 @@ export default function Forum() {
   const [detail, setDetail] = useState(null);
   const [imageLoad, setImageLoad] = useState(true);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("General");
+  const [selectedCategory, setSelectedCategory] = useState("None");
 
   //to write data into database
   const writeData = async (item) => {
@@ -218,7 +219,7 @@ export default function Forum() {
         post.title.toLowerCase().includes(lowercasedQuery) ||
         post.content.toLowerCase().includes(lowercasedQuery)
     );
-    if (selectedCategory !== "All") {
+    if (selectedCategory !== "None") {
       results = results.filter((post) => post.category === selectedCategory);
     }
     setFilteredPosts(results);
@@ -237,12 +238,10 @@ export default function Forum() {
 
   return (
     <View style={[stylesHome.bg, { paddingRight: 0 }]}>
-      <LinearGradient
-        colors={["#03633a", "#95f6cc"]} // start to end gradient
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+      <ImageBackground
+        source={require("../assets/bg-hibiscus.png")} // Your image path
         style={[
-          styles.container,
+          styles.background,
           {
             paddingTop:
               Platform.OS === "ios"
@@ -250,6 +249,7 @@ export default function Forum() {
                 : StatusBar.currentHeight,
           },
         ]}
+        resizeMode="cover"
       >
         <View style={{ flex: 1 }}>
           <Text
@@ -387,522 +387,567 @@ export default function Forum() {
               </Text>
             </View>
           ) : (
-            <FlatList //d6ffa7
-              style={{ paddingVertical: 10, backgroundColor: "#dedede" }}
-              data={filteredPosts}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => {
-                //for all posts
-                if (isAll) {
-                  return (
-                    <View
-                      style={[
-                        stylesHome.context,
-                        { paddingVertical: 10, backgroundColor: "#fafafa" },
-                      ]}
-                    >
+            <>
+              <View>
+                <TouchableOpacity
+                  onPress={() => setFilterModalVisible(true)}
+                  style={[
+                    {
+                      // marginRight: 25,
+                      width: "100%",
+                      backgroundColor: "#eeeeee",
+                      paddingVertical: 5,
+                      paddingHorizontal: 15,
+                      minWidth: 90,
+                      fontWeight: "bold",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    },
+                  ]}
+                >
+                  <Text style={[{ fontFamily: "Nunito-Bold", fontSize: 15 }]}>
+                    Filter
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <FlatList //d6ffa7
+                style={{ paddingVertical: 10, backgroundColor: "#dedede" }}
+                data={filteredPosts}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => {
+                  //for all posts
+                  if (isAll) {
+                    return (
                       <View
-                        style={{ flexDirection: "row", alignItems: "flex-end" }}
+                        style={[
+                          stylesHome.context,
+                          { paddingVertical: 10, backgroundColor: "#fafafa" },
+                        ]}
                       >
-                        <View>
-                          <Text
-                            style={{
-                              fontFamily: "Nunito-ExtraBold",
-                              fontSize: 25,
-                            }}
-                          >
-                            {item.title.length > 15
-                              ? `${item.title.slice(0, 15)}...`
-                              : item.title}
-                          </Text>
-
-                          <Text>
-                            <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
-                              Written by:{" "}
-                            </Text>
-                            {item.user}
-                          </Text>
-                        </View>
-
                         <View
                           style={{
-                            marginLeft: "auto",
+                            flexDirection: "row",
+                            alignItems: "flex-end",
                           }}
                         >
-                          <Text
+                          <View>
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-ExtraBold",
+                                fontSize: 25,
+                              }}
+                            >
+                              {item.title.length > 15
+                                ? `${item.title.slice(0, 15)}...`
+                                : item.title}
+                            </Text>
+
+                            <Text>
+                              <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
+                                Written by:{" "}
+                              </Text>
+                              {item.user}
+                            </Text>
+                          </View>
+
+                          <View
                             style={{
                               marginLeft: "auto",
-                              color: "grey",
-                              fontFamily: "Nunito-Bold",
                             }}
                           >
-                            {item.category}
-                          </Text>
+                            <Text
+                              style={{
+                                marginLeft: "auto",
+                                color: "grey",
+                                fontFamily: "Nunito-Bold",
+                              }}
+                            >
+                              {item.category}
+                            </Text>
+                            <Text
+                              style={{
+                                marginLeft: "auto",
+                                color: "grey",
+                                fontFamily: "Nunito",
+                              }}
+                            >
+                              {new Date(item.date).toDateString()}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={{ marginBottom: 0 }}>
                           <Text
                             style={{
-                              marginLeft: "auto",
-                              color: "grey",
+                              marginTop: 5,
+                              fontSize: 20,
                               fontFamily: "Nunito",
                             }}
                           >
-                            {new Date(item.date).toDateString()}
+                            {item.content}
                           </Text>
-                        </View>
-                      </View>
-                      <View style={{ marginBottom: 0 }}>
-                        <Text
-                          style={{
-                            marginTop: 5,
-                            fontSize: 20,
-                            fontFamily: "Nunito",
-                          }}
-                        >
-                          {item.content}
-                        </Text>
-                        {/* Display multiple images */}
-                        {/* {item.imageUris && Array.isArray(item.imageUris) ? ( */}
-                        {item.imageURL &&
-                        Array.isArray(item.imageURL) &&
-                        item.imageURL.length > 0 ? (
-                          <FlatList
-                            data={item.imageURL}
-                            keyExtractor={(uri, index) =>
-                              `${item.id}-image-${index}`
-                            }
-                            horizontal
-                            style={{}}
-                            renderItem={({ item: uri }) => (
-                              <View
-                                style={{
-                                  width: 200,
-                                  height: 200,
-                                  marginLeft: 0,
-                                  margin: 10,
-                                  // borderRadius: 5,
-                                  // borderWidth: 1,
-                                  borderColor: "#ccc",
-                                }}
-                              >
-                                {/* {imageLoad && (
-                                  <ActivityIndicator
-                                    size="large"
-                                    color="#0000ff"
-                                  />
-                                )} */}
-                                <Image
-                                  source={{ uri }} // Ensure it's a URL from Firebase Storage
+                          {/* Display multiple images */}
+                          {/* {item.imageUris && Array.isArray(item.imageUris) ? ( */}
+                          {item.imageURL &&
+                          Array.isArray(item.imageURL) &&
+                          item.imageURL.length > 0 ? (
+                            <FlatList
+                              data={item.imageURL}
+                              keyExtractor={(uri, index) =>
+                                `${item.id}-image-${index}`
+                              }
+                              horizontal
+                              style={{}}
+                              renderItem={({ item: uri }) => (
+                                <View
                                   style={{
                                     width: 200,
                                     height: 200,
-                                    // margin: 10,
-                                    borderRadius: 5,
-                                    borderWidth: 1,
-                                    borderColor: "#ccc",
-                                  }}
-                                  onLoad={() => setImageLoad(false)}
-                                  resizeMode="cover"
-                                />
-                                {imageLoad && (
-                                  <View
-                                    style={{
-                                      ...StyleSheet.absoluteFillObject, // fills the parent
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      backgroundColor:
-                                        "rgba(235, 235, 235, 0.8)", // optional semi-transparent overlay
-                                    }}
-                                  >
-                                    <ActivityIndicator
-                                      size="large"
-                                      color="#00ee00"
-                                    />
-                                    <Text>Loading image...</Text>
-                                  </View>
-                                )}
-                              </View>
-                            )}
-                          />
-                        ) : (
-                          <Text style={{ marginTop: 10, color: "gray" }}>
-                            No images attached
-                          </Text>
-                        )}
-                      </View>
-
-                      <View style={{ marginTop: 0 }}>
-                        <TextInput
-                          style={[
-                            styles.input,
-                            {
-                              marginBottom: 5,
-                              borderRadius: 20,
-                              width: "100%",
-                              left: 0,
-                              bottom: 5,
-                            },
-                          ]}
-                          placeholder="Comment"
-                          onPress={() => {
-                            setSelectedPost(item), setIsVisible(true);
-                          }}
-                        />
-                      </View>
-
-                      {item.email == user.email ? (
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
-                          <TouchableOpacity
-                            onPress={() => thumbsUp(item)}
-                            style={{ marginHorizontal: 10 }}
-                          >
-                            <Icon
-                              name="thumbs-up"
-                              size={24}
-                              color={
-                                item.upvoter?.includes(user.uid)
-                                  ? "green"
-                                  : "gray"
-                              } // Change color based on isUpvoted
-                            />
-                          </TouchableOpacity>
-                          <Text style={{ fontSize: 20 }}>
-                            {item.upvoter?.length || 0}
-                          </Text>
-
-                          <TouchableOpacity
-                            onPress={() =>
-                              Alert.alert(
-                                "Delete Post",
-                                "Are you sure you want to delete this post?",
-                                [
-                                  {
-                                    text: "Cancel",
-                                    style: "cancel", // Adds the "Cancel" style (button is usually grayed out)
-                                  },
-                                  {
-                                    text: "Delete",
-                                    style: "destructive", // Adds the "Delete" style (usually red)
-                                    onPress: () => deleteData(item.id),
-                                  },
-                                ]
-                              )
-                            }
-                            style={{
-                              backgroundColor: "red",
-                              marginLeft: "auto",
-                              borderRadius: 50,
-                              paddingHorizontal: 25,
-                              paddingVertical: 5,
-                            }}
-                          >
-                            <Icon
-                              name="trash"
-                              size={20}
-                              color={"#fdfdfd"} // Change color based on isUpvoted
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      ) : (
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
-                          <TouchableOpacity
-                            onPress={() => thumbsUp(item)}
-                            style={{ marginHorizontal: 10 }}
-                          >
-                            <Icon
-                              name="thumbs-up"
-                              size={24}
-                              color={
-                                item.upvoter?.includes(user.uid)
-                                  ? "green"
-                                  : "gray"
-                              } // Change color based on isUpvoted
-                            />
-                          </TouchableOpacity>
-                          <Text style={{ fontSize: 20 }}>
-                            {item.upvoter?.length || 0}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  );
-                }
-                //for post by the acc owner
-                else if (item.email == user.email) {
-                  return (
-                    <View
-                      style={[
-                        stylesHome.context,
-                        { paddingVertical: 10, backgroundColor: "#fafafa" },
-                      ]}
-                    >
-                      <View
-                        style={{ flexDirection: "row", alignItems: "flex-end" }}
-                      >
-                        <View>
-                          <Text
-                            style={{
-                              fontFamily: "Nunito-ExtraBold",
-                              fontSize: 25,
-                            }}
-                          >
-                            {item.title.length > 15
-                              ? `${item.title.slice(0, 15)}...`
-                              : item.title}
-                          </Text>
-
-                          <Text>
-                            <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
-                              Written by:{" "}
-                            </Text>
-                            {item.user}
-                          </Text>
-                        </View>
-
-                        <View
-                          style={{
-                            marginLeft: "auto",
-                          }}
-                        >
-                          <Text
-                            style={{
-                              marginLeft: "auto",
-                              color: "grey",
-                              fontFamily: "Nunito-Bold",
-                            }}
-                          >
-                            {item.category}
-                          </Text>
-                          <Text
-                            style={{
-                              marginLeft: "auto",
-                              color: "grey",
-                              fontFamily: "Nunito",
-                            }}
-                          >
-                            {new Date(item.date).toDateString()}
-                          </Text>
-                        </View>
-                      </View>
-                      <View style={{ marginBottom: 0 }}>
-                        <Text
-                          style={{
-                            marginTop: 5,
-                            fontSize: 20,
-                            fontFamily: "Nunito",
-                          }}
-                        >
-                          {item.content}
-                        </Text>
-                        {/* Display multiple images */}
-                        {item.imageURL && Array.isArray(item.imageURL) ? (
-                          <FlatList
-                            data={item.imageURL}
-                            keyExtractor={(uri, index) =>
-                              `${item.id}-image-${index}`
-                            }
-                            horizontal
-                            style={{}}
-                            renderItem={({ item: uri }) => (
-                              <View
-                                style={{
-                                  width: 200,
-                                  height: 200,
-                                  marginLeft: 0,
-                                  margin: 10,
-                                  borderRadius: 5,
-                                  // borderWidth: 1,
-                                  borderColor: "#ccc",
-                                }}
-                              >
-                                {/* {imageLoad && (
-                                  <ActivityIndicator
-                                    size="large"
-                                    color="#0000ff"
-                                  />
-                                )} */}
-                                <Image
-                                  source={{ uri }}
-                                  style={{
-                                    width: 200,
-                                    height: 200,
-                                    // margin: 10,
                                     marginLeft: 0,
-                                    resizeMode: "cover",
-                                    borderRadius: 5,
-                                    borderWidth: 1,
+                                    margin: 10,
+                                    // borderRadius: 5,
+                                    // borderWidth: 1,
                                     borderColor: "#ccc",
                                   }}
-                                  onLoad={() => setImageLoad(false)}
-                                />
-                                {imageLoad && (
-                                  <View
+                                >
+                                  {/* {imageLoad && (
+                                  <ActivityIndicator
+                                    size="large"
+                                    color="#0000ff"
+                                  />
+                                )} */}
+                                  <Image
+                                    source={{ uri }} // Ensure it's a URL from Firebase Storage
                                     style={{
-                                      ...StyleSheet.absoluteFillObject, // fills the parent
-                                      justifyContent: "center",
-                                      alignItems: "center",
-                                      backgroundColor:
-                                        "rgba(235, 235, 235, 0.8)", // optional semi-transparent overlay
+                                      width: 200,
+                                      height: 200,
+                                      // margin: 10,
+                                      borderRadius: 5,
+                                      borderWidth: 1,
+                                      borderColor: "#ccc",
                                     }}
-                                  >
-                                    <ActivityIndicator
-                                      size="small"
-                                      color="#00dd00"
-                                    />
-                                    <Text>Loading image...</Text>
-                                  </View>
-                                )}
-                              </View>
-                            )}
+                                    onLoad={() => setImageLoad(false)}
+                                    resizeMode="cover"
+                                  />
+                                  {imageLoad && (
+                                    <View
+                                      style={{
+                                        ...StyleSheet.absoluteFillObject, // fills the parent
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        backgroundColor:
+                                          "rgba(235, 235, 235, 0.8)", // optional semi-transparent overlay
+                                      }}
+                                    >
+                                      <ActivityIndicator
+                                        size="large"
+                                        color="#00ee00"
+                                      />
+                                      <Text>Loading image...</Text>
+                                    </View>
+                                  )}
+                                </View>
+                              )}
+                            />
+                          ) : (
+                            <Text style={{ marginTop: 10, color: "gray" }}>
+                              No images attached
+                            </Text>
+                          )}
+                        </View>
+
+                        <View style={{ marginTop: 0 }}>
+                          <TextInput
+                            style={[
+                              styles.input,
+                              {
+                                marginTop: 10,
+                                marginBottom: 5,
+                                borderRadius: 20,
+                                width: "100%",
+                                left: 0,
+                                bottom: 5,
+                              },
+                            ]}
+                            placeholder="Comment"
+                            onPress={() => {
+                              setSelectedPost(item), setIsVisible(true);
+                            }}
                           />
+                        </View>
+
+                        {item.email == user.email ? (
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            <TouchableOpacity
+                              onPress={() => thumbsUp(item)}
+                              style={{ marginHorizontal: 10 }}
+                            >
+                              <Icon
+                                name="thumbs-up"
+                                size={24}
+                                color={
+                                  item.upvoter?.includes(user.uid)
+                                    ? "green"
+                                    : "gray"
+                                } // Change color based on isUpvoted
+                              />
+                            </TouchableOpacity>
+                            <Text style={{ fontSize: 20 }}>
+                              {item.upvoter?.length || 0}
+                            </Text>
+
+                            <TouchableOpacity
+                              onPress={() =>
+                                Alert.alert(
+                                  "Delete Post",
+                                  "Are you sure you want to delete this post?",
+                                  [
+                                    {
+                                      text: "Cancel",
+                                      style: "cancel", // Adds the "Cancel" style (button is usually grayed out)
+                                    },
+                                    {
+                                      text: "Delete",
+                                      style: "destructive", // Adds the "Delete" style (usually red)
+                                      onPress: () => deleteData(item.id),
+                                    },
+                                  ]
+                                )
+                              }
+                              style={{
+                                backgroundColor: "red",
+                                marginLeft: "auto",
+                                borderRadius: 50,
+                                paddingHorizontal: 25,
+                                paddingVertical: 5,
+                              }}
+                            >
+                              <Icon
+                                name="trash"
+                                size={20}
+                                color={"#fdfdfd"} // Change color based on isUpvoted
+                              />
+                            </TouchableOpacity>
+                          </View>
                         ) : (
-                          <Text style={{ marginTop: 10, color: "gray" }}>
-                            No images attached
-                          </Text>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            <TouchableOpacity
+                              onPress={() => thumbsUp(item)}
+                              style={{ marginHorizontal: 10 }}
+                            >
+                              <Icon
+                                name="thumbs-up"
+                                size={24}
+                                color={
+                                  item.upvoter?.includes(user.uid)
+                                    ? "green"
+                                    : "gray"
+                                } // Change color based on isUpvoted
+                              />
+                            </TouchableOpacity>
+                            <Text style={{ fontSize: 20 }}>
+                              {item.upvoter?.length || 0}
+                            </Text>
+                          </View>
                         )}
                       </View>
-                      {/* comment */}
-
-                      <View style={{ marginTop: 0 }}>
-                        <TextInput
-                          style={[
-                            styles.input,
-                            {
-                              marginBottom: 5,
-                              borderRadius: 20,
-                              width: "100%",
-                              left: 0,
-                              bottom: 5,
-                            },
-                          ]}
-                          placeholder="Comment"
-                          onPress={() => {
-                            setSelectedPost(item), setIsVisible(true);
+                    );
+                  }
+                  //for post by the acc owner
+                  else if (item.email == user.email) {
+                    return (
+                      <View
+                        style={[
+                          stylesHome.context,
+                          { paddingVertical: 10, backgroundColor: "#fafafa" },
+                        ]}
+                      >
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "flex-end",
                           }}
-                        />
+                        >
+                          <View>
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-ExtraBold",
+                                fontSize: 25,
+                              }}
+                            >
+                              {item.title.length > 15
+                                ? `${item.title.slice(0, 15)}...`
+                                : item.title}
+                            </Text>
+
+                            <Text>
+                              <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
+                                Written by:{" "}
+                              </Text>
+                              {item.user}
+                            </Text>
+                          </View>
+
+                          <View
+                            style={{
+                              marginLeft: "auto",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                marginLeft: "auto",
+                                color: "grey",
+                                fontFamily: "Nunito-Bold",
+                              }}
+                            >
+                              {item.category}
+                            </Text>
+                            <Text
+                              style={{
+                                marginLeft: "auto",
+                                color: "grey",
+                                fontFamily: "Nunito",
+                              }}
+                            >
+                              {new Date(item.date).toDateString()}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={{ marginBottom: 0 }}>
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              fontSize: 20,
+                              fontFamily: "Nunito",
+                            }}
+                          >
+                            {item.content}
+                          </Text>
+                          {/* Display multiple images */}
+                          {item.imageURL && Array.isArray(item.imageURL) ? (
+                            <FlatList
+                              data={item.imageURL}
+                              keyExtractor={(uri, index) =>
+                                `${item.id}-image-${index}`
+                              }
+                              horizontal
+                              style={{}}
+                              renderItem={({ item: uri }) => (
+                                <View
+                                  style={{
+                                    width: 200,
+                                    height: 200,
+                                    marginLeft: 0,
+                                    margin: 10,
+                                    borderRadius: 5,
+                                    // borderWidth: 1,
+                                    borderColor: "#ccc",
+                                  }}
+                                >
+                                  {/* {imageLoad && (
+                                  <ActivityIndicator
+                                    size="large"
+                                    color="#0000ff"
+                                  />
+                                )} */}
+                                  <Image
+                                    source={{ uri }}
+                                    style={{
+                                      width: 200,
+                                      height: 200,
+                                      // margin: 10,
+                                      marginLeft: 0,
+                                      resizeMode: "cover",
+                                      borderRadius: 5,
+                                      borderWidth: 1,
+                                      borderColor: "#ccc",
+                                    }}
+                                    onLoad={() => setImageLoad(false)}
+                                  />
+                                  {imageLoad && (
+                                    <View
+                                      style={{
+                                        ...StyleSheet.absoluteFillObject, // fills the parent
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        backgroundColor:
+                                          "rgba(235, 235, 235, 0.8)", // optional semi-transparent overlay
+                                      }}
+                                    >
+                                      <ActivityIndicator
+                                        size="small"
+                                        color="#00dd00"
+                                      />
+                                      <Text>Loading image...</Text>
+                                    </View>
+                                  )}
+                                </View>
+                              )}
+                            />
+                          ) : (
+                            <Text style={{ marginTop: 10, color: "gray" }}>
+                              No images attached
+                            </Text>
+                          )}
+                        </View>
+                        {/* comment */}
+
+                        <View style={{ marginTop: 0 }}>
+                          <TextInput
+                            style={[
+                              styles.input,
+                              {
+                                marginTop: 10,
+                                marginBottom: 5,
+                                borderRadius: 20,
+                                width: "100%",
+                                left: 0,
+                                bottom: 5,
+                              },
+                            ]}
+                            placeholder="Comment"
+                            onPress={() => {
+                              setSelectedPost(item), setIsVisible(true);
+                            }}
+                          />
+                        </View>
+
+                        {item.email == user.email ? (
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            <TouchableOpacity
+                              onPress={() => thumbsUp(item)}
+                              style={{ marginHorizontal: 10 }}
+                            >
+                              <Icon
+                                name="thumbs-up"
+                                size={24}
+                                color={
+                                  item.upvoter?.includes(user.uid)
+                                    ? "green"
+                                    : "gray"
+                                } // Change color based on isUpvoted
+                              />
+                            </TouchableOpacity>
+                            <Text style={{ fontSize: 20 }}>
+                              {item.upvoter?.length || 0}
+                            </Text>
+
+                            <TouchableOpacity
+                              onPress={() =>
+                                Alert.alert(
+                                  "Delete Post",
+                                  "Are you sure you want to delete this post?",
+                                  [
+                                    {
+                                      text: "Cancel",
+                                      style: "cancel", // Adds the "Cancel" style (button is usually grayed out)
+                                    },
+                                    {
+                                      text: "Delete",
+                                      style: "destructive", // Adds the "Delete" style (usually red)
+                                      onPress: () => deleteData(item.id),
+                                    },
+                                  ]
+                                )
+                              }
+                              style={{
+                                backgroundColor: "red",
+                                marginLeft: "auto",
+                                borderRadius: 50,
+                                paddingHorizontal: 25,
+                                paddingVertical: 5,
+                              }}
+                            >
+                              <Icon
+                                name="trash"
+                                size={20}
+                                color={"#fdfdfd"} // Change color based on isUpvoted
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        ) : (
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            <TouchableOpacity
+                              onPress={() => thumbsUp(item)}
+                              style={{ marginHorizontal: 10 }}
+                            >
+                              <Icon
+                                name="thumbs-up"
+                                size={24}
+                                color={
+                                  item.upvoter?.includes(user.uid)
+                                    ? "green"
+                                    : "gray"
+                                } // Change color based on isUpvoted
+                              />
+                            </TouchableOpacity>
+                            <Text style={{ fontSize: 20 }}>
+                              {item.upvoter?.length || 0}
+                            </Text>
+
+                            <TouchableOpacity
+                              onPress={() =>
+                                Alert.alert(
+                                  "Delete Post",
+                                  "Are you sure you want to delete this post?",
+                                  [
+                                    {
+                                      text: "Cancel",
+                                      style: "cancel", // Adds the "Cancel" style (button is usually grayed out)
+                                    },
+                                    {
+                                      text: "Delete",
+                                      style: "destructive", // Adds the "Delete" style (usually red)
+                                      onPress: () => deleteData(item.id),
+                                    },
+                                  ]
+                                )
+                              }
+                              style={{
+                                backgroundColor: "red",
+                                marginLeft: "auto",
+                                borderRadius: 50,
+                                paddingHorizontal: 25,
+                                paddingVertical: 5,
+                              }}
+                            >
+                              <Icon
+                                name="trash"
+                                size={20}
+                                color={"#fdfdfd"} // Change color based on isUpvoted
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        )}
                       </View>
-
-                      {item.email == user.email ? (
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
-                          <TouchableOpacity
-                            onPress={() => thumbsUp(item)}
-                            style={{ marginHorizontal: 10 }}
-                          >
-                            <Icon
-                              name="thumbs-up"
-                              size={24}
-                              color={
-                                item.upvoter?.includes(user.uid)
-                                  ? "green"
-                                  : "gray"
-                              } // Change color based on isUpvoted
-                            />
-                          </TouchableOpacity>
-                          <Text style={{ fontSize: 20 }}>
-                            {item.upvoter?.length || 0}
-                          </Text>
-
-                          <TouchableOpacity
-                            onPress={() =>
-                              Alert.alert(
-                                "Delete Post",
-                                "Are you sure you want to delete this post?",
-                                [
-                                  {
-                                    text: "Cancel",
-                                    style: "cancel", // Adds the "Cancel" style (button is usually grayed out)
-                                  },
-                                  {
-                                    text: "Delete",
-                                    style: "destructive", // Adds the "Delete" style (usually red)
-                                    onPress: () => deleteData(item.id),
-                                  },
-                                ]
-                              )
-                            }
-                            style={{
-                              backgroundColor: "red",
-                              marginLeft: "auto",
-                              borderRadius: 50,
-                              paddingHorizontal: 25,
-                              paddingVertical: 5,
-                            }}
-                          >
-                            <Icon
-                              name="trash"
-                              size={20}
-                              color={"#fdfdfd"} // Change color based on isUpvoted
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      ) : (
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
-                          <TouchableOpacity
-                            onPress={() => thumbsUp(item)}
-                            style={{ marginHorizontal: 10 }}
-                          >
-                            <Icon
-                              name="thumbs-up"
-                              size={24}
-                              color={
-                                item.upvoter?.includes(user.uid)
-                                  ? "green"
-                                  : "gray"
-                              } // Change color based on isUpvoted
-                            />
-                          </TouchableOpacity>
-                          <Text style={{ fontSize: 20 }}>
-                            {item.upvoter?.length || 0}
-                          </Text>
-
-                          <TouchableOpacity
-                            onPress={() =>
-                              Alert.alert(
-                                "Delete Post",
-                                "Are you sure you want to delete this post?",
-                                [
-                                  {
-                                    text: "Cancel",
-                                    style: "cancel", // Adds the "Cancel" style (button is usually grayed out)
-                                  },
-                                  {
-                                    text: "Delete",
-                                    style: "destructive", // Adds the "Delete" style (usually red)
-                                    onPress: () => deleteData(item.id),
-                                  },
-                                ]
-                              )
-                            }
-                            style={{
-                              backgroundColor: "red",
-                              marginLeft: "auto",
-                              borderRadius: 50,
-                              paddingHorizontal: 25,
-                              paddingVertical: 5,
-                            }}
-                          >
-                            <Icon
-                              name="trash"
-                              size={20}
-                              color={"#fdfdfd"} // Change color based on isUpvoted
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      )}
-                    </View>
-                  );
-                }
-              }}
-            />
+                    );
+                  }
+                }}
+              />
+            </>
           )}
         </View>
-      </LinearGradient>
+      </ImageBackground>
 
       <Modal
         visible={filterModalVisible}
@@ -937,14 +982,14 @@ export default function Forum() {
               style={{ width: "100%" }}
               onValueChange={(itemValue) => setSelectedCategory(itemValue)}
             >
-              <Picker.Item label="All" value="All" color="black" />
+              <Picker.Item label="None" value="None" color="black" />
               <Picker.Item label="General" value="General" color="black" />
               <Picker.Item
                 label="Announcement"
                 value="Announcement"
                 color="black"
               />
-              <Picker.Item label="Question" value="Question" color="black" />
+              <Picker.Item label="Accident" value="Accident" color="black" />
               <Picker.Item label="Event" value="Event" color="black" />
               {/* Add more categories as needed */}
             </Picker>
@@ -990,7 +1035,7 @@ export default function Forum() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => setFilterModalVisible(true)}
         style={[
           {
@@ -1013,7 +1058,7 @@ export default function Forum() {
         <Text style={{ color: "#fdfdfd", fontWeight: "20", fontSize: 30 }}>
           Filter
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <BottomBar></BottomBar>
 
@@ -1044,7 +1089,7 @@ export default function Forum() {
       </TouchableOpacity>
 
       {isVisible && (
-        <View style={[styles.centeredView]}>
+        <View style={[styles.centeredView, { maxHeight: "80%" }]}>
           <Text
             style={{
               // backgroundColor: "red",
