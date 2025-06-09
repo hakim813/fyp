@@ -8,69 +8,31 @@ import {
   Dimensions,
   Platform,
   TouchableOpacity,
+  ImageBackground,
   ScrollView,
+  Modal,
+  Image,
+  Touchable,
 } from "react-native";
 import { styles, stylesHome } from "../styles";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../UserContext";
-import { ref, getDatabase, onValue } from "firebase/database";
+import { ref, getDatabase, onValue, update } from "firebase/database";
 import BottomBar from "./BottomBar";
 import { LinearGradient } from "expo-linear-gradient";
 
 const { width } = Dimensions.get("window");
 
 export default function HelpdeskHome() {
-  const [data, setData] = useState([
-    { scheme: "Scheme 1", chosenPlan: "Plan 1" },
-  ]);
+  const [data, setData] = useState([]);
 
   const { user } = useContext(UserContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isEnabled, setIsEnabled] = useState(false);
   const flatListRef = useRef(null);
+  const [mediaModalVisible, setMediaModalVisible] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState([]);
   //   const { pDate, pTime } = route.params || {};
-
-  const benefitKWSP = [
-    "Receive a special incentive of 20% (up to a maximum of RM500) of the total voluntary contribution in the current year",
-    "Enjoy annual dividends on retirement savings",
-    "Subject to EPF terms and conditions",
-    "Subject to LHDN terms and conditions",
-  ];
-
-  const benefitSocso = {
-    "Plan 1": [
-      "RM 30 per day",
-      "Lump Sum Payment : RM 32243.40",
-      "Lump Sum Payment : RM32243.40\nPeriodical Pension : RM 756.00 per month",
-      "RM 945 per month",
-      "RM 3000",
-      "RM 500 per month",
-    ],
-    "Plan 2": [
-      "RM 41.33 per day",
-      "Lump Sum Payment : RM 47957.40",
-      "Lump Sum Payment : RM 47957.40 & Periodical Pension : RM 1116.00 per month",
-      "RM 1395 per month",
-      "RM 3000",
-      "RM 500 per month",
-    ],
-    "Plan 3": [
-      "RM 78.67 per day",
-      "Lump Sum Payment : RM 90588.60",
-      "Lump Sum Payment : RM 90588.60 & Periodical Pension : RM 2124.00 per month",
-      "RM 2655 per month",
-      "RM 3000",
-      "RM 500 per month",
-    ],
-    "Plan 4": [
-      "RM 105.33 per day",
-      "Lump Sum Payment : RM 121296.60",
-      "Lump Sum Payment : RM 121296.60\nPeriodical Pension : RM 2844.00 per month",
-      "RM 3555 per month",
-      "RM3000",
-      "RM 500 per month",
-    ],
-  };
 
   const navi = useNavigation();
 
@@ -78,44 +40,54 @@ export default function HelpdeskHome() {
 
   useEffect(() => {
     const db = getDatabase();
-    const postsRef = ref(db, "socialplan");
+    const complaintRef = ref(db, "complaints");
 
-    onValue(postsRef, (snapshot) => {
+    onValue(complaintRef, (snapshot) => {
       const data = snapshot.val();
 
-      let fetchedPlans = [];
+      let fetchedComplaints = [];
 
       if (data) {
         // Convert the object to an array of posts
-        fetchedPlans = Object.keys(data)
+        fetchedComplaints = Object.keys(data)
           .map((key) => ({
             id: key,
-            user: data[key].user,
-            email: data[key].email,
-            scheme: data[key].scheme,
-            chosenPlan: data[key].chosenPlan,
-            totalContribution: data[key].totalContribution,
-            rdate: data[key].rdate ?? null,
-            rtime: data[key].rtime ?? null,
+            createdAt: data[key].createdAt,
+            description: data[key].description,
+            photoURL: data[key].photoURL,
+            status: data[key].status,
+            ticketNumber: data[key].ticketNumber,
+            title: data[key].title,
+            userId: data[key].userId,
           }))
-          .filter((item) => item.email === user.email); // Filter here;
+          .filter(
+            (item) => item.userId === user.uid && item.status === "ongoing"
+          ); // Filter here;
       } else {
         console.log("No data found in the database.");
       }
-
-      // Always add the 'Add New Plan' dummy card at the end
-      fetchedPlans.push({ isAddButton: true });
-
-      // console.log(pDate);
-      // console.log(pTime);
-      setData(fetchedPlans);
+      setData(fetchedComplaints);
     });
   }, []);
+
+  const setResolved = (id) => {
+    const db = getDatabase();
+    const complaintRef = ref(db, `complaints/${id}`);
+
+    // Correct usage of update:
+    update(complaintRef, { status: "Resolved" })
+      .then(() => {
+        console.log("Complaint marked as resolved.");
+      })
+      .catch((error) => {
+        console.error("Error updating complaint:", error);
+      });
+  };
 
   return (
     <View style={styles.container3}>
       <View style={styles.container}>
-        <LinearGradient
+        {/* <LinearGradient
           colors={["#03633a", "#95f6cc"]} // start to end gradient
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -128,172 +100,363 @@ export default function HelpdeskHome() {
                   : StatusBar.currentHeight,
             },
           ]}
+        > */}
+        <ImageBackground
+          source={require("../assets/bg-hibiscus.png")} // Your image path
+          style={[
+            styles.background,
+            {
+              paddingTop:
+                Platform.OS === "ios"
+                  ? StatusBar.currentHeight + 50
+                  : StatusBar.currentHeight,
+            },
+          ]}
+          resizeMode="cover"
         >
           <Text style={[styles.text]}>Helpdesk</Text>
-          <ScrollView
+          {/* <View
+            style={[
+              styles.container2,
+              {
+                borderRadius: 0,
+                padding: 0,
+                paddingTop: 5,
+                // paddingBottom: 100,
+              },
+            ]}
+          > */}
+
+          <View
             style={[
               styles.container2,
               {
                 borderBottomRightRadius: 0,
                 borderBottomLeftRadius: 0,
+                paddingTop: 5,
                 padding: 0,
               },
             ]}
           >
             {/* {data[currentIndex].email === user.email && ( */}
-            <Text
-              style={{
-                fontFamily: "Nunito-Bold",
-                color: "#050505",
-                marginLeft: 10,
-                fontSize: Platform.OS === "ios" ? 30 : 20,
-              }}
-            >
-              Tickets
-            </Text>
 
             {/* this should be the title of the social protection plan  */}
             {/* <Text style={[style.title, {fontFamily: 'Nunito'}]}>{data[currentIndex].title}</Text>  */}
+            <Modal
+              visible={mediaModalVisible}
+              transparent
+              animationType="slide"
+              onRequestClose={() => setMediaModalVisible(false)}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: "rgba(0,0,0,0.2)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <View
+                  style={{
+                    height: "50%",
+                    width: "100%",
+                    backgroundColor: "rgba(0,0,0,0.3)",
+                    justifyContent: "center",
+                    // alignItems: "center",
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => setMediaModalVisible(false)} // Close the modal
+                  >
+                    <Text
+                      style={{
+                        marginRight: 15,
+                        marginLeft: "auto",
+                        color: "#fdfdfd",
+                        fontSize: 30,
+                      }}
+                    >
+                      x
+                    </Text>
+                  </TouchableOpacity>
+                  <ScrollView horizontal>
+                    {selectedMedia.map((uri, idx) => (
+                      <Image
+                        key={idx}
+                        source={{ uri }}
+                        style={{
+                          width: 400,
+                          height: 400,
+                          margin: 10,
+                          // borderRadius: 10
+                          // borderWidth: 0.5,
+                          // borderColor: "#fff",
+                          backgroundColor: "rgba(0,0,0,0)",
+                        }}
+                        resizeMode="contain"
+                      />
+                    ))}
+                  </ScrollView>
+                </View>
+              </View>
+            </Modal>
 
-            <View
+            <View>
+              <FlatList
+                // style={{ backgroundColor: "red" }}
+                data={data}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => {
+                  return (
+                    <View
+                      style={[
+                        stylesHome.context,
+                        {
+                          minHeight: 10,
+                          paddingVertical: 10,
+                          marginBottom: 8,
+                          marginHorizontal: 8,
+                          backgroundColor: "#fafafa",
+                          borderRadius: 12,
+                          borderWidth: 0.1,
+                        },
+                      ]}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "flex-end",
+                          // marginBottom: 5,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: "Nunito-Bold",
+                            fontSize: 23,
+                          }}
+                        >
+                          {/* {item.title.length > 15
+                    ? `${item.title.slice(0, 15)}...`
+                    : item.title} */}
+                          {item.ticketNumber}
+                        </Text>
+
+                        <Text
+                          style={{
+                            marginLeft: "auto",
+                            color: "grey",
+                            fontFamily: "Nunito-Bold",
+                          }}
+                        >
+                          Category {item.category}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text
+                          style={{
+                            fontFamily: "Nunito",
+                            marginBottom: 3,
+                          }}
+                        >
+                          {new Date(item.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              weekday: "long",
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )}
+                        </Text>
+
+                        <Text
+                          style={{
+                            marginTop: 5,
+                            fontSize: 18,
+                            fontFamily: "Nunito-Bold",
+                          }}
+                        >
+                          Description
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            fontFamily: "Nunito-Regular",
+                          }}
+                        >
+                          {item.description}
+                        </Text>
+                        <Text
+                          style={{
+                            marginTop: 5,
+                            fontSize: 18,
+                            fontFamily: "Nunito-Bold",
+                          }}
+                        >
+                          Attached Media
+                        </Text>
+                        {item.photoURL && item.photoURL.length > 0 ? (
+                          <TouchableOpacity
+                            onPress={() => {
+                              setSelectedMedia(item.photoURL);
+                              setMediaModalVisible(true);
+                            }}
+                            style={{
+                              backgroundColor: "#efefef",
+                              borderWidth: 0.3,
+                              paddingHorizontal: 10,
+                              paddingVertical: 5,
+                              marginTop: 5,
+                              borderRadius: 50,
+                              marginRight: "auto",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontSize: 15,
+                                fontFamily: "Nunito-Regular",
+                              }}
+                            >
+                              View Media
+                            </Text>
+                          </TouchableOpacity>
+                        ) : (
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              fontFamily: "Nunito-Regular",
+                              color: "grey",
+                            }}
+                          >
+                            None
+                          </Text>
+                        )}
+                        <TouchableOpacity
+                          onPress={() => {
+                            setResolved(item.id);
+                          }}
+                          style={{
+                            borderColor: item.status === "grey",
+                            borderWidth: 1,
+                            paddingHorizontal: 10,
+                            paddingVertical: 5,
+                            marginLeft: "auto",
+                            marginTop: 5,
+                            borderRadius: 50,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: "Nunito-Regular",
+                              color: "#050505",
+                            }}
+                          >
+                            Set as resolved
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                }}
+                ListHeaderComponent={
+                  <>
+                    {/* <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        color: "#050505",
+                        margin: 5,
+                        marginLeft: 10,
+                        fontSize: Platform.OS === "ios" ? 30 : 20,
+                      }}
+                    >
+                      Ongoing Complaints
+                    </Text> */}
+
+                    <View
+                      style={{
+                        // backgroundColor: "red",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View
+                        flexDirection="row"
+                        style={{
+                          borderColor: "grey",
+                          borderWidth: 1,
+                          paddingHorizontal: 5,
+                          // paddingVertical: 5,
+                          backgroundColor: "#fdfdfd",
+                          marginVertical: 10,
+                          borderRadius: 50,
+                        }}
+                      >
+                        <View
+                          style={{
+                            // borderColor: "grey",
+                            // borderWidth: 1,
+                            paddingHorizontal: 10,
+                            paddingVertical: 5,
+                            marginHorizontal: 5,
+                            backgroundColor: "green",
+                            marginVertical: 10,
+                            borderRadius: 50,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: "Nunito-Regular",
+                              color: "#fdfdfd",
+                            }}
+                          >
+                            Ongoing
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            // borderColor: "grey",
+                            // borderWidth: 1,
+                            paddingHorizontal: 10,
+                            paddingVertical: 5,
+                            marginHorizontal: 5,
+                            backgroundColor: "#fdfdfd",
+                            marginVertical: 10,
+                            borderRadius: 50,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: "Nunito-Regular",
+                              color: "#050505",
+                            }}
+                          >
+                            History
+                          </Text>
+                        </View>
+                        {/* <Text
+                          style={{
+                            fontFamily: "Nunito-Regular",
+                            color: "#050505",
+                          }}
+                        >
+                          Set as resolved
+                        </Text> */}
+                      </View>
+                    </View>
+                  </>
+                }
+                ListFooterComponent={
+                  <View style={{ height: 90 }} /> // Adjust height to match or exceed your button's height + margin
+                }
+              />
+            </View>
+
+            {/* <View
               style={[
                 stylesHome.context,
                 { paddingVertical: 10, backgroundColor: "#fafafa" },
               ]}
-            >
-              <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-                <Text
-                  style={{
-                    fontFamily: "Nunito-ExtraBold",
-                    fontSize: 25,
-                  }}
-                >
-                  {/* {item.title.length > 15
-                    ? `${item.title.slice(0, 15)}...`
-                    : item.title} */}
-                  SOCSO issue
-                </Text>
-                <Text
-                  style={{
-                    marginLeft: "auto",
-                    color: "grey",
-                    fontFamily: "Nunito",
-                  }}
-                >
-                  {new Date().toDateString()}
-                </Text>
-              </View>
-              <View style={{ marginBottom: 0 }}>
-                <Text>
-                  <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
-                    Written by:{" "}
-                  </Text>
-                  hakim
-                </Text>
-                <Text
-                  style={{
-                    marginTop: 15,
-                    fontSize: 20,
-                    fontFamily: "Nunito",
-                  }}
-                >
-                  Complaint regarding social protection SOCSO issue
-                </Text>
-                <View
-                  style={{
-                    backgroundColor: "red",
-                    paddingHorizontal: 20,
-                    paddingVertical: 10,
-                    marginLeft: "auto",
-                    marginTop: 25,
-                    borderRadius: 50,
-                  }}
-                >
-                  <Text style={{ color: "#fdfdfd", fontsize: 15 }}>
-                    Status
-                    <Text
-                      style={{
-                        color: "#fdfdfd",
-                        fontsize: 15,
-                        fontFamily: "Nunito-Bold",
-                      }}
-                    >
-                      : Waiting
-                    </Text>
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            <View
-              style={[
-                stylesHome.context,
-                { paddingVertical: 10, backgroundColor: "#fafafa" },
-              ]}
-            >
-              <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-                <Text
-                  style={{
-                    fontFamily: "Nunito-ExtraBold",
-                    fontSize: 25,
-                  }}
-                >
-                  {/* {item.title.length > 15
-                    ? `${item.title.slice(0, 15)}...`
-                    : item.title} */}
-                  Payment from gig plat...
-                </Text>
-                <Text
-                  style={{
-                    marginLeft: "auto",
-                    color: "grey",
-                    fontFamily: "Nunito",
-                  }}
-                >
-                  {new Date().toDateString()}
-                </Text>
-              </View>
-              <View style={{ marginBottom: 0 }}>
-                <Text>
-                  <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
-                    Written by:{" "}
-                  </Text>
-                  hakim
-                </Text>
-                <Text
-                  style={{
-                    marginTop: 15,
-                    fontSize: 20,
-                    fontFamily: "Nunito",
-                  }}
-                >
-                  Gig platform late for commision payment
-                </Text>
-                <View
-                  style={{
-                    backgroundColor: "green",
-                    paddingHorizontal: 20,
-                    paddingVertical: 10,
-                    marginLeft: "auto",
-                    marginTop: 25,
-                    borderRadius: 50,
-                  }}
-                >
-                  <Text style={{ color: "#fdfdfd", fontsize: 15 }}>
-                    Status
-                    <Text
-                      style={{
-                        color: "#fdfdfd",
-                        fontsize: 15,
-                        fontFamily: "Nunito-Bold",
-                      }}
-                    >
-                      : Approved
-                    </Text>
-                  </Text>
-                </View>
-              </View>
-            </View>
+            ></View> */}
 
             {/* <View
               style={[
@@ -303,29 +466,32 @@ export default function HelpdeskHome() {
             ></View> */}
 
             {/* for adding space at bottom */}
-            <View style={{ height: 75 }}></View>
-          </ScrollView>
+          </View>
 
           <TouchableOpacity
             style={{
               backgroundColor: "green",
               position: "absolute",
               right: 20,
-              bottom: 110,
-              padding: 20,
-              borderRadius: 50,
+              bottom: 115,
+              width: 70, // set width
+              height: 70, // set height
+              borderRadius: 35, // half of width/height for a circle
+              alignItems: "center",
+              justifyContent: "center",
+              elevation: 4, // optional: shadow on Android
+              shadowColor: "#000", // optional: shadow on iOS
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 3,
             }}
+            onPress={() => navi.navigate("AddComplaint")}
           >
-            <Text
-              style={{ fontSize: 20, color: "#fdfdfd" }}
-              onPress={() => navi.navigate("AddComplaint")}
-            >
-              Add complaint
-            </Text>
+            <Text style={{ fontSize: 40, color: "#fdfdfd" }}>+</Text>
           </TouchableOpacity>
 
           <BottomBar></BottomBar>
-        </LinearGradient>
+        </ImageBackground>
       </View>
     </View>
   );
