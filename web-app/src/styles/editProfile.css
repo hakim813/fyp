@@ -1,166 +1,126 @@
-.edit-profile-page {
-    background: #ffffff;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 400px;
-    padding: 20px;
+body {
+  margin: 100px;
+  font-family: Arial, sans-serif;
+  background-color: #f0fdf4;
 }
 
-.edit-profile-container {
-    width: 1000px;
-    padding: 30px;
-    background-color: #ffffff;
-    border-radius: 24px;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    transition: all 0.3s ease;
+.edit-container {
+  display: flex;
+  min-height: 100vh;
 }
 
-.edit-profile-container:hover {
-    box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.15);
+.sidebar {
+  width: 220px;
+  background-color: #00b16a;
+  color: white;
+  padding: 20px;
 }
 
-.form-section {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 16px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.sidebar h2 {
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-.form-section h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #000000;
-    margin-bottom: 10px;
+.sidebar-item {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #00b16a;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0px;
+.sidebar-item:hover {
+  background-color: #009457;
 }
 
-.form-group label {
-    font-size: 0.9rem;
-    color: #333333;
+.sidebar-item.active {
+  background-color: white;
+  color: #00b16a;
+  font-weight: bold;
 }
 
-.form-group input,
-.form-group select {
-    padding: 10px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    background-color: #ffffff;
-    transition: border-color 0.3s;
+.tick {
+  margin-left: 10px;
+  color: white;
+  font-size: 14px;
 }
 
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #00de85;
+.sidebar-item.active .tick {
+  color: #00b16a;
 }
 
-.upload-section {
-    grid-column: span 2;
-    background-color: #f0f0f0;
-    padding: 20px;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.05);
+.edit-form {
+  flex: 1;
+  background: #fff;
+  padding: 40px;
 }
 
-.upload-section label {
-    font-size: 0.9rem;
-    color: #333333;
+.edit-form h2 {
+  color: #00b16a;
+  margin-bottom: 20px;
 }
 
-.upload-section input {
-    padding: 10px;
-    border-radius: 12px;
-    border: 1px solid #ddd;
-    background-color: #ffffff;
+.input-group {
+  margin-bottom: 16px;
 }
 
-.button-group {
-    grid-column: span 2;
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 20px;
+.input-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #333;
 }
 
-.edit-profile-page .edit-btn, .edit-profile-page .cancel-btn {
-    width: 150px;  /* Uniform width */
-    padding: 12px;
-    border-radius: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    color: #ffffff;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
 }
 
-.edit-btn {
-    padding: 10px 20px;
-    background-color: #2196F3;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-top: 20px;
-    transition: background-color 0.3s ease;
+.preview-img {
+  margin-top: 10px;
+  max-width: 100%;
+  max-height: 140px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
-.edit-btn:hover {
-    transform: translateY(-2px);
+.form-actions {
+  margin-top: 30px;
+  text-align: right;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.save-btn {
+  background-color: #00b16a;
+  color: white;
 }
 
 .cancel-btn {
-    padding: 10px 20px;
-    background-color: #f44336;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-top: 20px;
+  background-color: #ccc;
+  color: #333;
+}
+
+.save-btn:hover {
+  background-color: #009457;
 }
 
 .cancel-btn:hover {
-    background-color: #d32f2f;
-    transform: translateY(-2px);
-}
-
-@media (max-width: 1024px) {
-    .edit-profile-container {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .button-group {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .edit-btn, .cancel-btn {
-        width: 100%;
-    }
-}
-
-@media (max-width: 768px) {
-    .edit-profile-container {
-        width: 95%;
-    }
-
-    .edit-btn, .cancel-btn {
-        padding: 10px;
-    }
+  background-color: #aaa;
 }

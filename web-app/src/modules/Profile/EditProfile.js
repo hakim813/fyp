@@ -1,120 +1,147 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth } from "firebase/auth";
-import { getDatabase, ref, get, update } from "firebase/database";
+import { getDatabase, ref as dbRef, get, update } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import '../../styles/editProfile.css';
-import Navbar from '../../components/Navbar';
+
+const sections = {
+  Personal: ["fullName", "dob", "phone", "email", "address"],
+  Professional: ["workCategory", "industry", "skills", "experience", "availability", "languages"],
+  Identification: ["nric", "taxId", "workPermit"],
+  Platform: ["platforms", "platformType"],
+  Banking: ["bank", "ewallet"],
+  Compliance: ["insurance", "socialSecurity", "licenses"],
+  Emergency: ["emergency"],
+  Documents: ["profilePhoto", "verificationDocument"]
+};
+
+const fieldLabels = {
+  fullName: "Full Name", dob: "Date of Birth", phone: "Phone", email: "Email", address: "Address",
+  workCategory: "Work Category", industry: "Industry", skills: "Skills", experience: "Experience",
+  availability: "Availability", languages: "Languages", nric: "NRIC", taxId: "Tax ID", workPermit: "Work Permit",
+  platforms: "Gig Platforms Used", platformType: "Platform Type", bank: "Bank Account", ewallet: "E-Wallets",
+  insurance: "Insurance Status", socialSecurity: "Social Security", licenses: "Licenses",
+  emergency: "Emergency Contact", profilePhoto: "Profile Photo", verificationDocument: "Verification Document"
+};
 
 const EditProfile = () => {
-    const [userData, setUserData] = useState({
-        fullName: "",
-        nric: "",
-        email: "",
-        phone: "",
-        gender: "",
-        dob: "",
-        profilePhoto: "",
-        verificationDocument: ""
-    });
+  const navigate = useNavigate();
+  const auth = getAuth();
+  const db = getDatabase();
+  const storage = getStorage();
 
-    const navigate = useNavigate();
-    const auth = getAuth();
+  const [formData, setFormData] = useState({});
+  const [currentSection, setCurrentSection] = useState('Personal');
+  const [photoPreview, setPhotoPreview] = useState(null);
+
+  // ✅ Load data from Firebase
+  useEffect(() => {
     const user = auth.currentUser;
-    const db = getDatabase();
-    const storage = getStorage();
+    if (!user) return;
 
-    useEffect(() => {
-        if (user) {
-            const userRef = ref(db, `users/${user.uid}`);
-            get(userRef).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    setUserData({ ...data, email: user.email });
-                }
-            }).catch((error) => {
-                console.error("Error fetching user data:", error);
-            });
-        }
-    }, [user, db]);
+    const userRef = dbRef(db, `users/${user.uid}`);
+    get(userRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        setFormData(userData);
+        if (userData.profilePhoto) setPhotoPreview(userData.profilePhoto);
+      }
+    }).catch((error) => {
+      console.error("Error loading profile data:", error);
+    });
+  }, []);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setUserData({ ...userData, [name]: value });
-    };
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value
+    }));
+    if (name === "profilePhoto" && files) {
+      setPhotoPreview(URL.createObjectURL(files[0]));
+    }
+  };
 
-    const handleSubmit = () => {
-        if (user) {
-            const userRef = ref(db, `users/${user.uid}`);
-            update(userRef, userData)
-                .then(() => {
-                    alert("Profile updated successfully!");
-                    navigate("/profile");
-                })
-                .catch((error) => {
-                    console.error("Error updating profile:", error);
-                });
-        }
-    };
+  const getSectionCompletion = (section) => {
+    return sections[section].every(field => formData[field] && formData[field] !== "");
+  };
 
-    const handleCancel = () => {
-        navigate("/profile");
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) return;
 
-    return (
-        <>
-            <Navbar />
-            <div className="edit-profile-page edit-profile-container">
-                <div className="form-section">
-                    <h3>Personal Information</h3>
-                    <div className="form-group">
-                        <label>Full Name:</label>
-                        <input type="text" name="fullName" value={userData.fullName} onChange={handleInputChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>NRIC:</label>
-                        <input type="text" name="nric" value={userData.nric} onChange={handleInputChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>Email:</label>
-                        <input type="email" name="email" value={userData.email} readOnly />
-                    </div>
-                    <div className="form-group">
-                        <label>Phone:</label>
-                        <input type="text" name="phone" value={userData.phone} onChange={handleInputChange} />
-                    </div>
-                </div>
+    const userRef = dbRef(db, `users/${user.uid}`);
+    const updatedData = { ...formData };
 
-                <div className="form-section">
-                    <div className="form-group">
-                        <label>Gender:</label>
-                        <select name="gender" value={userData.gender} onChange={handleInputChange}>
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label>Date of Birth:</label>
-                        <input type="date" name="dob" value={userData.dob} onChange={handleInputChange} />
-                    </div>
-                </div>
+    // Upload profile photo
+    if (formData.profilePhoto instanceof File) {
+      const photoRef = storageRef(storage, `profilePhotos/${user.uid}`);
+      await uploadBytes(photoRef, formData.profilePhoto);
+      const photoURL = await getDownloadURL(photoRef);
+      updatedData.profilePhoto = photoURL;
+    }
 
-                <div className="upload-section">
-                    <label>Profile Photo:</label>
-                    <input type="file" name="profilePhoto" onChange={(e) => handleInputChange(e, 'profilePhoto')} />
+    // Upload verification document
+    if (formData.verificationDocument instanceof File) {
+      const docRef = storageRef(storage, `documents/${user.uid}`);
+      await uploadBytes(docRef, formData.verificationDocument);
+      const docURL = await getDownloadURL(docRef);
+      updatedData.verificationDocument = docURL;
+    }
 
-                    <label>Verification Document:</label>
-                    <input type="file" name="verificationDocument" onChange={(e) => handleInputChange(e, 'verificationDocument')} />
-                </div>
+    await update(userRef, updatedData);
+    navigate('/profile');
+  };
 
-                <div className="button-group">
-                    <button className="edit-btn" onClick={handleSubmit}>Update Profile</button>
-                    <button className="cancel-btn" onClick={handleCancel}>Cancel</button>
-                </div>
+  return (
+    <div className="edit-container">
+      <div className="sidebar">
+        <h2>WeGig</h2>
+        {Object.keys(sections).map((sec) => (
+          <div
+            key={sec}
+            className={`sidebar-item ${currentSection === sec ? 'active' : ''}`}
+            onClick={() => setCurrentSection(sec)}
+          >
+            {sec}
+            {getSectionCompletion(sec) && <span className="tick">✔</span>}
+          </div>
+        ))}
+      </div>
+
+      <div className="edit-form">
+        <h2>{currentSection} Information</h2>
+        <form onSubmit={handleSubmit}>
+          {sections[currentSection].map((field) => (
+            <div key={field} className="input-group">
+              <label>{fieldLabels[field]}</label>
+              {field === "profilePhoto" ? (
+                <>
+                  <input type="file" name={field} onChange={handleChange} />
+                  {photoPreview && <img className="preview-img" src={photoPreview} alt="Preview" />}
+                </>
+              ) : field.includes("Document") ? (
+                <input type="file" name={field} onChange={handleChange} />
+              ) : (
+                <input
+                  type={field === "dob" ? "date" : "text"}
+                  name={field}
+                  value={formData[field] || ""}
+                  onChange={handleChange}
+                />
+              )}
             </div>
-        </>
-    );
+          ))}
+          <div className="form-actions">
+            <button type="submit" className="save-btn">Save</button>
+            <button type="button" className="cancel-btn" onClick={() => navigate('/profile')}>Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 export default EditProfile;

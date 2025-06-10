@@ -5,130 +5,59 @@ import Navbar from '../../components/Navbar';
 import '../../styles/redeem.css';
 
 const Redeem = () => {
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [voucherCode, setVoucherCode] = useState('');
-  const [error, setError] = useState('');
-  const [redeemed, setRedeemed] = useState(false);
-
   const auth = getAuth();
   const db = getDatabase();
   const user = auth.currentUser;
 
-  const fetchUserData = () => {
-    if (user) {
-      const userRef = ref(db, `users/${user.uid}`);
-      get(userRef)
-        .then(snapshot => {
-          if (snapshot.exists()) {
-            const data = snapshot.val();
-            console.log("Redeem page user data:", data); // Debug log
-
-            setUserData(data);
-            setRedeemed(data.voucherRedeemed || false);
-          } else {
-            setError('User data not found.');
-          }
-          setLoading(false);
-        })
-        .catch(err => {
-          console.error(err);
-          setError('Failed to load user data.');
-          setLoading(false);
-        });
-    }
-  };
+  const [profileComplete, setProfileComplete] = useState(false);
+  const [voucherCode, setVoucherCode] = useState('');
+  const [alreadyRedeemed, setAlreadyRedeemed] = useState(false);
 
   useEffect(() => {
-    fetchUserData();
-  }, [user]);
-
-  const generateVoucherCode = () => {
-    return 'WEGIG-' + Math.random().toString(36).substring(2, 10).toUpperCase();
-  };
-
-  const handleRedeem = () => {
-    if (!userData) return;
-
-    const completionRaw = userData.completionPercentage ?? userData.profileCompletion ?? 0;
-    const completion = Number(completionRaw);
-
-    console.log("Completion value:", completion);
-    console.log("Voucher redeemed:", redeemed);
-
-    if (completion < 100) {
-      setError('Profile completion must be 100% to redeem.');
-      return;
+    if (user) {
+      const userRef = ref(db, `users/${user.uid}`);
+      get(userRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const isComplete = Object.values(data).every((v) => v !== "");
+          setProfileComplete(isComplete);
+          if (data.voucherCode) {
+            setVoucherCode(data.voucherCode);
+            setAlreadyRedeemed(true);
+          }
+        }
+      });
     }
+  }, [user, db]);
 
-    if (redeemed) {
-      setError('You have already redeemed your voucher.');
-      return;
-    }
-
-    const code = generateVoucherCode();
-
+  const generateCode = () => {
+    const code = 'PETRO-' + Math.random().toString(36).substring(2, 10).toUpperCase();
     const userRef = ref(db, `users/${user.uid}`);
-    update(userRef, {
-      voucherCode: code,
-      voucherRedeemed: true,
-    })
+    update(userRef, { voucherCode: code })
       .then(() => {
         setVoucherCode(code);
-        setRedeemed(true);
-        setError('');
+        setAlreadyRedeemed(true);
       })
-      .catch(err => {
-        console.error(err);
-        setError('Failed to redeem voucher. Please try again.');
-      });
+      .catch((err) => console.error(err));
   };
-
-  if (loading) {
-    return (
-      <>
-        <Navbar />
-        <div className="redeem-container">
-          <p>Loading...</p>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>
       <Navbar />
       <div className="redeem-container">
-        <h2>Redeem Your Voucher</h2>
+        <h2>Petrol Voucher Redemption</h2>
+        <p>Redeem a one-time free petrol voucher after completing your profile.</p>
 
-        {!redeemed && (
-          <>
-            <p>
-              {userData && (Number(userData.completionPercentage ?? userData.profileCompletion ?? 0) >= 100)
-                ? 'You are eligible to redeem a one-time petrol refill voucher.'
-                : 'Complete your profile 100% to be eligible for redemption.'}
-            </p>
-            <button
-              onClick={handleRedeem}
-              disabled={
-                !userData || Number(userData.completionPercentage ?? userData.profileCompletion ?? 0) < 100
-              }
-              className="redeem-btn"
-            >
-              Redeem Voucher
-            </button>
-          </>
-        )}
-
-        {redeemed && (
-          <div className="voucher-section">
-            <h3>Your Voucher Code:</h3>
-            <p className="voucher-code">{voucherCode || userData.voucherCode}</p>
-            <p>Redeem this code at selected gas stations for your petrol refill.</p>
+        {alreadyRedeemed ? (
+          <div className="voucher-box">
+            <p>Your voucher code:</p>
+            <span className="code">{voucherCode}</span>
           </div>
+        ) : profileComplete ? (
+          <button className="redeem-btn" onClick={generateCode}>Generate Voucher Code</button>
+        ) : (
+          <p className="warning-text">Please complete your profile to redeem the voucher.</p>
         )}
-
-        {error && <p className="error-msg">{error}</p>}
       </div>
     </>
   );

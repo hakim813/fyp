@@ -7,13 +7,14 @@
 
 body {
   font-family: 'Arial', sans-serif;
-  background-color: #00b16a; /* Green background color */
+  background-color: #00b16a;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
 }
 
+/* Container & Box */
 .login-container {
   display: flex;
   justify-content: center;
@@ -28,24 +29,23 @@ body {
   border-radius: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   width: 100%;
-  width: 450px;
+  max-width: 450px;
   text-align: center;
 }
 
+/* Titles */
 .login-box h1 {
-  font-size: 42px; /* Adjust the font size */
+  font-size: 42px;
   font-weight: bold;
-  color: #000; /* Set "We" to black */
+  color: #000;
   margin-bottom: 10px;
-  text-align: center; /* Center the text */
 }
 
 .login-box h1 span {
-  color: #00b16a; /* Set "Gig" to green */
-  font-size: inherit; /* Inherit the font size from h1 */
+  color: #00b16a;
 }
 
-h2 {
+.login-box h2 {
   font-size: 24px;
   color: #000;
   margin-bottom: 20px;
@@ -57,15 +57,10 @@ h2 {
   margin-bottom: 50px;
 }
 
-.signup-text p {
-  color: #555;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
+/* Input Fields */
 .input-field {
   text-align: left;
-  margin-bottom: 0px;
+  margin-bottom: 10px;
 }
 
 .input-field label {
@@ -84,17 +79,19 @@ h2 {
   margin-bottom: 12px;
 }
 
+/* Error Message */
 .error-message {
   color: #ff3333;
   font-size: 14px;
   margin-bottom: 10px;
 }
 
+/* Remember Checkbox */
 .checkbox-field {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .checkbox-field input {
@@ -104,27 +101,28 @@ h2 {
 .checkbox-field label {
   font-size: 12px;
   color: #333;
-  margin-bottom: auto;
 }
 
+/* Forgot Password Link */
 .forgot-password {
   font-size: 12px;
   color: #5a8cff;
   text-decoration: none;
   display: block;
-  margin-top: -20px;
+  text-align: right;
+  margin-top: -8px;
   margin-bottom: 20px;
-  text-align: right; /* Align the link to the right */
 }
 
 .forgot-password:hover {
   text-decoration: underline;
 }
 
-.btn {
+/* Submit Button */
+.login-button {
   width: 100%;
   padding: 14px;
-  background-color: #2ecc71; /* Green button */
+  background-color: #2ecc71;
   color: white;
   border: none;
   border-radius: 8px;
@@ -133,10 +131,11 @@ h2 {
   transition: background 0.3s ease;
 }
 
-.btn:hover {
+.login-button:hover {
   background-color: #27ae60;
 }
 
+/* Signup Link */
 .signup-text {
   margin-top: 15px;
   font-size: 14px;
