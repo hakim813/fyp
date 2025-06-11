@@ -1,126 +1,129 @@
-body {
-  margin: 100px;
-  font-family: Arial, sans-serif;
-  background-color: #f0fdf4;
-}
-
 .edit-container {
   display: flex;
   min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background: #f0fdf4;
 }
 
+/* Sidebar */
 .sidebar {
   width: 220px;
-  background-color: #00b16a;
-  color: white;
+  background: #00b16a;
   padding: 20px;
+  color: #fff;
 }
-
 .sidebar h2 {
   margin-bottom: 20px;
-  text-align: center;
+  font-size: 22px;
 }
-
 .sidebar-item {
   padding: 10px;
   margin-bottom: 10px;
-  background-color: #00b16a;
   border-radius: 6px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
-
 .sidebar-item:hover {
-  background-color: #009457;
+  background: #009457;
 }
-
-.sidebar-item.active {
-  background-color: white;
+.sidebar-item.done {
+  background: #fff;
   color: #00b16a;
   font-weight: bold;
 }
-
 .tick {
-  margin-left: 10px;
-  color: white;
-  font-size: 14px;
-}
-
-.sidebar-item.active .tick {
   color: #00b16a;
 }
 
+/* Form */
 .edit-form {
   flex: 1;
+  padding: 30px;
   background: #fff;
-  padding: 40px;
+}
+.progress-bar {
+  height: 12px;
+  background: #e0f7ec;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.progress-fill {
+  height: 100%;
+  background: #00b16a;
+  transition: width 0.3s;
 }
 
-.edit-form h2 {
-  color: #00b16a;
+h2 {
+  color: #333;
   margin-bottom: 20px;
 }
 
 .input-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
-
 .input-group label {
   display: block;
   font-weight: bold;
   margin-bottom: 6px;
-  color: #333;
+  color: #444;
 }
-
-.input-group input {
+.input-group input[type="text"],
+.input-group input[type="date"],
+.input-group input[type="file"] {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f9f9f9;
   font-size: 14px;
+}
+.preview-img {
+  display: block;
+  margin-top: 10px;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
   border-radius: 6px;
   border: 1px solid #ccc;
-  background-color: #f9f9f9;
+}
+.file-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 8px;
+}
+.file-list li {
+  color: #00b16a;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-bottom: 4px;
 }
 
-.preview-img {
-  margin-top: 10px;
-  max-width: 100%;
-  max-height: 140px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+.error {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
 }
 
 .form-actions {
   margin-top: 30px;
   text-align: right;
 }
-
 .save-btn,
 .cancel-btn {
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: bold;
-  border-radius: 6px;
+  padding: 10px 20px;
   border: none;
+  border-radius: 6px;
+  font-weight: bold;
   cursor: pointer;
   margin-left: 10px;
 }
-
 .save-btn {
-  background-color: #00b16a;
-  color: white;
+  background: #00b16a;
+  color: #fff;
 }
-
 .cancel-btn {
-  background-color: #ccc;
+  background: #ccc;
   color: #333;
-}
-
-.save-btn:hover {
-  background-color: #009457;
-}
-
-.cancel-btn:hover {
-  background-color: #aaa;
 }

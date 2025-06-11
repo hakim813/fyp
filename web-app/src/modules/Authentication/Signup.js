@@ -6,7 +6,7 @@ import '../../styles/signup.css';  // Correct path to signup.css
 
 function Signup() {
     const [email, setEmail] = useState('');
-    const [nric, setNric] = useState('');
+    const [nricId, setNricId] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
@@ -45,13 +45,13 @@ function Signup() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                     />
-                    <label htmlFor="nric">NRIC:</label>
+                    <label htmlFor="nricId">NRIC:</label>
                     <input
                         type="text"
-                        id="nric"
+                        id="nricId"
                         placeholder="NRIC"
-                        value={nric}
-                        onChange={(e) => setNric(e.target.value)}
+                        value={nricId}
+                        onChange={(e) => setNricId(e.target.value)}
                         required
                     />
                     <label htmlFor="password">Password:</label>
