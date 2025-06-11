@@ -389,7 +389,7 @@ export default function AddComplaint() {
             </Modal>
 
             <Text style={[styles.labelInput, { fontSize: 20, marginTop: 20 }]}>
-              Title of your complaint
+              Title
             </Text>
             <TextInput
               style={[styles.input, { fontFamily: "Nunito", color: "#303030" }]}

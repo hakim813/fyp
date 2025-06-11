@@ -6,6 +6,8 @@ import {
   ImageBackground,
   Platform,
   StatusBar,
+  Image,
+  Linking,
 } from "react-native";
 import { UserContext } from "../UserContext";
 import { useNavigation } from "@react-navigation/native";
@@ -19,7 +21,14 @@ import { LinearGradient } from "expo-linear-gradient";
 export default function Home() {
   const { user, setUser } = useContext(UserContext);
   const [detail, setDetail] = useState(null);
+  const [income, setIncome] = useState(0);
+  const [expense, setExpense] = useState(0);
   const navi = useNavigation();
+
+  const today = new Date();
+  const day = today.getDate();
+  const month = today.toLocaleString("default", { month: "long" }); // "Aug"
+  const formattedDate = `${day} ${month}`;
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -46,8 +55,45 @@ export default function Home() {
       }
     };
 
+    const fetchFinancial = async () => {
+      const db = getDatabase();
+      const dbRef = ref(db, "financeRecords");
+
+      try {
+        const snapshot = await get(dbRef);
+
+        if (snapshot.exists()) {
+          const allTransactions = snapshot.val();
+          let income = 0;
+          let expense = 0;
+
+          Object.values(allTransactions).forEach((transaction) => {
+            if (transaction.email === user.email) {
+              const amount = Number(transaction.value);
+
+              if (transaction.type === "Income") {
+                income += parseFloat(amount);
+              } else if (transaction.type === "Expense") {
+                expense += parseFloat(amount);
+              }
+            }
+          });
+
+          console.log("User Income:", income);
+          console.log("User Expense:", expense);
+
+          // Set to state if needed
+          setIncome(parseFloat(income).toFixed(2));
+          setExpense(parseFloat(expense).toFixed(2));
+        }
+      } catch (error) {
+        console.error("Error fetching financial records:", error);
+      }
+    };
+
     if (user) {
       fetchUserName();
+      fetchFinancial();
     }
   }, [user]); // Run the effect only when the `user` changes
 
@@ -67,247 +113,494 @@ export default function Home() {
   };
 
   return (
-    <View
-      style={[
-        stylesHome.bg,
-        { paddingTop: 0, backgroundColor: "white", alignItems: "center" },
-      ]}
-    >
+    <ScrollView>
       <View
-        style={{
-          width: "100%",
-          height: 200,
-          backgroundColor: "#50c878",
-          padding: 0,
-          borderBottomLeftRadius: 50,
-          borderBottomRightRadius: 50,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        style={[
+          stylesHome.bg,
+          { paddingTop: 0, backgroundColor: "white", alignItems: "center" },
+        ]}
       >
-        <ImageBackground
-          source={require("../assets/bg-hibiscus.png")} // Your image path
-          style={[
-            styles.background,
-            {
-              // alignItems: "center",
-              justifyContent: "center",
-              // paddingHorizontal: 25,
+        <View
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: 350,
+            backgroundColor: "#50c878",
+            padding: 0,
+            borderBottomLeftRadius: 50,
+            borderBottomRightRadius: 50,
+            overflow: "hidden", // <-- important for clipping children!
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ImageBackground
+            source={require("../assets/bg-hibiscus.png")}
+            style={{
               height: "100%",
               width: "100%",
+              // borderBottomLeftRadius: 120,
+              // borderBottomRightRadius: 120,
               backgroundColor: "#1b434d",
-            },
-          ]}
-          resizeMode="cover"
-        >
-          {detail ? (
-            <>
-              <Text style={[styles.text]}>
-                {getGreeting()}, {"\n"}
-                {detail.username}!
-              </Text>
-            </>
-          ) : (
-            <Text>Home</Text>
-          )}
-        </ImageBackground>
-      </View>
-      <View
-        style={{
-          width: "100%",
-          height: 280,
-          // paddingLeft: 10,
-          marginHorizontal: 40,
-        }}
-      >
-        <Text
+              alignItems: "center",
+              // justifyContent: "center",
+            }}
+            resizeMode="cover"
+          >
+            {detail ? (
+              <>
+                <Image
+                  source={
+                    detail.profilePhoto
+                      ? { uri: detail.profilePhoto }
+                      : require("../assets/bg-hibiscus.png") // fallback image
+                  }
+                  style={{
+                    height: 100,
+                    width: 100,
+                    borderRadius: 1000,
+                    marginTop:
+                      Platform.OS === "ios"
+                        ? (StatusBar.currentHeight || 20) + 30
+                        : (StatusBar.currentHeight || 0) + 50,
+                    backgroundColor: "grey",
+                  }}
+                  resizeMode="cover"
+                />
+                <Text
+                  style={[
+                    styles.text,
+                    {
+                      textAlign: "center",
+                      marginLeft: 0,
+                      marginTop: 10,
+                    },
+                  ]}
+                >
+                  {getGreeting()}, {"\n"}
+                  {detail.username}!
+                </Text>
+              </>
+            ) : (
+              <Text>Home</Text>
+            )}
+          </ImageBackground>
+        </View>
+        <View
           style={{
-            fontFamily: "Nunito-ExtraBold",
-            fontSize: 25,
-            marginTop: 15,
-            marginHorizontal: 15,
+            // flexDirection: "row",
+            position: "absolute",
+            top: 270,
+            borderRadius: 20,
+            backgroundColor: "#fdfdfd",
+            width: "90%",
+            minHeight: 125,
+            margin: 10,
+            alignItems: "center",
+            justifyContent: "center",
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 1,
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 1.84,
+            elevation: 3,
           }}
         >
-          Features
-        </Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ marginLeft: 10 }}
-        >
-          <View style={{ alignItems: "center", backgroundColor: "yellow" }}>
-            <TouchableOpacity
-              style={[stylesHome.features, { backgroundColor: "#D3C2F8" }]}
-              onPress={() => navi.navigate("Forum")}
-            >
-              <LinearGradient
-                colors={["#03633a", "#95f6cc"]} // start to end gradient
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0.5, y: 1.5 }}
-                // style={[{width: '100%', height: '100%', paddingTop: Platform.OS === 'ios' ? StatusBar.currentHeight+50 : StatusBar.currentHeight, borderBottomLeftRadius: 50, borderBottomRightRadius: 50}]}
-                style={[
-                  stylesHome.features,
-                  { alignItems: "center", justifyContent: "center" },
-                ]}
-              >
-                <Icon
-                  name="commenting"
-                  size={80}
-                  color={"#fefefe"}
-                  // style={{ marginBottom: 25 }}
-                />
-                <View style={{ alignItems: "center" }}></View>
-              </LinearGradient>
-            </TouchableOpacity>
-
+          <View //for date
+            style={{
+              // backgroundColor: "red",
+              marginTop: 10,
+              width: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Text
               style={{
-                fontFamily: "Nunito-Bold",
-                color: "#090909",
+                textAlign: "center",
                 fontSize: 25,
+                fontFamily: "Nunito-Bold",
               }}
             >
-              Forum
+              Today's financial summary{"\n"}
+              <Text
+                style={{
+                  fontFamily: "Nunito",
+                }}
+              >
+                {formattedDate}
+              </Text>
             </Text>
           </View>
-
-          <TouchableOpacity
-            style={[stylesHome.features, { backgroundColor: "#FAE2C8" }]}
-            onPress={() => navi.navigate("FinanceManager")}
+          <View //for gained
+            style={{
+              flexDirection: "row",
+              // backgroundColor: "yellow",
+              // margin: 5,
+              width: "100%",
+              height: 100,
+              alignItems: "center",
+              justifyContent: "space-evenly",
+            }}
           >
-            <LinearGradient
-              colors={["#03633a", "#95f6cc"]} // start to end gradient
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0.5, y: 1.5 }}
-              style={[
-                stylesHome.features,
-                { alignItems: "center", justifyContent: "center" },
-              ]}
-            >
-              <Icon
-                name="money"
-                size={80}
-                color={"#fefefe"}
-                style={{ marginBottom: 25 }}
-              />
-              <View style={{ alignItems: "center" }}>
-                <Text
-                  style={{
-                    fontFamily: "Nunito-Bold",
-                    color: "#fefefe",
-                    fontSize: 25,
-                  }}
-                >
-                  Finance
-                </Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[stylesHome.features, { backgroundColor: "#FAE2C8" }]}
-            onPress={() => navi.navigate("SPHome")}
-          >
-            <View
+            <Text
               style={{
-                borderRadius: 15,
-                alignItems: "center",
-                justifyContent: "center",
-                height: 120,
+                textAlign: "center",
+                fontSize: 25,
+                fontFamily: "Nunito-Bold",
               }}
             >
-              <Icon name="users" size={80} color={"#fefefe"} />
-            </View>
-            <View style={{ alignItems: "center" }}>
-              <Text
-                style={{
-                  fontFamily: "Nunito-Bold",
-                  color: "#fefefe",
-                  fontSize: 25,
-                }}
-              >
-                Social Protection
+              Gained:{"\n"}
+              <Text style={{ color: "#3eb489", fontFamily: "Nunito" }}>
+                RM {income}
               </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[stylesHome.features, { backgroundColor: "#CDF464" }]}
-            onPress={() => navi.navigate("HelpdeskHome")}
-          >
-            <View
+            </Text>
+            <Text
               style={{
-                borderRadius: 15,
-                alignItems: "center",
-                justifyContent: "center",
-                height: 120,
+                textAlign: "center",
+                fontSize: 25,
+                fontFamily: "Nunito-Bold",
               }}
             >
-              <Icon name="question-circle-o" size={80} color={"#fefefe"} />
-            </View>
-            <View style={{ alignItems: "center" }}>
-              <Text
-                style={{
-                  fontFamily: "Nunito-Bold",
-                  color: "#fefefe",
-                  fontSize: 25,
-                }}
-              >
-                Helpdesk
+              Spent:{"\n"}
+              <Text style={{ color: "#ec2d01", fontFamily: "Nunito" }}>
+                RM {expense}
               </Text>
-            </View>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
+            </Text>
+          </View>
+        </View>
 
-      <View
-        style={{
-          width: "100%",
-          height: 200,
-          paddingHorizontal: 10,
-          marginHorizontal: 30,
-        }}
-      >
-        <Text
+        <View
           style={{
-            fontFamily: "Nunito-ExtraBold",
-            fontSize: 25,
-            margin: 5,
-            marginHorizontal: 15,
+            width: "100%",
+            height: 280,
+            marginTop: 460,
+            // paddingLeft: 10,
+            marginHorizontal: 40,
+            marginBottom: 10,
           }}
         >
-          Information
-        </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            style={[stylesHome.imageSlider]}
-            onPress={() => navi.navigate("Forum")}
+          <Text
+            style={{
+              fontFamily: "Nunito-Bold",
+              fontSize: 25,
+              // marginTop: 15,
+              marginHorizontal: 15,
+            }}
           >
-            <View style={{ alignItems: "center" }}>
-              <Text
-                style={{ color: "#fdfdfd", fontWeight: "bold", fontSize: 25 }}
+            Features
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 16,
+              alignItems: "center",
+            }}
+            style={{
+              width: "100%",
+              flex: 0,
+              // backgroundColor: "#f8f8f8",
+            }}
+          >
+            <View style={{ flexDirection: "row" }}>
+              {/* One "page" of 6 features in 2 rows x 3 columns */}
+              <View
+                style={{ flexDirection: "column", justifyContent: "center" }}
               >
-                Image 1
-              </Text>
+                {/* First row */}
+                <View style={{ flexDirection: "row", marginBottom: 16 }}>
+                  <TouchableOpacity
+                    style={[
+                      stylesHome.featureSlider,
+                      {
+                        flexDirection: "row", // <-- side by side
+                        alignItems: "center",
+                        marginRight: 12,
+                        borderRadius: 20,
+                        // backgroundColor: "#d3d3d3",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 1,
+                        },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 1.84,
+                        elevation: 3,
+                        padding: 20,
+                      },
+                    ]}
+                    onPress={() => navi.navigate("Forum")}
+                  >
+                    <Image
+                      source={require("../assets/real-forum.png")}
+                      style={{ width: 50, height: 50, marginRight: 10 }}
+                      resizeMode="contain"
+                    />
+                    <Text
+                      style={{
+                        color: "#050505",
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 18,
+                      }}
+                    >
+                      WeGig{"\n"}Forum
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      stylesHome.featureSlider,
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginRight: 12,
+                        borderRadius: 20,
+                        // backgroundColor: "#d3d3d3",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 1,
+                        },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 1.84,
+                        elevation: 3,
+                        padding: 20,
+                      },
+                    ]}
+                    onPress={() => navi.navigate("FinanceManager")}
+                  >
+                    <Image
+                      source={require("../assets/forum.png")}
+                      style={{ width: 50, height: 50, marginRight: 10 }}
+                      resizeMode="contain"
+                    />
+                    <Text
+                      style={{
+                        color: "#050505",
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 18,
+                      }}
+                    >
+                      Finance
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      stylesHome.featureSlider,
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderRadius: 20,
+                        // backgroundColor: "#d3d3d3",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 1,
+                        },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 1.84,
+                        elevation: 3,
+                        padding: 20,
+                      },
+                    ]}
+                    onPress={() => navi.navigate("Profile")}
+                  >
+                    <Image
+                      source={require("../assets/profile.png")}
+                      style={{ width: 50, height: 50, marginRight: 10 }}
+                      resizeMode="contain"
+                    />
+                    <Text
+                      style={{
+                        color: "#050505",
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 18,
+                      }}
+                    >
+                      Manage{"\n"}Profile
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                {/* Second row */}
+                <View style={{ flexDirection: "row" }}>
+                  <TouchableOpacity
+                    style={[
+                      stylesHome.featureSlider,
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginRight: 12,
+                        borderRadius: 20,
+                        // backgroundColor: "#d3d3d3",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 1,
+                        },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 1.84,
+                        elevation: 3,
+                        padding: 20,
+                      },
+                    ]}
+                    onPress={() => navi.navigate("SPHome")}
+                  >
+                    <Image
+                      source={require("../assets/social-protection.png")}
+                      style={{ width: 50, height: 50, marginRight: 10 }}
+                      resizeMode="contain"
+                    />
+                    <Text
+                      style={{
+                        color: "#050505",
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 18,
+                      }}
+                    >
+                      Social{"\n"}Security
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      stylesHome.featureSlider,
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginRight: 12,
+                        borderRadius: 20,
+                        // backgroundColor: "#d3d3d3",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 1,
+                        },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 1.84,
+                        elevation: 3,
+                        padding: 20,
+                      },
+                    ]}
+                    onPress={() => navi.navigate("HelpdeskHome")}
+                  >
+                    <Image
+                      source={require("../assets/helpdesk.png")}
+                      style={{ width: 50, height: 50, marginRight: 10 }}
+                      resizeMode="contain"
+                    />
+                    <Text
+                      style={{
+                        color: "#050505",
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 18,
+                      }}
+                    >
+                      Complaint{"\n"}Helpdesk
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      stylesHome.featureSlider,
+                      {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        borderRadius: 20,
+                        // backgroundColor: "#d3d3d3",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 1,
+                        },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 1.84,
+                        elevation: 3,
+                        padding: 20,
+                      },
+                    ]}
+                    onPress={() => navi.navigate("RewardRedemption")}
+                  >
+                    <Image
+                      source={require("../assets/redeem.png")}
+                      style={{ width: 50, height: 50, marginRight: 10 }}
+                      resizeMode="contain"
+                    />
+                    <Text
+                      style={{
+                        color: "#050505",
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 18,
+                      }}
+                    >
+                      Reward{"\n"}Redemption
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-          </TouchableOpacity>
+          </ScrollView>
+        </View>
 
-          <TouchableOpacity
-            style={[stylesHome.imageSlider]}
-            onPress={() => navi.navigate("FinanceManager")}
+        <View
+          style={{
+            width: "100%",
+            paddingHorizontal: 10,
+            marginHorizontal: 40,
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: "Nunito-Bold",
+              fontSize: 25,
+              marginHorizontal: 15,
+            }}
           >
-            <View style={{ alignItems: "center" }}>
-              <Text
-                style={{ color: "#fdfdfd", fontWeight: "bold", fontSize: 25 }}
+            Information
+          </Text>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                style={[
+                  stylesHome.imageSlider,
+                  { width: 300, marginRight: 16 },
+                ]}
+                onPress={() => Linking.openURL("https://youtube.com")}
               >
-                Image 2
-              </Text>
+                <View style={{ alignItems: "center" }}>
+                  <Text
+                    style={{
+                      color: "#fdfdfd",
+                      fontWeight: "bold",
+                      fontSize: 25,
+                    }}
+                  >
+                    Image 1
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[stylesHome.imageSlider, { width: 300 }]}
+                onPress={() => Linking.openURL("https://instagram.com")}
+              >
+                <View style={{ alignItems: "center" }}>
+                  <Text
+                    style={{
+                      color: "#fdfdfd",
+                      fontWeight: "bold",
+                      fontSize: 25,
+                    }}
+                  >
+                    Image 2
+                  </Text>
+                </View>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-        </ScrollView>
+          </ScrollView>
+        </View>
+
+        <View style={{ height: 50 }}></View>
       </View>
-
-      <BottomBar></BottomBar>
-    </View>
+    </ScrollView>
   );
 }

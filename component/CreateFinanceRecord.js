@@ -16,6 +16,7 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  ImageBackground,
 } from "react-native";
 import styles from "../styles";
 import { auth, database } from "../firebase";
@@ -116,12 +117,10 @@ export default function CreateFinanceRecord({ route }) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container3}>
         <View style={[styles.container]}>
-          <LinearGradient
-            colors={["#03633a", "#95f6cc"]} // start to end gradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+          <ImageBackground
+            source={require("../assets/bg-hibiscus.png")} // Your image path
             style={[
-              styles.container,
+              styles.background,
               {
                 paddingTop:
                   Platform.OS === "ios"
@@ -129,6 +128,7 @@ export default function CreateFinanceRecord({ route }) {
                     : StatusBar.currentHeight,
               },
             ]}
+            resizeMode="cover"
           >
             <Text
               style={[styles.text, { backgroundColor: "", marginBottom: 30 }]}
@@ -158,7 +158,7 @@ export default function CreateFinanceRecord({ route }) {
                 <Text
                   style={[
                     styles.labelInput,
-                    { fontSize: 20, fontWeight: "bold" },
+                    { fontSize: 20, fontWeight: "bold", marginBottom: 5 },
                   ]}
                 >
                   Type
@@ -172,7 +172,7 @@ export default function CreateFinanceRecord({ route }) {
                 <Text
                   style={[
                     styles.labelInput,
-                    { fontSize: 20, fontWeight: "bold" },
+                    { fontSize: 20, fontWeight: "bold", marginBottom: 5 },
                   ]}
                 >
                   Value
@@ -188,7 +188,7 @@ export default function CreateFinanceRecord({ route }) {
                 <Text
                   style={[
                     styles.labelInput,
-                    { fontSize: 20, fontWeight: "bold" },
+                    { fontSize: 20, fontWeight: "bold", marginBottom: 5 },
                   ]}
                 >
                   Notes
@@ -202,7 +202,13 @@ export default function CreateFinanceRecord({ route }) {
                 />
               </View>
 
-              <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignContent: "center",
+                }}
+              >
                 <TouchableOpacity
                   onPress={() => {
                     id == null ? writeData() : updateData(id);
@@ -210,15 +216,15 @@ export default function CreateFinanceRecord({ route }) {
                   style={[
                     styles.button,
                     {
-                      marginRight: 15,
+                      marginHorizontal: 15,
                       paddingVertical: 15,
                       backgroundColor: "#296746",
                       borderRadius: 25,
                     },
                   ]}
                 >
-                  <Text style={{ color: "#fdfdfd", fontWeight: "bold" }}>
-                    Record Expense
+                  <Text style={{ color: "#fdfdfd", fontFamily: "Nunito-Bold" }}>
+                    Record Transaction
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -226,20 +232,20 @@ export default function CreateFinanceRecord({ route }) {
                   style={[
                     styles.button,
                     {
-                      marginRight: 15,
+                      marginHorizontal: 15,
                       paddingVertical: 15,
                       backgroundColor: "#296746",
                       borderRadius: 25,
                     },
                   ]}
                 >
-                  <Text style={{ color: "#fdfdfd", fontWeight: "bold" }}>
-                    Scan Receipt
+                  <Text style={{ color: "#fdfdfd", fontFamily: "Nunito-Bold" }}>
+                    Scan Gig History
                   </Text>
                 </TouchableOpacity>
               </View>
             </View>
-          </LinearGradient>
+          </ImageBackground>
         </View>
       </View>
     </TouchableWithoutFeedback>

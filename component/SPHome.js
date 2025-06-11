@@ -8,6 +8,7 @@ import {
   Dimensions,
   Platform,
   TouchableOpacity,
+  ImageBackground,
   ScrollView,
 } from "react-native";
 import { styles } from "../styles";
@@ -121,12 +122,10 @@ export default function SPHome({ route }) {
   return (
     <View style={styles.container3}>
       <View style={styles.container}>
-        <LinearGradient
-          colors={["#03633a", "#95f6cc"]} // start to end gradient
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+        <ImageBackground
+          source={require("../assets/bg-hibiscus.png")} // Your image path
           style={[
-            styles.container,
+            styles.background,
             {
               paddingTop:
                 Platform.OS === "ios"
@@ -134,6 +133,7 @@ export default function SPHome({ route }) {
                   : StatusBar.currentHeight,
             },
           ]}
+          resizeMode="cover"
         >
           <Text style={[styles.text]}>Social Protection</Text>
           <ScrollView
@@ -201,8 +201,10 @@ export default function SPHome({ route }) {
                 if (item.email === user.email) {
                   return (
                     <View style={[style.page]}>
-                      <Text style={{ fontSize: 25 }}>{item.chosenPlan}</Text>
-                      <Text style={{ fontSize: 50, marginVertical: 10 }}>
+                      <Text style={{ fontSize: 25, marginTop: 10 }}>
+                        {item.chosenPlan}
+                      </Text>
+                      <Text style={{ fontSize: 50, marginTop: 10 }}>
                         RM {data[index].totalContribution.toFixed(2).toString()}
                       </Text>
                       {/* <Text>{item.chosenPlan}</Text> */}
@@ -215,25 +217,31 @@ export default function SPHome({ route }) {
                         }}
                       >
                         <TouchableOpacity
-                          onPress={() => navi.navigate("RecordContribution")}
+                          onPress={() =>
+                            navi.navigate("RecordContribution", {
+                              scheme: data[index].scheme,
+                              chosenPlan: data[index].chosenPlan,
+                              id: data[index].id,
+                            })
+                          }
                           style={{
                             width: 120,
                             padding: 10,
                             margin: 5,
-                            backgroundColor: "#06a561",
+                            backgroundColor: "#20734f",
                             borderRadius: 50,
                             alignItems: "center",
                             justifyContent: "center",
                           }}
                         >
                           <Text
-                            onPress={() =>
-                              navi.navigate("RecordContribution", {
-                                scheme: data[index].scheme,
-                                chosenPlan: data[index].chosenPlan,
-                                id: data[index].id,
-                              })
-                            }
+                            // onPress={() =>
+                            //   navi.navigate("RecordContribution", {
+                            //     scheme: data[index].scheme,
+                            //     chosenPlan: data[index].chosenPlan,
+                            //     id: data[index].id,
+                            //   })
+                            // }
                             style={{
                               fontFamily: "Nunito-Semi-Bold",
                               color: "white",
@@ -256,7 +264,7 @@ export default function SPHome({ route }) {
                             width: 150,
                             padding: 10,
                             margin: 5,
-                            backgroundColor: "#06a561",
+                            backgroundColor: "#20734f",
                             borderRadius: 50,
                             alignItems: "center",
                             justifyContent: "center",
@@ -275,8 +283,10 @@ export default function SPHome({ route }) {
                         </TouchableOpacity>
                       </View>
                       {data[index].rdate !== 0 && (
-                        <Text style={{ marginVertical: 10 }}>
-                          Reminder at {data[index].rdate}, on{" "}
+                        <Text
+                          style={{ fontFamily: "Nunito", marginVertical: 10 }}
+                        >
+                          Reminder is set at {data[index].rdate}, on{" "}
                           {data[index].rtime}
                         </Text>
                       )}
@@ -298,7 +308,7 @@ export default function SPHome({ route }) {
                         width: 120,
                         flex: 0,
                         borderRadius: 15,
-                        backgroundColor: "green",
+                        backgroundColor: "#20734f",
                         alignContent: "center",
                         justifyContent: "center",
                         marginBottom: "10",
@@ -307,7 +317,7 @@ export default function SPHome({ route }) {
                       <Text
                         style={{
                           fontFamily: "Nunito-Bold",
-                          fontSize: 25,
+                          fontSize: 20,
                           textAlign: "center",
                           color: "#fdfdfd",
                         }}
@@ -324,16 +334,28 @@ export default function SPHome({ route }) {
                     >
                       Special Intencives
                     </Text>
-                    <Text
+                    <View
                       style={{
-                        fontSize: 15,
+                        backgroundColor: "#eee",
+                        paddingHorizontal: 15,
+                        borderRadius: 20,
+                        minHeight: 60,
+                        alignContent: "center",
+                        justifyContent: "center",
                         marginVertical: 10,
-                        textAlign: "justify",
-                        fontFamily: "Nunito-Regular",
                       }}
                     >
-                      {benefitKWSP[0]}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          marginVertical: 15,
+                          textAlign: "justify",
+                          fontFamily: "Nunito-Regular",
+                        }}
+                      >
+                        {benefitKWSP[0]}
+                      </Text>
+                    </View>
 
                     <Text
                       style={{
@@ -344,16 +366,28 @@ export default function SPHome({ route }) {
                     >
                       Annual Dividend
                     </Text>
-                    <Text
+                    <View
                       style={{
-                        fontSize: 15,
+                        backgroundColor: "#eee",
+                        paddingHorizontal: 15,
+                        borderRadius: 20,
+                        minHeight: 60,
+                        alignContent: "center",
+                        justifyContent: "center",
                         marginVertical: 10,
-                        textAlign: "justify",
-                        fontFamily: "Nunito-Regular",
                       }}
                     >
-                      {benefitKWSP[1]}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          marginVertical: 15,
+                          textAlign: "justify",
+                          fontFamily: "Nunito-Regular",
+                        }}
+                      >
+                        {benefitKWSP[1]}
+                      </Text>
+                    </View>
 
                     <Text
                       style={{
@@ -364,16 +398,28 @@ export default function SPHome({ route }) {
                     >
                       Death Beneficiaries
                     </Text>
-                    <Text
+                    <View
                       style={{
-                        fontSize: 15,
+                        backgroundColor: "#eee",
+                        paddingHorizontal: 15,
+                        borderRadius: 20,
+                        minHeight: 60,
+                        alignContent: "center",
+                        justifyContent: "center",
                         marginVertical: 10,
-                        textAlign: "justify",
-                        fontFamily: "Nunito-Regular",
                       }}
                     >
-                      {benefitKWSP[2]}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          marginVertical: 15,
+                          textAlign: "justify",
+                          fontFamily: "Nunito-Regular",
+                        }}
+                      >
+                        {benefitKWSP[2]}
+                      </Text>
+                    </View>
 
                     <Text
                       style={{
@@ -384,16 +430,28 @@ export default function SPHome({ route }) {
                     >
                       Tax Relief
                     </Text>
-                    <Text
+                    <View
                       style={{
-                        fontSize: 15,
+                        backgroundColor: "#eee",
+                        paddingHorizontal: 15,
+                        borderRadius: 20,
+                        minHeight: 60,
+                        alignContent: "center",
+                        justifyContent: "center",
                         marginVertical: 10,
-                        textAlign: "justify",
-                        fontFamily: "Nunito-Regular",
                       }}
                     >
-                      {benefitKWSP[3]}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          marginVertical: 15,
+                          textAlign: "justify",
+                          fontFamily: "Nunito-Regular",
+                        }}
+                      >
+                        {benefitKWSP[3]}
+                      </Text>
+                    </View>
                   </>
                 ) : (
                   <>
@@ -403,7 +461,7 @@ export default function SPHome({ route }) {
                         width: 120,
                         flex: 0,
                         borderRadius: 15,
-                        backgroundColor: "green",
+                        backgroundColor: "#20734f",
                         alignContent: "center",
                         justifyContent: "center",
                         marginBottom: "10",
@@ -412,7 +470,7 @@ export default function SPHome({ route }) {
                       <Text
                         style={{
                           fontFamily: "Nunito-Bold",
-                          fontSize: 25,
+                          fontSize: 20,
                           textAlign: "center",
                           color: "#fdfdfd",
                         }}
@@ -429,16 +487,28 @@ export default function SPHome({ route }) {
                     >
                       Temporary Disablement Benefit
                     </Text>
-                    <Text
+                    <View
                       style={{
-                        fontSize: 15,
+                        backgroundColor: "#eee",
+                        paddingHorizontal: 15,
+                        borderRadius: 20,
+                        minHeight: 60,
+                        alignContent: "center",
+                        justifyContent: "center",
                         marginVertical: 10,
-                        textAlign: "justify",
-                        fontFamily: "Nunito-Regular",
                       }}
                     >
-                      {benefitSocso[data[currentIndex].chosenPlan][0]}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          marginVertical: 10,
+                          textAlign: "justify",
+                          fontFamily: "Nunito-Regular",
+                        }}
+                      >
+                        {benefitSocso[data[currentIndex].chosenPlan][0]}
+                      </Text>
+                    </View>
 
                     <Text
                       style={{
@@ -449,16 +519,28 @@ export default function SPHome({ route }) {
                     >
                       Permanent Disablement Benefit
                     </Text>
-                    <Text
+                    <View
                       style={{
-                        fontSize: 15,
+                        backgroundColor: "#eee",
+                        paddingHorizontal: 15,
+                        borderRadius: 20,
+                        minHeight: 60,
+                        alignContent: "center",
+                        justifyContent: "center",
                         marginVertical: 10,
-                        textAlign: "justify",
-                        fontFamily: "Nunito-Regular",
                       }}
                     >
-                      {benefitSocso[data[currentIndex].chosenPlan][1]}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          marginVertical: 10,
+                          textAlign: "justify",
+                          fontFamily: "Nunito-Regular",
+                        }}
+                      >
+                        {benefitSocso[data[currentIndex].chosenPlan][1]}
+                      </Text>
+                    </View>
 
                     <Text
                       style={{
@@ -469,16 +551,28 @@ export default function SPHome({ route }) {
                     >
                       Permanent Disablement Benefit
                     </Text>
-                    <Text
+                    <View
                       style={{
-                        fontSize: 15,
+                        backgroundColor: "#eee",
+                        paddingHorizontal: 15,
+                        borderRadius: 20,
+                        minHeight: 60,
+                        alignContent: "center",
+                        justifyContent: "center",
                         marginVertical: 10,
-                        textAlign: "justify",
-                        fontFamily: "Nunito-Regular",
                       }}
                     >
-                      {benefitSocso[data[currentIndex].chosenPlan][2]}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          marginVertical: 10,
+                          textAlign: "justify",
+                          fontFamily: "Nunito-Regular",
+                        }}
+                      >
+                        {benefitSocso[data[currentIndex].chosenPlan][2]}
+                      </Text>
+                    </View>
 
                     <Text
                       style={{
@@ -489,16 +583,28 @@ export default function SPHome({ route }) {
                     >
                       Dependant Benefit
                     </Text>
-                    <Text
+                    <View
                       style={{
-                        fontSize: 15,
+                        backgroundColor: "#eee",
+                        paddingHorizontal: 15,
+                        borderRadius: 20,
+                        minHeight: 60,
+                        alignContent: "center",
+                        justifyContent: "center",
                         marginVertical: 10,
-                        textAlign: "justify",
-                        fontFamily: "Nunito-Regular",
                       }}
                     >
-                      {benefitSocso[data[currentIndex].chosenPlan][3]}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          marginVertical: 10,
+                          textAlign: "justify",
+                          fontFamily: "Nunito-Regular",
+                        }}
+                      >
+                        {benefitSocso[data[currentIndex].chosenPlan][3]}
+                      </Text>
+                    </View>
 
                     <Text
                       style={{
@@ -509,16 +615,28 @@ export default function SPHome({ route }) {
                     >
                       Funeral Benefit
                     </Text>
-                    <Text
+                    <View
                       style={{
-                        fontSize: 15,
+                        backgroundColor: "#eee",
+                        paddingHorizontal: 15,
+                        borderRadius: 20,
+                        minHeight: 60,
+                        alignContent: "center",
+                        justifyContent: "center",
                         marginVertical: 10,
-                        textAlign: "justify",
-                        fontFamily: "Nunito-Regular",
                       }}
                     >
-                      {benefitSocso[data[currentIndex].chosenPlan][4]}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          marginVertical: 10,
+                          textAlign: "justify",
+                          fontFamily: "Nunito-Regular",
+                        }}
+                      >
+                        {benefitSocso[data[currentIndex].chosenPlan][4]}
+                      </Text>
+                    </View>
 
                     <Text
                       style={{
@@ -529,16 +647,28 @@ export default function SPHome({ route }) {
                     >
                       Constant Attendance Allowance
                     </Text>
-                    <Text
+                    <View
                       style={{
-                        fontSize: 15,
+                        backgroundColor: "#eee",
+                        paddingHorizontal: 15,
+                        borderRadius: 20,
+                        minHeight: 60,
+                        alignContent: "center",
+                        justifyContent: "center",
                         marginVertical: 10,
-                        textAlign: "justify",
-                        fontFamily: "Nunito-Regular",
                       }}
                     >
-                      {benefitSocso[data[currentIndex].chosenPlan][5]}
-                    </Text>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          marginVertical: 10,
+                          textAlign: "justify",
+                          fontFamily: "Nunito-Regular",
+                        }}
+                      >
+                        {benefitSocso[data[currentIndex].chosenPlan][4]}
+                      </Text>
+                    </View>
                   </>
                 ))}
             </View>
@@ -548,7 +678,7 @@ export default function SPHome({ route }) {
           </ScrollView>
 
           <BottomBar></BottomBar>
-        </LinearGradient>
+        </ImageBackground>
       </View>
     </View>
   );
@@ -563,17 +693,5 @@ const style = StyleSheet.create({
     fontSize: 24,
     textAlign: "center",
     // marginBottom: 20,
-  },
-  page: {
-    width: width - 50,
-    borderColor: "#06a561",
-    borderWidth: 1.5,
-    margin: 5,
-    padding: 10,
-    height: 245,
-    borderRadius: 50,
-    backgroundColor: "#ededed",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });

@@ -24,6 +24,7 @@ import {
   TouchableOpacity,
   Platform,
   StatusBar,
+  ImageBackground,
 } from "react-native";
 import { stylesHome, styles } from "../styles";
 import { LinearGradient } from "expo-linear-gradient";
@@ -241,34 +242,38 @@ const ScanReceipt = () => {
 
   if (loading) {
     return (
-      <View
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          right: 0,
-          bottom: 0,
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1,
-          backgroundColor: "green",
-        }}
-      >
-        <ActivityIndicator
-          size="large"
-          color="#ffffff"
-          style={{ marginTop: 20 }}
-        />
-        <Text
-          style={{
-            fontFamily: "Nunito",
-            fontSize: 20,
-            color: "#fdfdfd",
-            margnTop: 15,
-          }}
+      <View style={{ width: "100%", height: "100%" }}>
+        <ImageBackground
+          source={require("../assets/landing-bg.png")} // Your image path
+          style={[
+            styles.background,
+            {
+              alignItems: "center",
+              justifyContent: "center",
+              paddingTop:
+                Platform.OS === "ios"
+                  ? StatusBar.currentHeight + 50
+                  : StatusBar.currentHeight,
+            },
+          ]}
+          resizeMode="cover"
         >
-          Scanning receipt...
-        </Text>
+          {/* <ActivityIndicator
+            size="large"
+            color="#ffffff"
+            style={{ marginTop: 60 }}
+          /> */}
+          <Text
+            style={{
+              fontFamily: "Nunito",
+              fontSize: 20,
+              color: "#fdfdfd",
+              marginTop: 60,
+            }}
+          >
+            Scanning receipt...
+          </Text>
+        </ImageBackground>
       </View>
     );
   }
@@ -276,12 +281,10 @@ const ScanReceipt = () => {
   return (
     <View style={styles.container3}>
       <View style={styles.container}>
-        <LinearGradient
-          colors={["#03633a", "#95f6cc"]} // start to end gradient
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+        <ImageBackground
+          source={require("../assets/bg-hibiscus.png")} // Your image path
           style={[
-            styles.container,
+            styles.background,
             {
               paddingTop:
                 Platform.OS === "ios"
@@ -289,6 +292,7 @@ const ScanReceipt = () => {
                   : StatusBar.currentHeight,
             },
           ]}
+          resizeMode="cover"
         >
           <Text style={[styles.text]}>Scan Receipt</Text>
 
@@ -299,7 +303,7 @@ const ScanReceipt = () => {
               {
                 borderBottomRightRadius: 0,
                 borderBottomLeftRadius: 0,
-                backgroundColor: "#fdfdfd",
+                // backgroundColor: "#fdfdfd",
                 alignItems: "center",
                 paddingBottom: 60,
               },
@@ -436,7 +440,7 @@ const ScanReceipt = () => {
 
             {/* )} */}
           </View>
-        </LinearGradient>
+        </ImageBackground>
       </View>
     </View>
   );

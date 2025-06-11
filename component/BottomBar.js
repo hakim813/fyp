@@ -30,7 +30,7 @@ export default function BottomBar() {
         marginTop: "auto",
         height: 100,
         width: "100%",
-        backgroundColor: "#04844d",
+        backgroundColor: "#20734f",
       }}
     >
       <TouchableOpacity

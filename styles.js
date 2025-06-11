@@ -9,10 +9,10 @@ export const styles = StyleSheet.create({
   centeredView: {
     position: "absolute", // Position it absolutely on the screen
     height: "100%",
-    bottom: "auto",
+    // bottom: "auto",
     // right: 120,
     width: "100%",
-    // transform: [{ translateX: -100 }, { translateY: -50 }], // Adjust to center precisely
+    transform: [{ translateX: 0 }, { translateY: 0 }], // Adjust to center precisely
     backgroundColor: "#fafafa",
     borderRadius: 20,
     elevation: 5, // Adds shadow on Android
@@ -170,13 +170,35 @@ export const stylesHome = StyleSheet.create({
   imageSlider: {
     backgroundColor: "#1b434d",
     paddingVertical: 15,
-    paddingHorizontal: 25,
+    paddingRight: 25,
     borderRadius: 30,
-    margin: 5,
+    marginVertical: 5,
+    marginRight: 10,
     height: 150,
     width: 230,
     opacity: 0.5,
     alignSelf: "center",
+  },
+
+  featureSlider: {
+    backgroundColor: "rgba(150, 192, 202, 0.2)",
+    paddingVertical: 15,
+    paddingRight: 25,
+    borderRadius: 30,
+    marginVertical: 5,
+    marginRight: 10,
+    height: 100,
+    width: 190,
+    alignSelf: "center",
+
+    // Add shadow for iOS
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+
+    // Add elevation for Android
+    elevation: 4,
   },
 });
 

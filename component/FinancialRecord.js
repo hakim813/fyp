@@ -11,6 +11,7 @@ import {
   TextInput,
   Platform,
   KeyboardAvoidingView,
+  ImageBackground,
   TouchableOpacity,
 } from "react-native";
 import { styles, stylesHome } from "../styles";
@@ -172,12 +173,10 @@ export default function FinancialRecord() {
   return (
     <View style={styles.container3}>
       <View style={[styles.container]}>
-        <LinearGradient
-          colors={["#03633a", "#95f6cc"]} // start to end gradient
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+        <ImageBackground
+          source={require("../assets/bg-hibiscus.png")} // Your image path
           style={[
-            styles.container,
+            styles.background,
             {
               paddingTop:
                 Platform.OS === "ios"
@@ -185,12 +184,14 @@ export default function FinancialRecord() {
                   : StatusBar.currentHeight,
             },
           ]}
+          resizeMode="cover"
         >
           <Text style={[styles.text]}>Expense Record</Text>
           <StatusBar style="auto" />
           <View style={[styles.container2]}>
             <View
               style={{
+                // backgroundColor
                 flexDirection: "row",
                 marginBottom: 15,
                 justifyContent: "center",
@@ -269,16 +270,30 @@ export default function FinancialRecord() {
                               borderRadius: 10,
                             }}
                           >
-                            <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Bold",
+                                fontSize: 20,
+                              }}
+                            >
                               Expense:
                             </Text>
-                            <Text style={{ fontSize: 20 }}>
+                            <Text
+                              style={{ fontFamily: "Nunito", fontSize: 20 }}
+                            >
                               RM {parseFloat(item.expense).toFixed(2)} {"\n"}
                             </Text>
-                            <Text style={{ fontWeight: "bold", fontSize: 20 }}>
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Bold",
+                                fontSize: 20,
+                              }}
+                            >
                               Income:
                             </Text>
-                            <Text style={{ fontSize: 20 }}>
+                            <Text
+                              style={{ fontFamily: "Nunito", fontSize: 20 }}
+                            >
                               RM {parseFloat(item.income).toFixed(2)}
                             </Text>
                             {/* Nested conditional for FlatList */}
@@ -330,14 +345,61 @@ export default function FinancialRecord() {
                                               borderBottomRightRadius: 10,
                                             }}
                                           >
-                                            <View style={{ height: 80 }}>
-                                              <Text>Type: {i.type}</Text>
-                                              <Text>Value: {i.value}</Text>
-                                              <Text>Notes: {i.notes}</Text>
+                                            <View
+                                              style={{
+                                                height: 80,
+                                                // backgroundColor: "yellow",
+                                                flex: 1,
+                                                marginRight: 10,
+                                              }}
+                                            >
+                                              <View
+                                                style={{
+                                                  // backgroundColor: "red",
+                                                  flexDirection: "row",
+                                                  justifyContent: "flex-end",
+                                                }}
+                                              >
+                                                <Text
+                                                  style={{
+                                                    fontFamily: "Nunito-Bold",
+                                                    fontSize: 20,
+                                                  }}
+                                                >
+                                                  {i.type}
+                                                </Text>
+                                                <Text
+                                                  style={{
+                                                    fontFamily: "Nunito-Bold",
+                                                    fontSize: 20,
+                                                    marginLeft: "auto",
+                                                    color:
+                                                      i.type === "Income"
+                                                        ? "#28C76F"
+                                                        : "#EA5455",
+                                                  }}
+                                                >
+                                                  RM{" "}
+                                                  {parseFloat(i.value).toFixed(
+                                                    2
+                                                  )}
+                                                </Text>
+                                              </View>
+
+                                              <Text
+                                                style={{
+                                                  fontFamily: "Nunito",
+                                                  fontSize: 20,
+                                                }}
+                                              >
+                                                {i.notes}
+                                              </Text>
                                               <Text
                                                 style={{
                                                   marginTop: "auto",
                                                   fontStyle: "italic",
+                                                  fontFamily: "Nunito",
+                                                  fontSize: 15,
                                                 }}
                                               >
                                                 {new Date(
@@ -373,9 +435,9 @@ export default function FinancialRecord() {
                         <View style={{ padding: 5, borderRadius: 10 }}>
                           <Text
                             style={{
-                              fontWeight: "bold",
+                              fontFamily: "Nunito-Bold",
                               fontSize: 25,
-                              marginBottom: 10,
+                              // marginBottom: 10,
                             }}
                           >
                             {item.date}
@@ -392,83 +454,92 @@ export default function FinancialRecord() {
                                 return (
                                   <View
                                     style={{
-                                      paddingLeft: 10,
-                                      marginVertical: 5,
-                                      backgroundColor:
-                                        i.type === "Income"
-                                          ? "#3282F6"
-                                          : "#f44f4f",
+                                      // paddingLeft: 10,
+                                      // marginVertical: 5,
+                                      // backgroundColor: "green",
                                       borderRadius: 10,
                                     }}
                                   >
                                     <View
                                       style={{
-                                        alignItems: "center",
-                                        flexDirection: "row",
-                                        padding: 10,
-                                        backgroundColor: "#ededed",
-                                        borderTopRightRadius: 10,
-                                        borderBottomRightRadius: 10,
+                                        paddingLeft: 10,
+                                        marginVertical: 5,
+                                        backgroundColor:
+                                          i.type === "Income"
+                                            ? "#3282F6"
+                                            : "#f44f4f",
+                                        borderRadius: 10,
                                       }}
                                     >
-                                      <View style={{ height: 80 }}>
-                                        <Text>Type: {i.type}</Text>
-                                        <Text>Value: {i.value}</Text>
-                                        <Text>Notes: {i.notes}</Text>
-                                        {/* <Text>{user.email}</Text> */}
-                                      </View>
-                                      <TouchableOpacity
-                                        onPress={() => {
-                                          navi.navigate("CreateFinanceRecord", {
-                                            type: i.type,
-                                            id: i.id,
-                                          });
-                                        }}
+                                      <View
                                         style={{
-                                          marginLeft: "auto",
-                                          marginRight: 20,
+                                          alignItems: "center",
+                                          flexDirection: "row",
+                                          padding: 10,
+                                          backgroundColor: "#fdfdfd",
+                                          borderTopRightRadius: 10,
+                                          borderBottomRightRadius: 10,
                                         }}
                                       >
-                                        <Icon
-                                          name="pencil"
-                                          size={24}
-                                          color={
-                                            item.upvoter?.includes(user.uid)
-                                              ? "green"
-                                              : "gray"
-                                          } // Change color based on isUpvoted
-                                        />
-                                      </TouchableOpacity>
-                                      <TouchableOpacity
-                                        onPress={() =>
-                                          Alert.alert(
-                                            "Delete Record",
-                                            "Are you sure you want to delete this record?",
-                                            [
-                                              {
-                                                text: "Cancel",
-                                                style: "cancel", // Adds the "Cancel" style (button is usually grayed out)
-                                              },
-                                              {
-                                                text: "Delete",
-                                                style: "destructive", // Adds the "Delete" style (usually red)
-                                                onPress: () => deleteData(i.id),
-                                              },
-                                            ]
-                                          )
-                                        }
-                                        style={{ marginHorizontal: 10 }}
-                                      >
-                                        <Icon
-                                          name="trash"
-                                          size={24}
-                                          color={
-                                            item.upvoter?.includes(user.uid)
-                                              ? "green"
-                                              : "gray"
-                                          } // Change color based on isUpvoted
-                                        />
-                                      </TouchableOpacity>
+                                        <View
+                                          style={{
+                                            height: 80,
+                                            // backgroundColor: "yellow",
+                                            flex: 1,
+                                            marginRight: 10,
+                                          }}
+                                        >
+                                          <View
+                                            style={{
+                                              // backgroundColor: "red",
+                                              flexDirection: "row",
+                                              justifyContent: "flex-end",
+                                            }}
+                                          >
+                                            <Text
+                                              style={{
+                                                fontFamily: "Nunito-Bold",
+                                                fontSize: 20,
+                                              }}
+                                            >
+                                              {i.type}
+                                            </Text>
+                                            <Text
+                                              style={{
+                                                fontFamily: "Nunito-Bold",
+                                                fontSize: 20,
+                                                marginLeft: "auto",
+                                                color:
+                                                  i.type === "Income"
+                                                    ? "#28C76F"
+                                                    : "#EA5455",
+                                              }}
+                                            >
+                                              RM{" "}
+                                              {parseFloat(i.value).toFixed(2)}
+                                            </Text>
+                                          </View>
+
+                                          <Text
+                                            style={{
+                                              fontFamily: "Nunito",
+                                              fontSize: 20,
+                                            }}
+                                          >
+                                            {i.notes}
+                                          </Text>
+                                          <Text
+                                            style={{
+                                              marginTop: "auto",
+                                              fontStyle: "italic",
+                                              fontFamily: "Nunito",
+                                              fontSize: 15,
+                                            }}
+                                          >
+                                            {new Date(i.date).toDateString()}
+                                          </Text>
+                                        </View>
+                                      </View>
                                     </View>
                                   </View>
                                 );
@@ -483,7 +554,7 @@ export default function FinancialRecord() {
               )}
             </View>
           </View>
-        </LinearGradient>
+        </ImageBackground>
       </View>
       <BottomBar></BottomBar>
     </View>

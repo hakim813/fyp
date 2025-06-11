@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Platform,
   StatusBar,
+  ImageBackground,
 } from "react-native";
 import {
   ref,
@@ -97,13 +98,19 @@ export default function AddPlan() {
     const existingSP =
       sp && Object.keys(sp).length > 0
         ? Object.values(sp).find(
-            (u) => u.email === user.email && u.chosenPlan === selectedValue
+            (u) =>
+              u.email === user.email &&
+              (u.chosenPlan === selectedValue || u.scheme === selectedLabel)
           )
         : null;
 
     if (existingSP) {
       console.log("This plan already exists for the user.");
-      navi.navigate("SPHome");
+      Alert.alert(
+        "SOCSO Plan Alert",
+        "You cannot have more than one plan under SOCSO scheme."
+      );
+      // navi.navigate("SPHome");
       return;
     }
 
@@ -127,12 +134,10 @@ export default function AddPlan() {
   return (
     <View style={styles.container3}>
       <View style={styles.container}>
-        <LinearGradient
-          colors={["#03633a", "#95f6cc"]} // start to end gradient
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
+        <ImageBackground
+          source={require("../assets/bg-hibiscus.png")} // Your image path
           style={[
-            styles.container,
+            styles.background,
             {
               paddingTop:
                 Platform.OS === "ios"
@@ -140,12 +145,23 @@ export default function AddPlan() {
                   : StatusBar.currentHeight,
             },
           ]}
+          resizeMode="cover"
         >
           <Text style={styles.text}>Social Protection</Text>
 
           <View style={[styles.container2]}>
             <Text
-              style={[styles.text, { color: "#101010", marginBottom: 100 }]}
+              style={[
+                styles.text,
+                {
+                  fontSize: 30,
+                  textAlign: "center",
+                  color: "#101010",
+                  marginBottom: 70,
+                  marginTop: 0,
+                  marginLeft: 0,
+                },
+              ]}
             >
               Choose your plan
             </Text>
@@ -226,20 +242,27 @@ export default function AddPlan() {
                 styles.button,
                 {
                   marginRight: 15,
+                  marginTop: 30,
                   paddingVertical: 15,
-                  backgroundColor: "#1b434d",
+                  backgroundColor: "#20734f",
                   borderRadius: 25,
                 },
               ]}
             >
-              <Text style={{ color: "#fdfdfd", fontWeight: "bold" }}>
-                Submit Post
+              <Text style={{ color: "#fdfdfd", fontFamily: "Nunito-Bold" }}>
+                Add New Plan
               </Text>
             </TouchableOpacity>
+            <Text
+              style={{ marginTop: 15, color: "#222", fontFamily: "Nunito" }}
+            >
+              *If you have any existing SOCSO plan which still not complete
+              12-months contributions, new plan will not be added
+            </Text>
           </View>
 
           {/* <BottomBar /> */}
-        </LinearGradient>
+        </ImageBackground>
       </View>
     </View>
   );
@@ -254,12 +277,14 @@ const stylesDropdown = StyleSheet.create({
   dropdown: {
     height: 50,
     borderColor: "#121212",
-    borderWidth: 1,
-    borderRadius: 30,
+    // borderWidth: 1,
+    borderRadius: 15,
     paddingHorizontal: 10,
+    backgroundColor: "#fdfdfd",
   },
   placeholderStyle: {
     fontSize: 16,
+    fontFamily: "Nunito",
     color: "#888",
   },
   selectedTextStyle: {
@@ -282,9 +307,9 @@ const stylesDropdown = StyleSheet.create({
     tintColor: "#333",
   },
   containerStyle: {
-    borderRadius: 30,
+    borderRadius: 15,
     backgroundColor: "#fff",
-    borderWidth: 1,
+    // borderWidth: 1,
     borderColor: "green",
     padding: 5,
   },

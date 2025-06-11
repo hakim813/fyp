@@ -20,8 +20,8 @@ import { UserContext } from "../../UserContext";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function Login() {
-  const [email, setEmail] = useState("test@gmail.com");
-  const [pw, setPw] = useState("test123");
+  const [email, setEmail] = useState("hakimkvip1@gmail.com");
+  const [pw, setPw] = useState("hakimTest123");
   const navi = useNavigation();
   const { user, setUser } = useContext(UserContext);
 

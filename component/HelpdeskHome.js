@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import {
+  Alert,
   StyleSheet,
   StatusBar,
   Text,
@@ -15,9 +16,10 @@ import {
   Touchable,
 } from "react-native";
 import { styles, stylesHome } from "../styles";
+import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../UserContext";
-import { ref, getDatabase, onValue, update } from "firebase/database";
+import { ref, getDatabase, onValue, update, set } from "firebase/database";
 import BottomBar from "./BottomBar";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -25,13 +27,14 @@ const { width } = Dimensions.get("window");
 
 export default function HelpdeskHome() {
   const [data, setData] = useState([]);
-
+  const [allData, setAllData] = useState([]);
   const { user } = useContext(UserContext);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isEnabled, setIsEnabled] = useState(false);
   const flatListRef = useRef(null);
   const [mediaModalVisible, setMediaModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
+  const [isOngoingPage, setIsOngoingPage] = useState(true);
   //   const { pDate, pTime } = route.params || {};
 
   const navi = useNavigation();
@@ -46,6 +49,7 @@ export default function HelpdeskHome() {
       const data = snapshot.val();
 
       let fetchedComplaints = [];
+      let allComplaints = [];
 
       if (data) {
         // Convert the object to an array of posts
@@ -53,6 +57,7 @@ export default function HelpdeskHome() {
           .map((key) => ({
             id: key,
             createdAt: data[key].createdAt,
+            category: data[key].category,
             description: data[key].description,
             photoURL: data[key].photoURL,
             status: data[key].status,
@@ -63,10 +68,25 @@ export default function HelpdeskHome() {
           .filter(
             (item) => item.userId === user.uid && item.status === "ongoing"
           ); // Filter here;
+
+        allComplaints = Object.keys(data)
+          .map((key) => ({
+            id: key,
+            createdAt: data[key].createdAt,
+            category: data[key].category,
+            description: data[key].description,
+            photoURL: data[key].photoURL,
+            status: data[key].status,
+            ticketNumber: data[key].ticketNumber,
+            title: data[key].title,
+            userId: data[key].userId,
+          }))
+          .filter((item) => item.userId === user.uid);
       } else {
         console.log("No data found in the database.");
       }
       setData(fetchedComplaints);
+      setAllData(allComplaints);
     });
   }, []);
 
@@ -202,165 +222,212 @@ export default function HelpdeskHome() {
             </Modal>
 
             <View>
-              <FlatList
-                // style={{ backgroundColor: "red" }}
-                data={data}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => {
-                  return (
-                    <View
-                      style={[
-                        stylesHome.context,
-                        {
-                          minHeight: 10,
-                          paddingVertical: 10,
-                          marginBottom: 8,
-                          marginHorizontal: 8,
-                          backgroundColor: "#fafafa",
-                          borderRadius: 12,
-                          borderWidth: 0.1,
-                        },
-                      ]}
-                    >
+              {isOngoingPage ? (
+                <FlatList
+                  // style={{ backgroundColor: "red" }}
+                  data={data}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => {
+                    return (
                       <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "flex-end",
-                          // marginBottom: 5,
-                        }}
+                        style={[
+                          stylesHome.context,
+                          {
+                            minHeight: 10,
+                            paddingVertical: 10,
+                            marginBottom: 8,
+                            marginHorizontal: 8,
+                            backgroundColor: "#fafafa",
+                            borderRadius: 12,
+                            borderWidth: 0.1,
+
+                            // Shadow for iOS
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 1 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 3.84,
+
+                            // Shadow for Android
+                            elevation: 5,
+                          },
+                        ]}
                       >
-                        <Text
+                        <View
                           style={{
-                            fontFamily: "Nunito-Bold",
-                            fontSize: 23,
+                            flexDirection: "row",
+                            alignItems: "flex-end",
+                            // marginBottom: 5,
                           }}
                         >
-                          {/* {item.title.length > 15
-                    ? `${item.title.slice(0, 15)}...`
-                    : item.title} */}
-                          {item.ticketNumber}
-                        </Text>
-
-                        <Text
-                          style={{
-                            marginLeft: "auto",
-                            color: "grey",
-                            fontFamily: "Nunito-Bold",
-                          }}
-                        >
-                          Category {item.category}
-                        </Text>
-                      </View>
-                      <View>
-                        <Text
-                          style={{
-                            fontFamily: "Nunito",
-                            marginBottom: 3,
-                          }}
-                        >
-                          {new Date(item.createdAt).toLocaleDateString(
-                            "en-US",
-                            {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            }
-                          )}
-                        </Text>
-
-                        <Text
-                          style={{
-                            marginTop: 5,
-                            fontSize: 18,
-                            fontFamily: "Nunito-Bold",
-                          }}
-                        >
-                          Description
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: 18,
-                            fontFamily: "Nunito-Regular",
-                          }}
-                        >
-                          {item.description}
-                        </Text>
-                        <Text
-                          style={{
-                            marginTop: 5,
-                            fontSize: 18,
-                            fontFamily: "Nunito-Bold",
-                          }}
-                        >
-                          Attached Media
-                        </Text>
-                        {item.photoURL && item.photoURL.length > 0 ? (
-                          <TouchableOpacity
-                            onPress={() => {
-                              setSelectedMedia(item.photoURL);
-                              setMediaModalVisible(true);
-                            }}
+                          <Text
                             style={{
-                              backgroundColor: "#efefef",
-                              borderWidth: 0.3,
-                              paddingHorizontal: 10,
-                              paddingVertical: 5,
-                              marginTop: 5,
-                              borderRadius: 50,
-                              marginRight: "auto",
+                              fontFamily: "Nunito-Bold",
+                              fontSize: 20,
                             }}
                           >
-                            <Text
-                              style={{
-                                fontSize: 15,
-                                fontFamily: "Nunito-Regular",
-                              }}
-                            >
-                              View Media
-                            </Text>
-                          </TouchableOpacity>
-                        ) : (
+                            {/* {item.title.length > 15
+                    ? `${item.title.slice(0, 15)}...`
+                    : item.title} */}
+                            {item.ticketNumber}
+                          </Text>
+
+                          <Text
+                            style={{
+                              marginLeft: "auto",
+                              color: "grey",
+                              fontFamily: "Nunito-Bold",
+                            }}
+                          >
+                            {item.category}
+                          </Text>
+                        </View>
+                        <View>
+                          <Text
+                            style={{
+                              fontFamily: "Nunito",
+                              marginBottom: 3,
+                            }}
+                          >
+                            {new Date(item.createdAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </Text>
+
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              fontSize: 18,
+                              fontFamily: "Nunito-Bold",
+                            }}
+                          >
+                            Description
+                          </Text>
                           <Text
                             style={{
                               fontSize: 18,
                               fontFamily: "Nunito-Regular",
-                              color: "grey",
                             }}
                           >
-                            None
+                            {item.description}
                           </Text>
-                        )}
-                        <TouchableOpacity
-                          onPress={() => {
-                            setResolved(item.id);
-                          }}
-                          style={{
-                            borderColor: item.status === "grey",
-                            borderWidth: 1,
-                            paddingHorizontal: 10,
-                            paddingVertical: 5,
-                            marginLeft: "auto",
-                            marginTop: 5,
-                            borderRadius: 50,
-                          }}
-                        >
                           <Text
                             style={{
-                              fontFamily: "Nunito-Regular",
-                              color: "#050505",
+                              marginTop: 5,
+                              fontSize: 18,
+                              fontFamily: "Nunito-Bold",
                             }}
                           >
-                            Set as resolved
+                            Attached Media
                           </Text>
-                        </TouchableOpacity>
+                          {item.photoURL && item.photoURL.length > 0 ? (
+                            <TouchableOpacity
+                              onPress={() => {
+                                // If item.photoURL is a string, wrap it in an array
+                                setSelectedMedia(
+                                  Array.isArray(item.photoURL)
+                                    ? item.photoURL
+                                    : [item.photoURL]
+                                );
+                                setMediaModalVisible(true);
+                              }}
+                              style={{
+                                backgroundColor: "#efefef",
+                                borderWidth: 0.3,
+                                paddingHorizontal: 10,
+                                paddingVertical: 5,
+                                marginTop: 5,
+                                borderRadius: 50,
+                                marginRight: "auto",
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontSize: 15,
+                                  fontFamily: "Nunito-Regular",
+                                }}
+                              >
+                                View Media
+                              </Text>
+                            </TouchableOpacity>
+                          ) : (
+                            <Text
+                              style={{
+                                fontSize: 18,
+                                fontFamily: "Nunito-Regular",
+                                color: "grey",
+                              }}
+                            >
+                              None
+                            </Text>
+                          )}
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            <TouchableOpacity
+                              onPress={() => {
+                                setResolved(item.id);
+                              }}
+                              style={{
+                                borderColor: item.status === "grey",
+                                borderWidth: 1,
+                                paddingHorizontal: 10,
+                                paddingVertical: 5,
+                                marginRight: 10,
+                                marginTop: 5,
+                                borderRadius: 50,
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontFamily: "Nunito-Regular",
+                                  color: "#050505",
+                                }}
+                              >
+                                Set as Resolved
+                              </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              onPress={() => {}}
+                              style={{
+                                borderColor: item.status === "grey",
+                                paddingHorizontal: 10,
+                                paddingVertical: 5,
+                                // marginLeft: "auto",
+                                marginTop: 5,
+                                borderRadius: 50,
+                                backgroundColor:
+                                  item.status === "ongoing"
+                                    ? "yellow"
+                                    : "green",
+                              }}
+                            >
+                              <Icon
+                                name={
+                                  item.status === "ongoing"
+                                    ? "frown-o"
+                                    : "smile-o"
+                                }
+                                size={18}
+                                style={{ color: "grey" }}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
                       </View>
-                    </View>
-                  );
-                }}
-                ListHeaderComponent={
-                  <>
-                    {/* <Text
+                    );
+                  }}
+                  ListHeaderComponent={
+                    <>
+                      {/* <Text
                       style={{
                         fontFamily: "Nunito-Bold",
                         color: "#050505",
@@ -372,68 +439,86 @@ export default function HelpdeskHome() {
                       Ongoing Complaints
                     </Text> */}
 
-                    <View
-                      style={{
-                        // backgroundColor: "red",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
                       <View
-                        flexDirection="row"
                         style={{
-                          borderColor: "grey",
-                          borderWidth: 1,
-                          paddingHorizontal: 5,
-                          // paddingVertical: 5,
-                          backgroundColor: "#fdfdfd",
-                          marginVertical: 10,
-                          borderRadius: 50,
+                          // backgroundColor: "red",
+                          alignItems: "center",
+                          justifyContent: "center",
                         }}
                       >
                         <View
+                          flexDirection="row"
                           style={{
-                            // borderColor: "grey",
+                            borderColor: "grey",
                             // borderWidth: 1,
-                            paddingHorizontal: 10,
-                            paddingVertical: 5,
-                            marginHorizontal: 5,
-                            backgroundColor: "green",
-                            marginVertical: 10,
-                            borderRadius: 50,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontFamily: "Nunito-Regular",
-                              color: "#fdfdfd",
-                            }}
-                          >
-                            Ongoing
-                          </Text>
-                        </View>
-                        <View
-                          style={{
-                            // borderColor: "grey",
-                            // borderWidth: 1,
-                            paddingHorizontal: 10,
-                            paddingVertical: 5,
-                            marginHorizontal: 5,
+                            paddingHorizontal: 5,
+                            // paddingVertical: 5,
                             backgroundColor: "#fdfdfd",
                             marginVertical: 10,
                             borderRadius: 50,
+                            // Shadow for iOS
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 3.84,
+
+                            // Shadow for Android
+                            elevation: 5,
                           }}
                         >
-                          <Text
+                          <TouchableOpacity
+                            onPress={() => {
+                              setIsOngoingPage(true);
+                            }}
                             style={{
-                              fontFamily: "Nunito-Regular",
-                              color: "#050505",
+                              // borderColor: "grey",
+                              // borderWidth: 1,
+                              paddingHorizontal: 10,
+                              paddingVertical: 5,
+                              marginHorizontal: 5,
+                              backgroundColor:
+                                isOngoingPage === true ? "green" : "#fdfdfd",
+                              marginVertical: 10,
+                              borderRadius: 50,
                             }}
                           >
-                            History
-                          </Text>
-                        </View>
-                        {/* <Text
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Regular",
+                                color:
+                                  isOngoingPage === true ? "#fdfdfd" : "green",
+                              }}
+                            >
+                              Ongoing
+                            </Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => {
+                              setIsOngoingPage(false);
+                            }}
+                            style={{
+                              // borderColor: "grey",
+                              // borderWidth: 1,
+                              paddingHorizontal: 10,
+                              paddingVertical: 5,
+                              marginHorizontal: 5,
+                              backgroundColor:
+                                isOngoingPage === true ? "#fdfdfd" : "green",
+                              marginVertical: 10,
+                              borderRadius: 50,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Regular",
+                                color:
+                                  isOngoingPage === true ? "green" : "#fdfdfd",
+                              }}
+                            >
+                              History
+                            </Text>
+                          </TouchableOpacity>
+                          {/* <Text
                           style={{
                             fontFamily: "Nunito-Regular",
                             color: "#050505",
@@ -441,14 +526,348 @@ export default function HelpdeskHome() {
                         >
                           Set as resolved
                         </Text> */}
+                        </View>
                       </View>
-                    </View>
-                  </>
-                }
-                ListFooterComponent={
-                  <View style={{ height: 90 }} /> // Adjust height to match or exceed your button's height + margin
-                }
-              />
+                    </>
+                  }
+                  ListFooterComponent={
+                    <View style={{ height: 90 }} /> // Adjust height to match or exceed your button's height + margin
+                  }
+                />
+              ) : (
+                <FlatList
+                  // style={{ backgroundColor: "red" }}
+                  data={allData}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => {
+                    return (
+                      <View
+                        style={[
+                          stylesHome.context,
+                          {
+                            minHeight: 10,
+                            paddingVertical: 10,
+                            marginBottom: 8,
+                            marginHorizontal: 8,
+                            backgroundColor: "#fafafa",
+                            borderRadius: 12,
+                            borderWidth: 0.1,
+
+                            // Shadow for iOS
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 1 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 3.84,
+
+                            // Shadow for Android
+                            elevation: 5,
+                          },
+                        ]}
+                      >
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "flex-end",
+                            // marginBottom: 5,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: "Nunito-Bold",
+                              fontSize: 20,
+                            }}
+                          >
+                            {/* {item.title.length > 15
+                    ? `${item.title.slice(0, 15)}...`
+                    : item.title} */}
+                            {item.ticketNumber}
+                          </Text>
+
+                          <Text
+                            style={{
+                              marginLeft: "auto",
+                              color: "grey",
+                              fontFamily: "Nunito-Bold",
+                            }}
+                          >
+                            {item.category}
+                          </Text>
+                        </View>
+                        <View>
+                          <Text
+                            style={{
+                              fontFamily: "Nunito",
+                              marginBottom: 3,
+                            }}
+                          >
+                            {new Date(item.createdAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )}
+                          </Text>
+
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              fontSize: 18,
+                              fontFamily: "Nunito-Bold",
+                            }}
+                          >
+                            Description
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              fontFamily: "Nunito-Regular",
+                            }}
+                          >
+                            {item.description}
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              fontSize: 18,
+                              fontFamily: "Nunito-Bold",
+                            }}
+                          >
+                            Attached Media
+                          </Text>
+                          {item.photoURL && item.photoURL.length > 0 ? (
+                            <TouchableOpacity
+                              onPress={() => {
+                                // If item.photoURL is a string, wrap it in an array
+                                setSelectedMedia(
+                                  Array.isArray(item.photoURL)
+                                    ? item.photoURL
+                                    : [item.photoURL]
+                                );
+                                setMediaModalVisible(true);
+                              }}
+                              style={{
+                                backgroundColor: "#efefef",
+                                borderWidth: 0.3,
+                                paddingHorizontal: 10,
+                                paddingVertical: 5,
+                                marginTop: 5,
+                                borderRadius: 50,
+                                marginRight: "auto",
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontSize: 15,
+                                  fontFamily: "Nunito-Regular",
+                                }}
+                              >
+                                View Media
+                              </Text>
+                            </TouchableOpacity>
+                          ) : (
+                            <Text
+                              style={{
+                                fontSize: 18,
+                                fontFamily: "Nunito-Regular",
+                                color: "grey",
+                              }}
+                            >
+                              None
+                            </Text>
+                          )}
+
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              justifyContent: "flex-end",
+                            }}
+                          >
+                            <TouchableOpacity
+                              onPress={() => {
+                                setResolved(item.id);
+                              }}
+                              style={{
+                                borderColor: item.status === "grey",
+                                // borderWidth: 1,
+                                paddingHorizontal: 10,
+                                paddingVertical: 5,
+                                marginRight: 10,
+                                marginTop: 5,
+                                borderRadius: 50,
+                                backgroundColor: "red",
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontFamily: "Nunito-Regular",
+                                  color: "#fdfdfd",
+                                }}
+                              >
+                                Delete
+                              </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              onPress={() => {
+                                if (item.status === "ongoing") {
+                                  Alert.alert(
+                                    "Ticket In Progress", // Title
+                                    "This means our team is still working on your helpdesk ticket. Thank you for your patience!", // Message
+                                    [{ text: "OK", onPress: () => {} }]
+                                  );
+                                } else {
+                                  Alert.alert(
+                                    "Ticket Is Resolved", // Title
+                                    "This means your helpdesk ticket is resolved. Thank you for using our service!", // ✅ Fixed message
+                                    [{ text: "OK", onPress: () => {} }]
+                                  );
+                                }
+                              }}
+                              style={{
+                                borderColor: item.status === "grey",
+                                paddingHorizontal: 10,
+                                paddingVertical: 5,
+                                // marginLeft: "auto",
+                                marginTop: 5,
+                                borderRadius: 50,
+                                backgroundColor:
+                                  item.status === "ongoing"
+                                    ? "yellow"
+                                    : "green",
+                              }}
+                            >
+                              <Icon
+                                name={
+                                  item.status === "ongoing"
+                                    ? "frown-o"
+                                    : "smile-o"
+                                }
+                                size={18}
+                                style={{
+                                  color:
+                                    item.status === "ongoing"
+                                      ? "grey"
+                                      : "#fdfdfd",
+                                }}
+                              />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      </View>
+                    );
+                  }}
+                  ListHeaderComponent={
+                    <>
+                      {/* <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        color: "#050505",
+                        margin: 5,
+                        marginLeft: 10,
+                        fontSize: Platform.OS === "ios" ? 30 : 20,
+                      }}
+                    >
+                      Ongoing Complaints
+                    </Text> */}
+
+                      <View
+                        style={{
+                          // backgroundColor: "red",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <View
+                          flexDirection="row"
+                          style={{
+                            borderColor: "grey",
+                            // borderWidth: 1,
+                            paddingHorizontal: 5,
+                            // paddingVertical: 5,
+                            backgroundColor: "#fdfdfd",
+                            marginVertical: 10,
+                            borderRadius: 50,
+                            // Shadow for iOS
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 2 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 3.84,
+
+                            // Shadow for Android
+                            elevation: 5,
+                          }}
+                        >
+                          <TouchableOpacity
+                            onPress={() => {
+                              setIsOngoingPage(true);
+                            }}
+                            style={{
+                              // borderColor: "grey",
+                              // borderWidth: 1,
+                              paddingHorizontal: 10,
+                              paddingVertical: 5,
+                              marginHorizontal: 5,
+                              backgroundColor:
+                                isOngoingPage === true ? "green" : "#fdfdfd",
+                              marginVertical: 10,
+                              borderRadius: 50,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Regular",
+                                color:
+                                  isOngoingPage === true ? "#333333" : "green",
+                              }}
+                            >
+                              Ongoing
+                            </Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => {
+                              setIsOngoingPage(false);
+                            }}
+                            style={{
+                              // borderColor: "grey",
+                              // borderWidth: 1,
+                              paddingHorizontal: 10,
+                              paddingVertical: 5,
+                              marginHorizontal: 5,
+                              backgroundColor:
+                                isOngoingPage === true ? "#fdfdfd" : "green",
+                              marginVertical: 10,
+                              borderRadius: 50,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Regular",
+                                color:
+                                  isOngoingPage === true ? "green" : "#fdfdfd",
+                              }}
+                            >
+                              History
+                            </Text>
+                          </TouchableOpacity>
+                          {/* <Text
+                          style={{
+                            fontFamily: "Nunito-Regular",
+                            color: "#050505",
+                          }}
+                        >
+                          Set as resolved
+                        </Text> */}
+                        </View>
+                      </View>
+                    </>
+                  }
+                  ListFooterComponent={
+                    <View style={{ height: 90 }} /> // Adjust height to match or exceed your button's height + margin
+                  }
+                />
+              )}
             </View>
 
             {/* <View

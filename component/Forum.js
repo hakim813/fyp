@@ -12,6 +12,7 @@ import {
   Platform,
   TouchableOpacity,
   ActivityIndicator,
+  KeyboardAvoidingView,
   ImageBackground,
 } from "react-native";
 import { styles, stylesHome } from "../styles";
@@ -179,6 +180,9 @@ export default function Forum() {
           title: data[key].title,
           content: data[key].content,
           date: data[key].date,
+          profilePhoto:
+            data[key].profilePhoto ||
+            "https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png",
           category: data[key].category,
           comment: data[key].commentId,
           upvoter: data[key].upvoter || [],
@@ -225,17 +229,6 @@ export default function Forum() {
     setFilteredPosts(results);
   }, [searchQuery, posts, selectedCategory]);
 
-  // useEffect(() => {
-  //   //for filtering posts based on query in search bar
-  //   const lowercasedQuery = searchQuery.toLowerCase();
-  //   const results = posts.filter(
-  //     (post) =>
-  //       post.title.toLowerCase().includes(lowercasedQuery) ||
-  //       post.content.toLowerCase().includes(lowercasedQuery)
-  //   );
-  //   setFilteredPosts(results);
-  // }, [searchQuery, posts]);
-
   return (
     <View style={[stylesHome.bg, { paddingRight: 0 }]}>
       <ImageBackground
@@ -266,13 +259,24 @@ export default function Forum() {
               {
                 backgroundColor: "#fdfdfd",
                 borderRadius: 20,
-                marginHorizontal: 15,
+                marginHorizontal: 10,
+                marginTop: 10,
               },
             ]}
             placeholder="Search any content. . ."
             value={searchQuery}
             onChangeText={(text) => setSearchQuery(text)}
           />
+          {/* <TouchableOpacity
+            style={[
+              styles.input,
+              {
+                backgroundColor: "#fdfdfd",
+                borderRadius: 20,
+                marginHorizontal: 5,
+              },
+            ]}
+          ></TouchableOpacity> */}
           <View
             style={{
               flexDirection: "row",
@@ -395,7 +399,7 @@ export default function Forum() {
                     {
                       // marginRight: 25,
                       width: "100%",
-                      backgroundColor: "#eeeeee",
+                      backgroundColor: "#bbb",
                       paddingVertical: 5,
                       paddingHorizontal: 15,
                       minWidth: 90,
@@ -422,57 +426,85 @@ export default function Forum() {
                       <View
                         style={[
                           stylesHome.context,
-                          { paddingVertical: 10, backgroundColor: "#fafafa" },
+                          {
+                            paddingVertical: 10,
+                            backgroundColor: "#fafafa", // Shadow for iOS
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 1 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 1,
+                            borderWidth: 0,
+                            // Shadow for Android
+                            elevation: 2,
+                            marginHorizontal: 10,
+                          },
                         ]}
                       >
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "flex-end",
-                          }}
-                        >
-                          <View>
-                            <Text
-                              style={{
-                                fontFamily: "Nunito-ExtraBold",
-                                fontSize: 25,
-                              }}
-                            >
-                              {item.title.length > 15
-                                ? `${item.title.slice(0, 15)}...`
-                                : item.title}
-                            </Text>
-
-                            <Text>
-                              <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
-                                Written by:{" "}
-                              </Text>
-                              {item.user}
-                            </Text>
-                          </View>
-
+                        <View>
                           <View
                             style={{
-                              marginLeft: "auto",
+                              flexDirection: "row",
+                              // backgroundColor: "red",
+                              justifyContent: "flex-start",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Image
+                              source={{
+                                uri:
+                                  item.profilePhoto ||
+                                  "https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png",
+                              }}
+                              style={{
+                                width: 35,
+                                height: 35,
+                                borderRadius: 50,
+                                backgroundColor: "blue", // fallback color if image fails to load
+                              }}
+                            />
+                            <Text
+                              style={{
+                                marginLeft: 5,
+                                fontFamily: "Nunito-Regular",
+                                fontSize: 16,
+                              }}
+                            >
+                              {/* <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
+                                Written by:{" "}
+                              </Text> */}
+                              {item.user}
+                            </Text>
+                            <Text
+                              style={{
+                                marginLeft: 5,
+                                fontFamily: "Nunito-Bold",
+                                color: "grey",
+                                marginLeft: "auto",
+                                marginRight: 10,
+                                fontSize: 16,
+                              }}
+                            >
+                              {/* <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
+                                Written by:{" "}
+                              </Text> */}
+                              {item.category}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              // backgroundColor: "blue",
+                              justifyContent: "flex-start",
                             }}
                           >
                             <Text
                               style={{
-                                marginLeft: "auto",
-                                color: "grey",
+                                marginTop: 5,
                                 fontFamily: "Nunito-Bold",
+                                fontSize: 20,
                               }}
                             >
-                              {item.category}
-                            </Text>
-                            <Text
-                              style={{
-                                marginLeft: "auto",
-                                color: "grey",
-                                fontFamily: "Nunito",
-                              }}
-                            >
-                              {new Date(item.date).toDateString()}
+                              {item.title}
                             </Text>
                           </View>
                         </View>
@@ -507,7 +539,7 @@ export default function Forum() {
                                     margin: 10,
                                     // borderRadius: 5,
                                     // borderWidth: 1,
-                                    borderColor: "#ccc",
+                                    // borderColor: "#ccc",
                                   }}
                                 >
                                   {/* {imageLoad && (
@@ -620,8 +652,10 @@ export default function Forum() {
                                 )
                               }
                               style={{
-                                backgroundColor: "red",
+                                backgroundColor: "#fdfdfd",
                                 marginLeft: "auto",
+                                borderColor: "red",
+                                borderWidth: 1,
                                 borderRadius: 50,
                                 paddingHorizontal: 25,
                                 paddingVertical: 5,
@@ -630,7 +664,7 @@ export default function Forum() {
                               <Icon
                                 name="trash"
                                 size={20}
-                                color={"#fdfdfd"} // Change color based on isUpvoted
+                                color={"red"} // Change color based on isUpvoted
                               />
                             </TouchableOpacity>
                           </View>
@@ -669,57 +703,84 @@ export default function Forum() {
                       <View
                         style={[
                           stylesHome.context,
-                          { paddingVertical: 10, backgroundColor: "#fafafa" },
+                          {
+                            paddingVertical: 10,
+                            backgroundColor: "#fafafa",
+                            shadowColor: "#000",
+                            shadowOffset: { width: 0, height: 1 },
+                            shadowOpacity: 0.25,
+                            shadowRadius: 1,
+                            borderWidth: 0,
+                            // Shadow for Android
+                            elevation: 2,
+                          },
                         ]}
                       >
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "flex-end",
-                          }}
-                        >
-                          <View>
-                            <Text
-                              style={{
-                                fontFamily: "Nunito-ExtraBold",
-                                fontSize: 25,
-                              }}
-                            >
-                              {item.title.length > 15
-                                ? `${item.title.slice(0, 15)}...`
-                                : item.title}
-                            </Text>
-
-                            <Text>
-                              <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
-                                Written by:{" "}
-                              </Text>
-                              {item.user}
-                            </Text>
-                          </View>
-
+                        <View>
                           <View
                             style={{
-                              marginLeft: "auto",
+                              flexDirection: "row",
+                              // backgroundColor: "red",
+                              justifyContent: "flex-start",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Image
+                              source={{
+                                uri:
+                                  item.profilePhoto ||
+                                  "https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png",
+                              }}
+                              style={{
+                                width: 35,
+                                height: 35,
+                                borderRadius: 50,
+                                backgroundColor: "blue", // fallback color if image fails to load
+                              }}
+                            />
+                            <Text
+                              style={{
+                                marginLeft: 5,
+                                fontFamily: "Nunito-Regular",
+                                fontSize: 16,
+                              }}
+                            >
+                              {/* <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
+                                Written by:{" "}
+                              </Text> */}
+                              {item.user}
+                            </Text>
+                            <Text
+                              style={{
+                                marginLeft: 5,
+                                fontFamily: "Nunito-Bold",
+                                color: "grey",
+                                marginLeft: "auto",
+                                marginRight: 10,
+                                fontSize: 16,
+                              }}
+                            >
+                              {/* <Text style={{ fontFamily: "Nunito-ExtraBold" }}>
+                                Written by:{" "}
+                              </Text> */}
+                              {item.category}
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              // backgroundColor: "blue",
+                              justifyContent: "flex-start",
                             }}
                           >
                             <Text
                               style={{
-                                marginLeft: "auto",
-                                color: "grey",
+                                marginTop: 5,
                                 fontFamily: "Nunito-Bold",
+                                fontSize: 20,
                               }}
                             >
-                              {item.category}
-                            </Text>
-                            <Text
-                              style={{
-                                marginLeft: "auto",
-                                color: "grey",
-                                fontFamily: "Nunito",
-                              }}
-                            >
-                              {new Date(item.date).toDateString()}
+                              {item.title}
                             </Text>
                           </View>
                         </View>
@@ -866,8 +927,10 @@ export default function Forum() {
                                 )
                               }
                               style={{
-                                backgroundColor: "red",
+                                backgroundColor: "#fdfdfd",
                                 marginLeft: "auto",
+                                borderColor: "red",
+                                borderWidth: 1,
                                 borderRadius: 50,
                                 paddingHorizontal: 25,
                                 paddingVertical: 5,
@@ -876,7 +939,7 @@ export default function Forum() {
                               <Icon
                                 name="trash"
                                 size={20}
-                                color={"#fdfdfd"} // Change color based on isUpvoted
+                                color={"red"} // Change color based on isUpvoted
                               />
                             </TouchableOpacity>
                           </View>
@@ -924,8 +987,10 @@ export default function Forum() {
                                 )
                               }
                               style={{
-                                backgroundColor: "red",
+                                backgroundColor: "#fdfdfd",
                                 marginLeft: "auto",
+                                borderColor: "red",
+                                borderWidth: 1,
                                 borderRadius: 50,
                                 paddingHorizontal: 25,
                                 paddingVertical: 5,
@@ -934,7 +999,7 @@ export default function Forum() {
                               <Icon
                                 name="trash"
                                 size={20}
-                                color={"#fdfdfd"} // Change color based on isUpvoted
+                                color={"red"} // Change color based on isUpvoted
                               />
                             </TouchableOpacity>
                           </View>
@@ -943,6 +1008,15 @@ export default function Forum() {
                     );
                   }
                 }}
+                ListFooterComponent={
+                  <View
+                    style={{
+                      height: 90,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  ></View>
+                }
               />
             </>
           )}
@@ -973,7 +1047,11 @@ export default function Forum() {
             }}
           >
             <Text
-              style={{ fontWeight: "bold", fontSize: 20, marginBottom: 10 }}
+              style={{
+                fontFamily: "Nunito-Bold",
+                fontSize: 20,
+                marginBottom: 10,
+              }}
             >
               Select Category
             </Text>
@@ -997,13 +1075,15 @@ export default function Forum() {
               onPress={() => setFilterModalVisible(false)}
               style={{
                 marginTop: 20,
-                backgroundColor: "#1b434d",
-                borderRadius: 10,
-                paddingHorizontal: 20,
+                backgroundColor: "green",
+                borderRadius: 20,
+                paddingHorizontal: 30,
                 paddingVertical: 10,
               }}
             >
-              <Text style={{ color: "#fff", fontWeight: "bold" }}>Apply</Text>
+              <Text style={{ color: "#fff", fontFamily: "Nunito-Bold" }}>
+                Apply
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1060,147 +1140,167 @@ export default function Forum() {
         </Text>
       </TouchableOpacity> */}
 
+      <Modal
+        visible={isVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setIsVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0,0,0,0.3)",
+            justifyContent: "flex-end",
+          }}
+        >
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={80} // adjust as needed for your header/nav
+            style={{
+              backgroundColor: "#fff",
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              maxHeight: "80%",
+              paddingBottom: 300,
+              paddingTop: 20,
+              paddingHorizontal: 10,
+              flex: 1,
+            }}
+          >
+            {/* Header */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 10,
+              }}
+            >
+              <Text style={{ fontWeight: "bold", fontSize: 22, flex: 1 }}>
+                Comments
+              </Text>
+              <TouchableOpacity onPress={() => setIsVisible(false)}>
+                <Icon name="close" size={24} />
+              </TouchableOpacity>
+            </View>
+            {/* Comments List */}
+            <FlatList
+              data={comments.filter((c) => c.post === selectedPost?.id)}
+              keyExtractor={(item) => item.id}
+              style={{ marginBottom: 60 }}
+              renderItem={({ item }) => (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "flex-start",
+                    marginBottom: 15,
+                  }}
+                >
+                  <Image
+                    source={{
+                      uri: "https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png",
+                    }}
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 18,
+                      marginRight: 10,
+                      borderWidth: 1,
+                      borderColor: "#eee",
+                    }}
+                  />
+                  <View
+                    style={{
+                      backgroundColor: "#f1f1f1",
+                      borderRadius: 15,
+                      padding: 10,
+                      flex: 1,
+                    }}
+                  >
+                    <Text style={{ fontWeight: "bold", marginBottom: 2 }}>
+                      {item.user}
+                    </Text>
+                    <Text style={{ color: "#333" }}>{item.comment}</Text>
+                    {/* Optional: Add timestamp if available */}
+                    {/* <Text style={{ fontSize: 10, color: "#888", marginTop: 4 }}>{item.date}</Text> */}
+                  </View>
+                </View>
+              )}
+            />
+            {/* Input Area */}
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  // paddingVertical: 10,
+                  borderTopWidth: 1,
+                  borderColor: "#eee",
+                  // backgroundColor: "red",
+                  position: "absolute",
+                  bottom: 30,
+                  left: 0,
+                  right: 0,
+                  paddingHorizontal: 10,
+                }}
+              >
+                <TextInput
+                  style={{
+                    flex: 1,
+                    borderRadius: 20,
+                    backgroundColor: "#f1f1f1",
+                    paddingHorizontal: 15,
+                    paddingVertical: 8,
+                    fontSize: 16,
+                    marginRight: 10,
+                  }}
+                  placeholder="Write a comment..."
+                  value={comment}
+                  onChangeText={setComment}
+                />
+                <TouchableOpacity
+                  onPress={() => writeData(selectedPost)}
+                  style={{
+                    backgroundColor: "#1b434d",
+                    borderRadius: 20,
+                    padding: 10,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Icon name="send" size={20} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            </KeyboardAvoidingView>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+
       <BottomBar></BottomBar>
 
       <TouchableOpacity
+        style={{
+          backgroundColor: "green",
+          position: "absolute",
+          right: 20,
+          bottom: 115,
+          width: 70, // set width
+          height: 70, // set height
+          borderRadius: 35, // half of width/height for a circle
+          alignItems: "center",
+          justifyContent: "center",
+          elevation: 4, // optional: shadow on Android
+          shadowColor: "#000", // optional: shadow on iOS
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.3,
+          shadowRadius: 3,
+        }}
         onPress={() => navi.navigate("CreatePost")}
-        style={[
-          {
-            position: "absolute",
-            bottom: 20,
-            right: "42%",
-            alignSelf: "center",
-            paddingHorizontal: 25,
-            marginTop: 10,
-            paddingVertical: 15,
-            backgroundColor: "#81b0ff",
-            borderRadius: 100,
-            elevation: 5,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.8,
-            shadowRadius: 3,
-          },
-        ]}
       >
-        <Text style={{ color: "#1b434d", fontWeight: "800", fontSize: 30 }}>
-          +
-        </Text>
+        <Icon name="plus" size={30} color="#fff" />
       </TouchableOpacity>
-
-      {isVisible && (
-        <View style={[styles.centeredView, { maxHeight: "80%" }]}>
-          <Text
-            style={{
-              // backgroundColor: "red",
-              position: "absolute",
-              left: 15,
-              fontWeight: "bold",
-              fontSize: 30,
-              marginLeft: 15,
-              marginTop: 15,
-            }}
-          >
-            Comment
-          </Text>
-          <TouchableOpacity
-            onPress={() => setIsVisible(false)}
-            style={{
-              position: "absolute",
-              right: 20,
-              fontWeight: "bold",
-              fontSize: 30,
-              marginLeft: 15,
-              marginTop: 15,
-              fontSize: 30,
-            }}
-          >
-            <Icon name="close" size={24} />
-          </TouchableOpacity>
-          {/* <Text onPress={()=>setIsVisible(false)} style={{position: 'absolute', right: 20, fontWeight: 'bold', fontSize: 30, marginLeft: 15, marginTop: 15, fontSize: 30}}>X</Text> */}
-          <FlatList
-            style={{ paddingTop: 0, marginTop: 60 }}
-            data={comments}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => {
-              if (item.post == selectedPost.id) {
-                return (
-                  <View
-                    style={[
-                      stylesHome.context,
-                      {
-                        flexDirection: "row",
-                        minHeight: 10,
-                        borderBottomWidth: 0.3,
-                      },
-                    ]}
-                  >
-                    <Image
-                      source={{
-                        uri: "https://us-tuna-sounds-images.voicemod.net/05e1f76c-d7a6-4bcc-b33d-95d6a66dd02a-1683971589675.png",
-                      }}
-                      style={{
-                        potition: "absolute",
-                        width: 30,
-                        height: 40,
-                        width: 40,
-                        marginBottom: 10,
-                        resizeMode: "cover",
-                        borderRadius: 75,
-                        borderWidth: 1,
-                      }}
-                    />
-                    <View style={{ marginLeft: 10, border: "#111" }}>
-                      <Text style={{ fontWeight: "bold" }}>{item.user}</Text>
-                      <Text style={{ marginTop: 5 }}>{item.comment}</Text>
-                    </View>
-                  </View>
-                );
-              }
-            }}
-          />
-          <TextInput
-            style={[
-              styles.input,
-              {
-                borderRadius: 50,
-                position: "absolute",
-                width: "72%",
-                left: 15,
-                bottom: 20,
-                margin: 10,
-                marginTop: "auto",
-                marginBottom: 70,
-              },
-            ]}
-            placeholder="Comment"
-            value={comment}
-            onChangeText={setComment}
-          />
-
-          <TouchableOpacity
-            onPress={() => {
-              writeData(selectedPost);
-            }}
-            style={[
-              styles.submitComment,
-              {
-                marginBottom: 90,
-              },
-            ]}
-          >
-            <Text
-              style={{
-                color: "#fdfdfd",
-                fontWeight: "800",
-                fontSize: 30,
-              }}
-            >
-              +
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 }
