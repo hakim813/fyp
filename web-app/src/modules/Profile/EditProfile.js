@@ -29,6 +29,7 @@ const initialForm = {
   fullName: "",
   dob: "",
   email: "",
+  phone: "",
   address: "",
   profilePhoto: "",
   // Identification
@@ -54,6 +55,7 @@ const fieldLabels = {
   fullName: "Full Name",
   dob: "Date of Birth",
   email: "Email",
+  phone: "Phone Number",
   address: "Address",
   profilePhoto: "Profile Photo",
   nricId: "NRIC",
@@ -129,7 +131,7 @@ export default function EditProfile() {
 
   // Section fields for ticks
   const sectionFields = {
-    Personal: ["fullName", "dob", "email", "address", "profilePhoto"],
+    Personal: ["fullName", "dob", "email", "phone", "address", "profilePhoto"],
     Identification: ["nricId", "icPhotos", "taxId", "workPermit"],
     Professional: ["workStatus", "workCategory", "experience", "languages"],
     Finance: ["bank", "bankAccountNumber"],
@@ -138,32 +140,38 @@ export default function EditProfile() {
 
   // Handlers
   const handleChange = (e) => {
-  const { name, value, type, files } = e.target;
-  if (type === "file") {
-    if (name === "profilePhoto") {
-      const file = files[0];
-      setFormData((p) => ({ ...p, profilePhoto: file }));
-      setPreviews((pv) => ({ ...pv, profilePhoto: URL.createObjectURL(file) }));
-    } else if (name === "icPhotos") {
-      // Merge new files with existing, max 2
-      let existing = formData.icPhotos || [];
-      // Remove any File objects from existing if user re-selects
-      existing = existing.filter(f => typeof f === "string");
-      let arr = Array.from(files);
-      let merged = [...existing, ...arr].slice(0, 2);
-      setFormData((p) => ({ ...p, icPhotos: merged }));
-      setPreviews((pv) => ({
-        ...pv,
-        icPhotos: merged.map(f =>
-          typeof f === "string" ? f : URL.createObjectURL(f)
-        ),
-      }));
+    const { name, value, type, files } = e.target;
+    if (type === "file") {
+      if (name === "profilePhoto") {
+        const file = files[0];
+        setFormData((p) => ({ ...p, profilePhoto: file }));
+        setPreviews((pv) => ({ ...pv, profilePhoto: URL.createObjectURL(file) }));
+      } else if (name === "icPhotos") {
+        // Merge new files with existing, max 2
+        let existing = formData.icPhotos || [];
+        // Remove any File objects from existing if user re-selects
+        existing = existing.filter(f => typeof f === "string");
+        let arr = Array.from(files);
+        let merged = [...existing, ...arr].slice(0, 2);
+        setFormData((p) => ({ ...p, icPhotos: merged }));
+        setPreviews((pv) => ({
+          ...pv,
+          icPhotos: merged.map(f =>
+            typeof f === "string" ? f : URL.createObjectURL(f)
+          ),
+        }));
+      }
+    } else {
+      if (name === "phone") {
+        // Only allow numbers, max 10 digits
+        const digits = value.replace(/\D/g, "").slice(0, 10);
+        setFormData((p) => ({ ...p, phone: digits }));
+      } else {
+        setFormData((p) => ({ ...p, [name]: value }));
+      }
     }
-  } else {
-    setFormData((p) => ({ ...p, [name]: value }));
-  }
-  setErrors((err) => ({ ...err, [name]: undefined }));
-};
+    setErrors((err) => ({ ...err, [name]: undefined }));
+  };
 
   // For Languages: use checkboxes
   const handleLanguageChange = (e) => {
@@ -180,17 +188,17 @@ export default function EditProfile() {
     setErrors((err) => ({ ...err, languages: undefined }));
   };
 
+  // Only validate format if field is filled, not required
   const validate = () => {
     let err = {};
-    if (!formData.fullName) err.fullName = "Required";
-    if (!formData.dob) err.dob = "Required";
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) err.email = "Invalid email";
-    if (!formData.nricId || !/^[A-Za-z0-9]{12}$/.test(formData.nricId)) err.nricId = "NRIC must be 12 alphanumeric characters";
-    if (formData.icPhotos.length === 0) err.icPhotos = "Upload at least 1 IC photo";
-    if (formData.icPhotos.length > 2) err.icPhotos = "Maximum 2 files";
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) err.email = "Invalid email";
+    if (formData.nricId && !/^[A-Za-z0-9]{12}$/.test(formData.nricId)) err.nricId = "NRIC must be 12 alphanumeric characters";
+    if (formData.icPhotos && formData.icPhotos.length > 2) err.icPhotos = "Maximum 2 files";
     if (formData.bankAccountNumber && !/^\d+$/.test(formData.bankAccountNumber)) err.bankAccountNumber = "Digits only";
     if (formData.taxId && !/^\d+$/.test(formData.taxId)) err.taxId = "Digits only";
     if (formData.workPermit && !/^\d+$/.test(formData.workPermit)) err.workPermit = "Digits only";
+    // Phone: must be exactly 10 digits
+    if (!/^\d{10}$/.test(formData.phone)) err.phone = "Phone must be exactly 10 digits";
     return err;
   };
 
@@ -255,6 +263,20 @@ export default function EditProfile() {
               {errors.email && <div className="error">{errors.email}</div>}
             </div>
             <div className="input-group">
+              <label>{fieldLabels.phone}</label>
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                maxLength={10}
+                inputMode="numeric"
+                pattern="\d*"
+                placeholder="e.g. 0123456789"
+              />
+              {errors.phone && <div className="error">{errors.phone}</div>}
+            </div>
+            <div className="input-group">
               <label>{fieldLabels.address}</label>
               <input type="text" name="address" value={formData.address} onChange={handleChange} />
             </div>
@@ -312,11 +334,11 @@ export default function EditProfile() {
               <label>{fieldLabels.workCategory}</label>
               <select name="workCategory" value={formData.workCategory} onChange={handleChange}>
                 <option value="">Select</option>
-                <option value="food delivery">Food Delivery</option>
-                <option value="parcel delivery">Parcel Delivery</option>
-                <option value="ride-hailing">Ride-hailing</option>
-                <option value="freelancing">Freelancing</option>
-                <option value="others">Others</option>
+                <option value="Food Delivery">Food Delivery</option>
+                <option value="Parcel Delivery">Parcel Delivery</option>
+                <option value="Ride-hailing">Ride-hailing</option>
+                <option value="Freelancing">Freelancing</option>
+                <option value="Others">Others</option>
               </select>
             </div>
             <div className="input-group">

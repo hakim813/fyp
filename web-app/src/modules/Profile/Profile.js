@@ -5,9 +5,53 @@ import { Link } from "react-router-dom";
 import '../../styles/profile.css';
 import Navbar from '../../components/Navbar';
 
+const fieldLabels = {
+  fullName: "Full Name",
+  dob: "Date of Birth",
+  email: "Email",
+  phone: "Phone Number",
+  address: "Address",
+  nricId: "NRIC",
+  icPhotos: "IC Card Upload",
+  taxId: "Tax ID",
+  workPermit: "Work Permit",
+  workStatus: "Work Status",
+  workCategory: "Work Category",
+  experience: "Years of Experience",
+  languages: "Languages",
+  bank: "Bank",
+  bankAccountNumber: "Bank Account Number",
+  insuranceCoverage: "Insurance Coverage",
+  socialSecurity: "Social Security",
+  licenses: "Licenses",
+};
+
+const sections = [
+  {
+    name: "Personal",
+    fields: ["fullName", "dob", "email", "phone", "address"]
+  },
+  {
+    name: "Identification",
+    fields: ["nricId", "icPhotos", "taxId", "workPermit"]
+  },
+  {
+    name: "Professional",
+    fields: ["workStatus", "workCategory", "experience", "languages"]
+  },
+  {
+    name: "Finance",
+    fields: ["bank", "bankAccountNumber"]
+  },
+  {
+    name: "Compliance",
+    fields: ["insuranceCoverage", "socialSecurity", "licenses"]
+  }
+];
+
 const Profile = () => {
   const [userData, setUserData] = useState({});
-  const [activeSection, setActiveSection] = useState("Personal Information");
+  const [activeSection, setActiveSection] = useState(sections[0].name);
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -27,69 +71,74 @@ const Profile = () => {
     }
   }, [user]);
 
-  const getProfileCompletion = () => {
-    const requiredFields = [
-      userData.fullName, userData.dob, userData.phone, userData.email, userData.address,
-      userData.workCategory, userData.industry, userData.skills, userData.experience, userData.availability,
-      userData.languages, userData.nric, userData.taxId, userData.workPermit, userData.platforms,
-      userData.platformType, userData.bankAccount, userData.eWallets, userData.insurance,
-      userData.socialSecurity, userData.licenses, userData.emergencyContact
-    ];
-    const filled = requiredFields.filter(val => val && val !== "").length;
-    return Math.round((filled / requiredFields.length) * 100);
+  // Profile completion calculation
+  const allFields = sections.flatMap(s => s.fields);
+  const filledCount = allFields.filter(f => {
+    const v = userData[f];
+    if (Array.isArray(v)) return v.length > 0;
+    return v !== undefined && v !== null && v !== "";
+  }).length;
+  const percent = Math.round((filledCount / allFields.length) * 100);
+
+  const renderField = (field) => {
+    const value = userData[field];
+    if (field === "profilePhoto") {
+      return (
+        <div className="detail-row" key={field}>
+          <strong>{fieldLabels[field]}:</strong>
+          <br />
+          <img
+            src={value || "/default-profile.png"}
+            alt="Profile"
+            className="profile-avatar"
+            style={{ width: 100, height: 100, objectFit: "cover", borderRadius: "50%" }}
+          />
+        </div>
+      );
+    }
+    if (field === "icPhotos" && Array.isArray(value) && value.length > 0) {
+      return (
+        <div className="detail-row" key={field}>
+          <strong>{fieldLabels[field]}:</strong>
+          <div className="ic-photo-list">
+            {value.map((url, idx) => (
+              <img
+                key={idx}
+                src={url}
+                alt={`IC Photo ${idx + 1}`}
+                className="ic-photo"
+                style={{ width: 80, height: 50, objectFit: "cover", marginRight: 8, borderRadius: 4 }}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    if (field === "languages" && Array.isArray(value)) {
+      return (
+        <div className="detail-row" key={field}>
+          <strong>{fieldLabels[field]}:</strong> {value.length > 0 ? value.join(", ") : "Not provided"}
+        </div>
+      );
+    }
+    return (
+      <div className="detail-row" key={field}>
+        <strong>{fieldLabels[field]}:</strong> {value || "Not provided"}
+      </div>
+    );
   };
-
-  const completion = getProfileCompletion();
-
-  const sections = {
-    "Personal Information": [
-      ["Full Name", userData.fullName],
-      ["Date of Birth", userData.dob],
-      ["Phone Number", userData.phone],
-      ["Email", userData.email],
-      ["Address", userData.address],
-    ],
-    "Professional Details": [
-      ["Work Category", userData.workCategory],
-      ["Industry", userData.industry],
-      ["Skills", userData.skills],
-      ["Experience", userData.experience],
-      ["Availability", userData.availability],
-      ["Languages", userData.languages],
-    ],
-    "Identification": [
-      ["National ID", userData.nric],
-      ["Tax ID", userData.taxId],
-      ["Work Permit", userData.workPermit],
-    ],
-    "Platform Details": [
-      ["Gig Platforms Used", userData.platforms],
-      ["Platform Type", userData.platformType],
-    ],
-    "Banking & Payments": [
-      ["Bank Account Details", userData.bankAccount],
-      ["E-Wallets", userData.eWallets],
-    ],
-    "Regulatory Compliance": [
-      ["Insurance Status", userData.insurance],
-      ["Social Security", userData.socialSecurity],
-      ["Licenses", userData.licenses],
-    ],
-    "Emergency Contact": [
-      ["Emergency Contact", userData.emergencyContact],
-    ]
-  };
-
-  const renderField = (label, value) => (
-    <div className="detail-row" key={label}>
-      <strong>{label}:</strong> {value || "Not provided"}
-    </div>
-  );
 
   return (
     <>
       <Navbar />
       <div className="profile-wrapper">
+        {/* Profile Completion Progress Bar */}
+        {/* <div className="completion-wrapper">
+          <div className="completion-bar">
+            <div className="completion-fill" style={{ width: `${percent}%` }} />
+          </div>
+          <div className="completion-label">{percent}% Profile Completed</div>
+        </div> */}
         <div className="profile-header">
           <img
             src={userData.profilePhoto || "/default-profile.png"}
@@ -98,37 +147,33 @@ const Profile = () => {
           />
           <h2>{userData.fullName || "Unnamed User"}</h2>
           <p>{userData.email}</p>
-
-          <div className="completion-wrapper">
-            <div className="completion-bar">
-              <div className="completion-fill" style={{ width: `${completion}%` }}></div>
-            </div>
-            <p className="completion-label">{completion}% Profile Completed</p>
-          </div>
-
           <Link to="/edit-profile">
             <button className="edit-btn">Edit Profile</button>
           </Link>
         </div>
-
         <div className="profile-body">
           <div className="profile-sidebar">
-            {Object.keys(sections).map((section) => (
+            {sections.map((section) => (
               <button
-                key={section}
-                className={`tab-btn ${activeSection === section ? "active" : ""}`}
-                onClick={() => setActiveSection(section)}
+                key={section.name}
+                className={`tab-btn ${activeSection === section.name ? "active" : ""}`}
+                onClick={() => setActiveSection(section.name)}
               >
-                {section}
+                {section.name}
               </button>
             ))}
+            <div className="completion-wrapper">
+          <div className="completion-bar">
+            <div className="completion-fill" style={{ width: `${percent}%` }} />
           </div>
-
+          <div className="completion-label">{percent}% Profile Completion</div>
+        </div>
+          </div>
           <div className="profile-content">
-            <h3>{activeSection}</h3>
-            {sections[activeSection].map(([label, value]) =>
-              renderField(label, value)
-            )}
+            <h3>{activeSection} Information</h3>
+            {sections
+              .find((section) => section.name === activeSection)
+              .fields.map(renderField)}
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@
   box-shadow: 0 4px 24px rgba(0,0,0,0.08);
   margin: 40px auto;
   width: 800px;
-  overflow: hidden;
+  overflow:hidden;
 }
 .sidebar {
   width: 220px;
