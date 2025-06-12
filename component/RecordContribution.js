@@ -50,13 +50,17 @@ export default function RecordContribution({ route }) {
     const db = getDatabase(); // Initialize Firebase Realtime Database
     const dbRef = ref(db); // Reference to the database
     const snapshot = await get(child(dbRef, "socialplan")); // Fetch all users from the database
+
+    const socialContriRef = ref(database, "SPcontribution/"); // Parent path where data will be stored
+    const newSocialContriRef = push(socialContriRef);
     console.log("Fetching user data...");
 
     const sp = snapshot.val();
     const existingUser = Object.values(sp).find(
       (u) => u.email === user.email && u.chosenPlan === chosenPlan
     );
-
+    console.log("Bug before this...");
+    console.log(existingUser);
     // Fetch current totalContribution of the user (if exists)
     const currentTotalContribution =
       parseFloat(existingUser.totalContribution) || 0.0;
@@ -73,6 +77,37 @@ export default function RecordContribution({ route }) {
 
     const spRef = ref(database, `socialplan/${id}`); // Parent path where data will be stored
     // const updatedSPRef = push(spRef);
+
+    console.log("Passed here...");
+    try {
+      if (scheme !== "i-Saraan KWSP") {
+        await set(newSocialContriRef, {
+          email: existingUser.email,
+          chosenPlan: chosenPlan,
+          scheme: scheme,
+          createdAt: Date.now(),
+          monthsCovered: month,
+          value: newContribution,
+        });
+        console.log("Data written for SOCSO successfully!");
+      } else {
+        await set(newSocialContriRef, {
+          email: existingUser.email,
+          chosenPlan: chosenPlan,
+          scheme: scheme,
+          createdAt: Date.now(),
+          value: newContribution,
+        });
+        console.log("Data written for KWSP successfully!");
+      }
+
+      navi.navigate("Home");
+      console.log("Passed here too...");
+    } catch (error) {
+      console.error("Error writing data: ", error);
+    }
+
+    console.log("Passed here too...");
 
     update(spRef, {
       totalContribution: newTotalContribution,

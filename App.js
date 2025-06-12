@@ -26,6 +26,9 @@ import SignoutSuccessful from "./component/Auth/SignoutSuccessful";
 import { useFonts } from "expo-font";
 import RecordContribution from "./component/RecordContribution";
 import LandingPage from "./component/LandingPage";
+import ContributionRecord from "./component/ContributionRecord";
+import { Asset } from "expo-asset";
+import { Image } from "react-native";
 
 const Stack = createStackNavigator();
 
@@ -39,7 +42,35 @@ const App = () => {
     "Nunito-Black": require("./assets/fonts/Nunito-Black.ttf"),
   });
 
-  if (!fontsLoaded) {
+  const preloadAssets = async () => {
+    await Asset.loadAsync([
+      require("./assets/bg-hibiscus.png"),
+      require("./assets/forum.png"),
+      require("./assets/helpdesk.png"),
+      require("./assets/landing-bg.png"),
+      require("./assets/landing-page.png"),
+      require("./assets/profile.png"),
+      require("./assets/real-forum.png"),
+      require("./assets/redeem.png"),
+      require("./assets/social-protection.png"),
+    ]);
+  };
+  const [assetsLoaded, setAssetsLoaded] = React.useState(false);
+
+  const loadAppAssets = async () => {
+    try {
+      await preloadAssets();
+      setAssetsLoaded(true);
+    } catch (e) {
+      console.warn("Asset loading error:", e);
+    }
+  };
+
+  React.useEffect(() => {
+    loadAppAssets();
+  }, []);
+
+  if (!fontsLoaded || !assetsLoaded) {
     console.log("Problem here");
     return null; // or a loading indicator
   }
@@ -79,6 +110,10 @@ const App = () => {
           <Stack.Screen name="FinancialRecord" component={FinancialRecord} />
           <Stack.Screen name="SPHome" component={SPHome} />
           <Stack.Screen name="Profile" component={Profile} />
+          <Stack.Screen
+            name="ContributionRecord"
+            component={ContributionRecord}
+          />
           <Stack.Screen
             name="SignoutSuccessful"
             component={SignoutSuccessful}

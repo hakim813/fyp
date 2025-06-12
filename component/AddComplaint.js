@@ -148,13 +148,15 @@ export default function AddComplaint() {
 
     const db = getDatabase(); // Initialize Firebase Realtime Database
     const dbRef = ref(db); // Reference to the database
-    const snapshot = await get(child(dbRef, "complaints")); // Fetch all users from the database
+    const snapshot = await get(child(dbRef, "users")); // Fetch all users from the database
 
-    console.log(user);
+    console.log("User data: ", user);
     const users = snapshot.val();
-    const existingUser = Object.values(users).find(
-      (u) => u.userId === user.uid
-    ); // Match email
+    // const existingUser = Object.entries(users).find(
+    //   ([key, userData]) => key === user.uid
+    // );
+    const existingUser = Object.keys(users).find((key) => key === user.uid);
+    console.log("Existing User: ", existingUser);
 
     const complaintRef = ref(database, "complaints/"); // Parent path where data will be stored
     const newComplaintRef = push(complaintRef);
@@ -220,8 +222,15 @@ export default function AddComplaint() {
       // status: 'ongoing',
       // createdAt: Date.now(),
       console.log("Loading to Firebase...");
+      // console.log(existingUser.userId);
+
+      console.log(title);
+      console.log(description);
+      console.log(category);
+      console.log(imgUrl.length);
+      console.log(existingUser.uid);
       set(newComplaintRef, {
-        userId: existingUser.userId,
+        userId: existingUser,
         ticketNumber: ticketNumber,
         title: title ? title : "",
         description: description,
@@ -276,7 +285,12 @@ export default function AddComplaint() {
                 justifyContent: "space-between",
               }}
             >
-              <Text style={[styles.labelInput, { fontSize: 20 }]}>
+              <Text
+                style={[
+                  styles.labelInput,
+                  { fontSize: Platform.OS === "ios" ? 20 : 17 },
+                ]}
+              >
                 Complaint Category
               </Text>
               <TouchableOpacity
@@ -284,8 +298,8 @@ export default function AddComplaint() {
                 style={{
                   backgroundColor: "#efefef",
                   borderWidth: 0.3,
-                  minWidth: 165,
-                  paddingHorizontal: 20,
+                  minWidth: 145,
+                  paddingHorizontal: Platform.OS === "ios" ? 20 : 10,
                   paddingVertical: 5,
                   marginTop: 5,
                   borderRadius: 50,
@@ -297,7 +311,7 @@ export default function AddComplaint() {
                 <Text
                   style={{
                     fontFamily: "Nunito-Bold",
-                    fontSize: 15,
+                    fontSize: Platform.OS === "ios" ? 15 : 13,
                     color: "#101010",
                   }}
                 >
@@ -592,7 +606,7 @@ export default function AddComplaint() {
             </View>
 
             {/* for adding space at bottom */}
-            <View style={{ height: 210 }}></View>
+            <View style={{ height: Platform.OS === "ios" ? 210 : 230 }}></View>
           </ScrollView>
 
           <BottomBar></BottomBar>

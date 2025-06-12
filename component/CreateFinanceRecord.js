@@ -158,7 +158,11 @@ export default function CreateFinanceRecord({ route }) {
                 <Text
                   style={[
                     styles.labelInput,
-                    { fontSize: 20, fontWeight: "bold", marginBottom: 5 },
+                    {
+                      fontSize: 20,
+                      fontFamily: "Nunito-Bold",
+                      marginBottom: 5,
+                    },
                   ]}
                 >
                   Type
@@ -172,7 +176,11 @@ export default function CreateFinanceRecord({ route }) {
                 <Text
                   style={[
                     styles.labelInput,
-                    { fontSize: 20, fontWeight: "bold", marginBottom: 5 },
+                    {
+                      fontSize: 20,
+                      fontFamily: "Nunito-Bold",
+                      marginBottom: 5,
+                    },
                   ]}
                 >
                   Value
@@ -188,7 +196,11 @@ export default function CreateFinanceRecord({ route }) {
                 <Text
                   style={[
                     styles.labelInput,
-                    { fontSize: 20, fontWeight: "bold", marginBottom: 5 },
+                    {
+                      fontSize: 20,
+                      fontFamily: "Nunito-Bold",
+                      marginBottom: 5,
+                    },
                   ]}
                 >
                   Notes
@@ -204,7 +216,7 @@ export default function CreateFinanceRecord({ route }) {
 
               <View
                 style={{
-                  flexDirection: "row",
+                  // flexDirection: "row",
                   justifyContent: "center",
                   alignContent: "center",
                 }}
@@ -216,7 +228,7 @@ export default function CreateFinanceRecord({ route }) {
                   style={[
                     styles.button,
                     {
-                      marginHorizontal: 15,
+                      // marginHorizontal: 15,
                       paddingVertical: 15,
                       backgroundColor: "#296746",
                       borderRadius: 25,
@@ -232,7 +244,8 @@ export default function CreateFinanceRecord({ route }) {
                   style={[
                     styles.button,
                     {
-                      marginHorizontal: 15,
+                      // marginHorizontal: 15,
+
                       paddingVertical: 15,
                       backgroundColor: "#296746",
                       borderRadius: 25,

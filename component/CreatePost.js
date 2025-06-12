@@ -45,6 +45,7 @@ import * as FileSystem from "expo-file-system";
 
 import * as ImagePicker from "expo-image-picker";
 import { LinearGradient } from "expo-linear-gradient";
+import BottomBar from "./BottomBar";
 
 export default function CreatePost() {
   const [title, setTitle] = useState("");
@@ -244,7 +245,15 @@ export default function CreatePost() {
             <Text style={[styles.text]}>Create Your Post</Text>
             <StatusBar style="auto" />
             <ScrollView
-              style={[styles.container2, { flex: 0, height: "100%" }]}
+              style={[
+                styles.container2,
+                {
+                  flex: 0,
+                  height: "100%",
+                  borderBottomRightRadius: 0,
+                  borderBottomLeftRadius: 0,
+                },
+              ]}
             >
               <View style={[styles.containerAttachMedia]}>
                 <View
@@ -483,7 +492,7 @@ export default function CreatePost() {
                 >
                   <Text
                     style={{
-                      fontFamily: "Nunito",
+                      fontFamily: "Nunito-Regular",
                       fontSize: 20,
                       color: "#fdfdfd",
                     }}
@@ -498,7 +507,7 @@ export default function CreatePost() {
                     styles.button,
                     {
                       // maxWidth: 100,
-                      backgroundColor: "red",
+                      backgroundColor: "#ff6347",
                       paddingVertical: 5,
                       paddingHorizontal: 20,
                       borderRadius: 50,
@@ -509,7 +518,7 @@ export default function CreatePost() {
                 >
                   <Text
                     style={{
-                      fontFamily: "Nunito",
+                      fontFamily: "Nunito-Regular",
                       fontSize: 20,
                       color: "#fdfdfd",
                     }}
@@ -518,7 +527,7 @@ export default function CreatePost() {
                   </Text>
                 </TouchableOpacity>
               </View>
-              <View style={{ height: 100 }} />
+              <View style={{ height: 50 }} />
               <Modal
                 visible={filterModalVisible}
                 transparent
@@ -601,6 +610,7 @@ export default function CreatePost() {
                 </View>
               </Modal>
             </ScrollView>
+            <BottomBar></BottomBar>
           </ImageBackground>
         </LinearGradient>
       </View>

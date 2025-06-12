@@ -147,6 +147,29 @@ export default function SPHome({ route }) {
             ]}
           >
             {/* {data[currentIndex].email === user.email && ( */}
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#ededed",
+                paddingVertical: 5,
+                paddingHorizontal: 10,
+                justifyContent: "center", // or "flex-end" if you want the text at the end
+                borderRadius: 20,
+                // Remove minWidth: 10,
+                alignSelf: "flex-end", // ensures it only takes as much space as needed
+              }}
+              onPress={() => navi.navigate("ContributionRecord")}
+            >
+              <Text
+                style={{
+                  fontFamily: "Nunito-Bold",
+                  fontSize: 15,
+                  color: "#20734f",
+                }}
+              >
+                Contribution History{"  >"}
+              </Text>
+            </TouchableOpacity>
+
             <Text
               style={{
                 fontFamily: "Nunito-Bold",
@@ -201,10 +224,22 @@ export default function SPHome({ route }) {
                 if (item.email === user.email) {
                   return (
                     <View style={[style.page]}>
-                      <Text style={{ fontSize: 25, marginTop: 10 }}>
+                      <Text
+                        style={{
+                          fontFamily: "Nunito-Bold",
+                          fontSize: 25,
+                          marginTop: 10,
+                        }}
+                      >
                         {item.chosenPlan}
                       </Text>
-                      <Text style={{ fontSize: 50, marginTop: 10 }}>
+                      <Text
+                        style={{
+                          fontFamily: "Nunito-Regular",
+                          fontSize: 50,
+                          marginTop: 10,
+                        }}
+                      >
                         RM {data[index].totalContribution.toFixed(2).toString()}
                       </Text>
                       {/* <Text>{item.chosenPlan}</Text> */}
@@ -225,8 +260,8 @@ export default function SPHome({ route }) {
                             })
                           }
                           style={{
-                            width: 120,
-                            padding: 10,
+                            minWidth: Platform.OS === "ios" ? 150 : 120,
+                            padding: 15,
                             margin: 5,
                             backgroundColor: "#20734f",
                             borderRadius: 50,
@@ -245,11 +280,11 @@ export default function SPHome({ route }) {
                             style={{
                               fontFamily: "Nunito-Semi-Bold",
                               color: "white",
-                              fontSize: 15,
+                              fontSize: Platform.OS === "ios" ? 15 : 13,
                               textAlign: "center",
                             }}
                           >
-                            Record Contribution
+                            Record{"\n"}Contribution
                           </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -274,11 +309,11 @@ export default function SPHome({ route }) {
                             style={{
                               fontFamily: "Nunito-Semi-Bold",
                               color: "white",
-                              fontSize: 15,
+                              fontSize: Platform.OS === "ios" ? 15 : 13,
                               textAlign: "center",
                             }}
                           >
-                            Set Reminder
+                            Set{"\n"}Reminder
                           </Text>
                         </TouchableOpacity>
                       </View>
@@ -693,5 +728,26 @@ const style = StyleSheet.create({
     fontSize: 24,
     textAlign: "center",
     // marginBottom: 20,
+  },
+  page: {
+    width: width - 50,
+    borderColor: "#06a561",
+    // borderWidth: 1.5,
+    margin: 5,
+    padding: 10,
+    height: 245,
+    borderRadius: 50,
+    backgroundColor: "#ededed",
+    alignItems: "center",
+    justifyContent: "center",
+
+    // Shadow for iOS
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+
+    // Shadow for Android
+    elevation: 5,
   },
 });

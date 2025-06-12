@@ -188,10 +188,16 @@ export default function FinancialRecord() {
         >
           <Text style={[styles.text]}>Expense Record</Text>
           <StatusBar style="auto" />
-          <View style={[styles.container2]}>
+          <View
+            style={[
+              styles.container2,
+              { borderBottomRightRadius: 0, borderBottomLeftRadius: 0 },
+            ]}
+          >
             <View
               style={{
                 // backgroundColor
+
                 flexDirection: "row",
                 marginBottom: 15,
                 justifyContent: "center",

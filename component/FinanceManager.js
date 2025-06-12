@@ -360,94 +360,80 @@ export default function FinanceManager() {
                       paddingTop: 10,
                     }}
                   >
-                    <ScrollView
-                      horizontal
+                    <View
                       // backgroundColor="#00ff00"
+                      style={{ justifyContent: "center", alignItems: "center" }}
                       height={350}
                     >
+                      <PieChart
+                        style={{ backgroundColor: "transparent" }} // not "styles"
+                        data={pieChartDataDaily}
+                        donut
+                        textSize={16}
+                        innerRadius={Platform.OS === "ios" ? 120 : 110}
+                        radius={Platform.OS === "ios" ? 160 : 140}
+                        isAnimated={true}
+                        animationDuration={2000}
+                        showText // <-- add this
+                        showValuesAsPercentage // <-- add this
+                        textColor="#000" // or any visible color
+                      />
+
                       <View
                         style={{
-                          backgroundColor: "transparent",
-                          borderRadius: 30,
-                          height: Platform.OS === "ios" ? 340 : 300,
-                          width: width - 50,
-                          justifyContent: "center",
+                          height: 100,
+                          position: "absolute",
                           alignItems: "center",
-                          paddingVertical: 30,
-                          marginRight: 50,
-                          flex: 1,
+                          justifyContent: "center",
                         }}
                       >
-                        <PieChart
-                          style={{ backgroundColor: "transparent" }} // not "styles"
-                          data={pieChartDataDaily}
-                          donut
-                          textSize={16}
-                          innerRadius={Platform.OS === "ios" ? 120 : 110}
-                          radius={Platform.OS === "ios" ? 160 : 140}
-                          isAnimated={true}
-                          animationDuration={2000}
-                          showText // <-- add this
-                          showValuesAsPercentage // <-- add this
-                          textColor="#000" // or any visible color
-                        />
-
-                        <View
-                          style={{
-                            height: 100,
-                            position: "absolute",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
+                        <Text
+                          style={{ fontFamily: "Nunito-Bold", fontSize: 25 }}
                         >
-                          <Text
-                            style={{ fontFamily: "Nunito-Bold", fontSize: 25 }}
-                          >
-                            {new Date().toLocaleDateString("en-US", {
-                              day: "numeric",
-                              month: "short",
-                            })}
-                          </Text>
-                          <Text
-                            style={{ fontFamily: "Nunito-Bold", fontSize: 25 }}
-                          >
-                            Net profit
-                          </Text>
-                          {totalIncome - totalExpense >= 0 ? (
-                            <>
-                              <Text
-                                style={{
-                                  fontFamily: "Nunito-Bold",
-                                  fontSize: 35,
-                                  color: "green",
-                                }}
-                              >
-                                RM{" "}
-                                {(totalIncome - totalExpense).toFixed(2)
-                                  .length > 7
-                                  ? (totalIncome - totalExpense)
-                                      .toFixed(2)
-                                      .slice(0, 7) + "..."
-                                  : (totalIncome - totalExpense).toFixed(2)}
-                              </Text>
-                            </>
-                          ) : (
-                            <>
-                              <Text style={{ fontSize: 35, color: "#F44F4F" }}>
-                                - RM{" "}
-                                {(totalExpense - totalIncome).toFixed(2)
-                                  .length > 7
-                                  ? (totalExpense - totalIncome)
-                                      .toFixed(2)
-                                      .slice(0, 7) + "..."
-                                  : (totalExpense - totalIncome).toFixed(2)}
-                              </Text>
-                            </>
-                          )}
-                        </View>
+                          {new Date().toLocaleDateString("en-US", {
+                            day: "numeric",
+                            month: "short",
+                          })}
+                        </Text>
+                        <Text
+                          style={{ fontFamily: "Nunito-Bold", fontSize: 25 }}
+                        >
+                          Net profit
+                        </Text>
+                        {totalIncome - totalExpense >= 0 ? (
+                          <>
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Bold",
+                                fontSize: 35,
+                                color: "green",
+                              }}
+                            >
+                              RM{" "}
+                              {(totalIncome - totalExpense).toFixed(2).length >
+                              7
+                                ? (totalIncome - totalExpense)
+                                    .toFixed(2)
+                                    .slice(0, 7) + "..."
+                                : (totalIncome - totalExpense).toFixed(2)}
+                            </Text>
+                          </>
+                        ) : (
+                          <>
+                            <Text style={{ fontSize: 35, color: "#F44F4F" }}>
+                              - RM{" "}
+                              {(totalExpense - totalIncome).toFixed(2).length >
+                              7
+                                ? (totalExpense - totalIncome)
+                                    .toFixed(2)
+                                    .slice(0, 7) + "..."
+                                : (totalExpense - totalIncome).toFixed(2)}
+                            </Text>
+                          </>
+                        )}
                       </View>
 
-                      <View
+                      {/* <View
                         style={{
                           backgroundColor: "rgba(255,255,255,120)",
                           borderRadius: 30,
@@ -505,8 +491,8 @@ export default function FinanceManager() {
                           showDataPointText={true}
                           maxValue={maxY}
                         />
-                      </View>
-                    </ScrollView>
+                      </View> */}
+                    </View>
                   </View>
                 ) : (
                   // <View style={{height: 325, width: '100%', justifyContent: 'center', alignItems: 'center'}}>
@@ -566,10 +552,20 @@ export default function FinanceManager() {
                       padding: 10,
                     }}
                   >
-                    <Text style={{ fontFamily: "Nunito-Bold", fontSize: 20 }}>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: Platform.OS === "ios" ? 20 : 18,
+                      }}
+                    >
                       Gain:{" "}
                     </Text>
-                    <Text style={{ fontFamily: "Nunito", fontSize: 20 }}>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Regular",
+                        fontSize: Platform.OS === "ios" ? 20 : 18,
+                      }}
+                    >
                       RM {totalIncome}
                     </Text>
                   </View>
@@ -586,10 +582,20 @@ export default function FinanceManager() {
                       padding: 10,
                     }}
                   >
-                    <Text style={{ fontFamily: "Nunito-Bold", fontSize: 20 }}>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: Platform.OS === "ios" ? 20 : 18,
+                      }}
+                    >
                       Spent:{" "}
                     </Text>
-                    <Text style={{ fontFamily: "Nunito", fontSize: 20 }}>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Regular",
+                        fontSize: Platform.OS === "ios" ? 20 : 18,
+                      }}
+                    >
                       RM {totalExpense}
                     </Text>
                   </View>
@@ -608,12 +614,12 @@ export default function FinanceManager() {
                       paddingTop: 10,
                     }}
                   >
-                    <ScrollView
-                      horizontal
+                    <View
+                      style={{ justifyContent: "center", alignItems: "center" }}
                       // backgroundColor="#00ff00"
                       height={350}
                     >
-                      <View
+                      {/* <View
                         style={{
                           backgroundColor: "transparent",
                           borderRadius: 30,
@@ -625,148 +631,82 @@ export default function FinanceManager() {
                           marginRight: 50,
                           flex: 1,
                         }}
-                      >
-                        <PieChart
-                          style={{ backgroundColor: "transparent" }} // not "styles"
-                          data={pieChartDataMonthly}
-                          donut
-                          textSize={16}
-                          innerRadius={Platform.OS === "ios" ? 120 : 110}
-                          radius={Platform.OS === "ios" ? 160 : 140}
-                          isAnimated={true}
-                          animationDuration={2000}
-                          showText // <-- add this
-                          showValuesAsPercentage // <-- add this
-                          textColor="#000" // or any visible color
-                        />
-                        <View
-                          style={{
-                            height: 100,
-                            position: "absolute",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontFamily: "Nunito-Bold",
-                              fontSize: 25,
-                            }}
-                          >
-                            {new Date().toLocaleDateString("en-US", {
-                              month: "long",
-                            })}
-                          </Text>
-                          <Text
-                            style={{
-                              fontFamily: "Nunito-Bold",
-                              fontSize: 25,
-                            }}
-                          >
-                            Net profit
-                          </Text>
-                          {totalIncomeMonthly - totalExpenseMonthly >= 0 ? (
-                            <>
-                              <Text
-                                style={{
-                                  fontFamily: "Nunito-Bold",
-                                  fontSize: 35,
-                                  color: "green",
-                                }}
-                              >
-                                RM{" "}
-                                {(
-                                  totalIncomeMonthly - totalExpenseMonthly
-                                ).toFixed(2).length > 7
-                                  ? (totalIncomeMonthly - totalExpenseMonthly)
-                                      .toFixed(2)
-                                      .slice(0, 7) + "..."
-                                  : (
-                                      totalIncomeMonthly - totalExpenseMonthly
-                                    ).toFixed(2)}
-                              </Text>
-                            </>
-                          ) : (
-                            <>
-                              <Text style={{ fontSize: 35, color: "#F44F4F" }}>
-                                - RM{" "}
-                                {(totalExpense - totalIncome).toFixed(2)
-                                  .length > 7
-                                  ? (totalExpense - totalIncome)
-                                      .toFixed(2)
-                                      .slice(0, 7) + "..."
-                                  : (totalExpense - totalIncome).toFixed(2)}
-                              </Text>
-                            </>
-                          )}
-                        </View>
-                      </View>
-
+                      > */}
+                      <PieChart
+                        style={{ backgroundColor: "transparent" }} // not "styles"
+                        data={pieChartDataMonthly}
+                        donut
+                        textSize={16}
+                        innerRadius={Platform.OS === "ios" ? 120 : 110}
+                        radius={Platform.OS === "ios" ? 160 : 140}
+                        isAnimated={true}
+                        animationDuration={2000}
+                        showText // <-- add this
+                        showValuesAsPercentage // <-- add this
+                        textColor="#000" // or any visible color
+                      />
                       <View
                         style={{
-                          backgroundColor: "rgba(255,255,255,120)",
-                          borderRadius: 30,
-                          height: Platform.OS === "ios" ? 340 : 300,
-                          width: width - 50,
-                          justifyContent: "center",
+                          height: 100,
+                          position: "absolute",
                           alignItems: "center",
-                          padding: 10,
-                          flex: 1,
+                          justifyContent: "center",
                         }}
                       >
                         <Text
                           style={{
                             fontFamily: "Nunito-Bold",
-                            marginBottom: 10,
-                            color: "#03633a",
-                            fontSize: 20,
+                            fontSize: 25,
                           }}
                         >
-                          6-Months Income vs Expense
+                          {new Date().toLocaleDateString("en-US", {
+                            month: "long",
+                          })}
                         </Text>
-                        <LineChart
-                          data={monthlyIncomeData}
-                          data2={monthlyExpenseData}
-                          height={220}
-                          // backgroundColor={'#0000ff'}
-                          spacing={45}
-                          initialSpacing={30}
-                          color1="#3282F6"
-                          color2="#F44F4F"
-                          textColor1="#222"
-                          textColor2="#222"
-                          thickness={2}
-                          thickness2={2}
-                          hideDataPoints={false}
-                          dataPointsColor1="#3282F6"
-                          dataPointsColor2="#F44F4F"
-                          yAxisColor="#aaa"
-                          xAxisColor="#aaa"
-                          yAxisTextStyle={{
-                            color: "#222",
-                            paddingRight: 10,
-                            // marginHorizontal: 50,
-                            // width: 50,
+                        <Text
+                          style={{
+                            fontFamily: "Nunito-Bold",
+                            fontSize: 25,
                           }}
-                          xAxisLabelTextStyle={{ color: "#222" }}
-                          noOfSections={5}
-                          yAxisLabelPrefix="RM "
-                          yAxisLabelWidth={50}
-                          yAxisTextNumberOfLines={2}
-                          showLegend={true}
-                          legendLabel1="Income"
-                          legendLabel2="Expense"
-                          showXAxisIndices
-                          showYAxisIndices
-                          showDataPointText={true}
-                          maxValue={Math.max(
-                            10,
-                            ...monthlyIncomeData.map((d) => d.value),
-                            ...monthlyExpenseData.map((d) => d.value)
-                          )}
-                        />
+                        >
+                          Net profit
+                        </Text>
+                        {totalIncomeMonthly - totalExpenseMonthly >= 0 ? (
+                          <>
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Bold",
+                                fontSize: 35,
+                                color: "green",
+                              }}
+                            >
+                              RM{" "}
+                              {(
+                                totalIncomeMonthly - totalExpenseMonthly
+                              ).toFixed(2).length > 7
+                                ? (totalIncomeMonthly - totalExpenseMonthly)
+                                    .toFixed(2)
+                                    .slice(0, 7) + "..."
+                                : (
+                                    totalIncomeMonthly - totalExpenseMonthly
+                                  ).toFixed(2)}
+                            </Text>
+                          </>
+                        ) : (
+                          <>
+                            <Text style={{ fontSize: 35, color: "#F44F4F" }}>
+                              - RM{" "}
+                              {(totalExpense - totalIncome).toFixed(2).length >
+                              7
+                                ? (totalExpense - totalIncome)
+                                    .toFixed(2)
+                                    .slice(0, 7) + "..."
+                                : (totalExpense - totalIncome).toFixed(2)}
+                            </Text>
+                          </>
+                        )}
                       </View>
-                    </ScrollView>
+                    </View>
                   </View>
                 ) : (
                   <View
@@ -822,10 +762,20 @@ export default function FinanceManager() {
                       padding: 10,
                     }}
                   >
-                    <Text style={{ fontFamily: "Nunito-Bold", fontSize: 20 }}>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: Platform.OS === "ios" ? 20 : 18,
+                      }}
+                    >
                       Gain:{" "}
                     </Text>
-                    <Text style={{ fontFamily: "Nunito", fontSize: 20 }}>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Regular",
+                        fontSize: Platform.OS === "ios" ? 20 : 18,
+                      }}
+                    >
                       RM {totalIncomeMonthly}
                     </Text>
                   </View>
@@ -842,10 +792,20 @@ export default function FinanceManager() {
                       padding: 10,
                     }}
                   >
-                    <Text style={{ fontFamily: "Nunito-Bold", fontSize: 20 }}>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: Platform.OS === "ios" ? 20 : 18,
+                      }}
+                    >
                       Spent:{" "}
                     </Text>
-                    <Text style={{ fontFamily: "Nunito", fontSize: 20 }}>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Regular",
+                        fontSize: Platform.OS === "ios" ? 20 : 18,
+                      }}
+                    >
                       RM {totalExpenseMonthly}
                     </Text>
                   </View>

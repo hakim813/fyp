@@ -220,14 +220,14 @@ export default function Home() {
             <Text
               style={{
                 textAlign: "center",
-                fontSize: 25,
+                fontSize: Platform.OS === "ios" ? 25 : 22,
                 fontFamily: "Nunito-Bold",
               }}
             >
               Today's financial summary{"\n"}
               <Text
                 style={{
-                  fontFamily: "Nunito",
+                  fontFamily: "Nunito-Regular",
                 }}
               >
                 {formattedDate}
@@ -248,24 +248,24 @@ export default function Home() {
             <Text
               style={{
                 textAlign: "center",
-                fontSize: 25,
+                fontSize: Platform.OS === "ios" ? 25 : 22,
                 fontFamily: "Nunito-Bold",
               }}
             >
               Gained:{"\n"}
-              <Text style={{ color: "#3eb489", fontFamily: "Nunito" }}>
+              <Text style={{ color: "#3eb489", fontFamily: "Nunito-Regular" }}>
                 RM {income}
               </Text>
             </Text>
             <Text
               style={{
                 textAlign: "center",
-                fontSize: 25,
+                fontSize: Platform.OS === "ios" ? 25 : 22,
                 fontFamily: "Nunito-Bold",
               }}
             >
               Spent:{"\n"}
-              <Text style={{ color: "#ec2d01", fontFamily: "Nunito" }}>
+              <Text style={{ color: "#ec2d01", fontFamily: "Nunito-Regular" }}>
                 RM {expense}
               </Text>
             </Text>
@@ -343,7 +343,7 @@ export default function Home() {
                       style={{
                         color: "#050505",
                         fontFamily: "Nunito-Bold",
-                        fontSize: 18,
+                        fontSize: Platform.OS === "ios" ? 18 : 16,
                       }}
                     >
                       WeGig{"\n"}Forum
@@ -380,7 +380,7 @@ export default function Home() {
                       style={{
                         color: "#050505",
                         fontFamily: "Nunito-Bold",
-                        fontSize: 18,
+                        fontSize: Platform.OS === "ios" ? 18 : 16,
                       }}
                     >
                       Finance
@@ -416,7 +416,7 @@ export default function Home() {
                       style={{
                         color: "#050505",
                         fontFamily: "Nunito-Bold",
-                        fontSize: 18,
+                        fontSize: Platform.OS === "ios" ? 18 : 16,
                       }}
                     >
                       Manage{"\n"}Profile
@@ -456,7 +456,7 @@ export default function Home() {
                       style={{
                         color: "#050505",
                         fontFamily: "Nunito-Bold",
-                        fontSize: 18,
+                        fontSize: Platform.OS === "ios" ? 18 : 16,
                       }}
                     >
                       Social{"\n"}Security
@@ -493,7 +493,7 @@ export default function Home() {
                       style={{
                         color: "#050505",
                         fontFamily: "Nunito-Bold",
-                        fontSize: 18,
+                        fontSize: Platform.OS === "ios" ? 18 : 16,
                       }}
                     >
                       Complaint{"\n"}Helpdesk
@@ -529,7 +529,7 @@ export default function Home() {
                       style={{
                         color: "#050505",
                         fontFamily: "Nunito-Bold",
-                        fontSize: 18,
+                        fontSize: Platform.OS === "ios" ? 18 : 16,
                       }}
                     >
                       Reward{"\n"}Redemption

@@ -8,6 +8,7 @@ import {
   FlatList,
   Image,
   View,
+  ScrollView,
   TextInput,
   Platform,
   TouchableOpacity,
@@ -45,11 +46,13 @@ export default function Forum() {
   const [isEnabled, setIsEnabled] = useState(false);
   const [isAll, setIsAll] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mediaModalVisible, setMediaModalVisible] = useState(false);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [detail, setDetail] = useState(null);
   const [imageLoad, setImageLoad] = useState(true);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("None");
+  const [selectedMedia, setSelectedMedia] = useState([]);
 
   //to write data into database
   const writeData = async (item) => {
@@ -284,6 +287,64 @@ export default function Forum() {
               marginBottom: 15,
             }}
           >
+            <Modal
+              visible={mediaModalVisible}
+              transparent
+              animationType="slide"
+              onRequestClose={() => setMediaModalVisible(false)}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  backgroundColor: "rgba(0,0,0,0.2)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <View
+                  style={{
+                    height: "50%",
+                    width: "100%",
+                    backgroundColor: "rgba(0,0,0,0.3)",
+                    justifyContent: "center",
+                    // alignItems: "center",
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => setMediaModalVisible(false)} // Close the modal
+                  >
+                    <Text
+                      style={{
+                        marginRight: 15,
+                        marginLeft: "auto",
+                        color: "#fdfdfd",
+                        fontSize: 30,
+                      }}
+                    >
+                      x
+                    </Text>
+                  </TouchableOpacity>
+                  <ScrollView horizontal>
+                    {selectedMedia.map((uri, idx) => (
+                      <Image
+                        key={idx}
+                        source={{ uri }}
+                        style={{
+                          width: 400,
+                          height: 400,
+                          margin: 10,
+                          // borderRadius: 10
+                          // borderWidth: 0.5,
+                          // borderColor: "#fff",
+                          backgroundColor: "rgba(0,0,0,0)",
+                        }}
+                        resizeMode="contain"
+                      />
+                    ))}
+                  </ScrollView>
+                </View>
+              </View>
+            </Modal>
             <TouchableOpacity
               onPress={() => setIsAll(true)}
               style={[
@@ -513,7 +574,7 @@ export default function Forum() {
                             style={{
                               marginTop: 5,
                               fontSize: 20,
-                              fontFamily: "Nunito",
+                              fontFamily: "Nunito-Regular",
                             }}
                           >
                             {item.content}
@@ -548,36 +609,44 @@ export default function Forum() {
                                     color="#0000ff"
                                   />
                                 )} */}
-                                  <Image
-                                    source={{ uri }} // Ensure it's a URL from Firebase Storage
-                                    style={{
-                                      width: 200,
-                                      height: 200,
-                                      // margin: 10,
-                                      borderRadius: 5,
-                                      borderWidth: 1,
-                                      borderColor: "#ccc",
+                                  <TouchableOpacity
+                                    onPress={() => {
+                                      // If item.photoURL is a string, wrap it in an array
+                                      setSelectedMedia([uri]);
+                                      setMediaModalVisible(true);
                                     }}
-                                    onLoad={() => setImageLoad(false)}
-                                    resizeMode="cover"
-                                  />
-                                  {imageLoad && (
-                                    <View
+                                  >
+                                    <Image
+                                      source={{ uri }} // Ensure it's a URL from Firebase Storage
                                       style={{
-                                        ...StyleSheet.absoluteFillObject, // fills the parent
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        backgroundColor:
-                                          "rgba(235, 235, 235, 0.8)", // optional semi-transparent overlay
+                                        width: 200,
+                                        height: 200,
+                                        // margin: 10,
+                                        borderRadius: 5,
+                                        borderWidth: 1,
+                                        borderColor: "#ccc",
                                       }}
-                                    >
-                                      <ActivityIndicator
-                                        size="large"
-                                        color="#00ee00"
-                                      />
-                                      <Text>Loading image...</Text>
-                                    </View>
-                                  )}
+                                      onLoad={() => setImageLoad(false)}
+                                      resizeMode="cover"
+                                    />
+                                    {imageLoad && (
+                                      <View
+                                        style={{
+                                          ...StyleSheet.absoluteFillObject, // fills the parent
+                                          justifyContent: "center",
+                                          alignItems: "center",
+                                          backgroundColor:
+                                            "rgba(235, 235, 235, 0.8)", // optional semi-transparent overlay
+                                        }}
+                                      >
+                                        <ActivityIndicator
+                                          size="large"
+                                          color="#00ee00"
+                                        />
+                                        <Text>Loading image...</Text>
+                                      </View>
+                                    )}
+                                  </TouchableOpacity>
                                 </View>
                               )}
                             />
@@ -789,7 +858,7 @@ export default function Forum() {
                             style={{
                               marginTop: 5,
                               fontSize: 20,
-                              fontFamily: "Nunito",
+                              fontFamily: "Nunito-Regular",
                             }}
                           >
                             {item.content}

@@ -181,8 +181,10 @@ export const stylesHome = StyleSheet.create({
   },
 
   featureSlider: {
-    backgroundColor: "rgba(150, 192, 202, 0.2)",
-    paddingVertical: 15,
+    backgroundColor:
+      Platform.OS === "ios" ? "rgba(150, 192, 202, 0.2)" : "rgb(219, 231, 236)",
+
+    // paddingVertical: 15,
     paddingRight: 25,
     borderRadius: 30,
     marginVertical: 5,
@@ -198,7 +200,7 @@ export const stylesHome = StyleSheet.create({
     shadowRadius: 3,
 
     // Add elevation for Android
-    elevation: 4,
+    elevation: 3,
   },
 });
 
