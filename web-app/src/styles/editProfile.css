@@ -5,6 +5,7 @@
   border-radius: 22px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.08);
   margin: 40px auto;
+  margin-top: 160px;
   width: 800px;
   overflow:hidden;
 }
@@ -13,7 +14,7 @@
   background: #e6f9f1; /* very light green */
   color: #009e60; /* dark green text */
   padding: 30px 0 0 0;
-  min-height: 100vh;
+  min-height:120vh;
   border-right: 2px solid #00b16a;
 }
 .sidebar h2 {
