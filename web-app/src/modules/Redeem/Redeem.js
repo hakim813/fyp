@@ -62,7 +62,7 @@ export default function Redeem() {
   const [tabAnim, setTabAnim] = useState("fade-in");
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: "YOUR_GOOGLE_MAPS_API_KEY",
+    googleMapsApiKey: "AIzaSyC_DEkV1SbS4oOawjSgzPfgdoattVhEaM8",
     libraries: ["places"]
   });
 

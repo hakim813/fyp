@@ -1,10 +1,16 @@
 .navbar {
   display: flex;
-  justify-content: space-between; /* Space out the items */
+  justify-content: space-between;
   align-items: center;
-  background-color: white;
-  padding: 10px 20px; /* Reduced padding for thinner navbar */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding: 0 24px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  height: 64px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
 }
 
 .navbar-logo-link {
@@ -14,44 +20,40 @@
 }
 
 .navbar-logo-we {
-  font-size: 30px;
-  font-weight: bold; /* Bold "We" */
-  color: black; /* Black color for "We" */
-  margin-left: 30px;
+  font-size: 28px;
+  font-weight: bold;
+  color: #222;
+  margin-left: 10px;
 }
 
 .navbar-logo-gig {
-  font-size: 30px;
-  font-weight: bold; /* Bold "Gig" */
-  color: #00b16a; /* Green color for "Gig" */
+  font-size: 28px;
+  font-weight: bold;
+  color: #00b16a;
 }
 
 .navbar-links {
-  list-style-type: none;
+  list-style: none;
   display: flex;
-  gap: 30px; /* Increased gap between items */
-  justify-content: right;
-  margin-right: 30px;
-  width: 100%;
-  padding-left: 0; /* Remove any default padding */
+  gap: 28px;
+  margin-right: 10px;
+  padding-left: 0;
 }
 
 .navbar-links li {
   font-size: 16px;
-  font-weight: normal; /* Bold the text of navbar links */
 }
 
 .navbar-links a {
   text-decoration: none;
   color: #333;
-  display: inline-block;
-  padding: 5px 10px; /* Adds padding to make clickable area bigger */
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
 }
 
-.navbar-links a:hover {
-  color: #00b16a; /* Green color on hover */
-}
-
+.navbar-links a:hover,
 .navbar-links .active {
-  color: #00b16a; /* Green color for active link */
+  color: #00b16a;
+  background: #e3f9ef;
 }

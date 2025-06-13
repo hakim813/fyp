@@ -1,4 +1,3 @@
-/* General Reset */
 * {
   margin: 0;
   padding: 0;
@@ -6,36 +5,34 @@
 }
 
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #00b16a;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #00b16a 50%, #1dd187 100%);
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 }
 
-/* Container & Box */
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
 }
 
 .login-box {
-  background-color: white;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding: 36px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.10);
   width: 100%;
-  max-width: 450px;
+  max-width: 420px;
   text-align: center;
 }
 
-/* Titles */
 .login-box h1 {
-  font-size: 42px;
+  font-size: 38px;
   font-weight: bold;
   color: #000;
   margin-bottom: 10px;
@@ -46,18 +43,17 @@ body {
 }
 
 .login-box h2 {
-  font-size: 24px;
+  font-size: 22px;
   color: #000;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .login-box p {
   color: #555;
   font-size: 14px;
-  margin-bottom: 50px;
+  margin-bottom: 36px;
 }
 
-/* Input Fields */
 .input-field {
   text-align: left;
   margin-bottom: 10px;
@@ -79,14 +75,12 @@ body {
   margin-bottom: 12px;
 }
 
-/* Error Message */
 .error-message {
   color: #ff3333;
   font-size: 14px;
   margin-bottom: 10px;
 }
 
-/* Remember Checkbox */
 .checkbox-field {
   display: flex;
   justify-content: flex-start;
@@ -103,7 +97,6 @@ body {
   color: #333;
 }
 
-/* Forgot Password Link */
 .forgot-password {
   font-size: 12px;
   color: #5a8cff;
@@ -118,24 +111,22 @@ body {
   text-decoration: underline;
 }
 
-/* Submit Button */
 .login-button {
   width: 100%;
   padding: 14px;
-  background-color: #2ecc71;
-  color: white;
+  background: #2ecc71;
+  color: #fff;
   border: none;
   border-radius: 8px;
   font-size: 16px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s;
 }
 
 .login-button:hover {
-  background-color: #27ae60;
+  background: #27ae60;
 }
 
-/* Signup Link */
 .signup-text {
   margin-top: 15px;
   font-size: 14px;

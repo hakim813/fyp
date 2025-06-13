@@ -1,8 +1,6 @@
-
-
 .redeem-glass-wrapper {
   max-width: 900px;
-  margin: 48px auto;
+  margin: 96px auto 48px auto;
   background: rgba(255,255,255,0.85);
   border-radius: 18px;
   box-shadow: 0 8px 32px rgba(60,80,120,0.10);

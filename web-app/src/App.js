@@ -21,6 +21,9 @@ import History from './modules/Helpdesk/History';
 
 import Redeem from './modules/Redeem/Redeem';
 
+import Forum from './modules/Forum/Forum';
+import CreatePost from './modules/Forum/CreatePost';
+
 function App() {
   return (
     <UserProvider>
@@ -41,6 +44,13 @@ function App() {
           <Route path="/helpdesk/history" element={<><Navbar /><History /></>} />
 
           <Route path="/redeem" element={<><Navbar /><Redeem /></>} />
+
+          <Route path="/forum" element={<><Navbar /><Forum /></>} />
+          <Route path="/forum/create" element={<><Navbar /><CreatePost /></>} />
+
+
+          {/* Sidebar for all routes except Login and Signup */}
+          
 
         </Routes>
       </Router>

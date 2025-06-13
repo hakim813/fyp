@@ -1,37 +1,28 @@
-/* General reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  font-family: 'Arial', sans-serif;
-  background: linear-gradient(180deg, #00de85, #004b2d); /* WeGig Green */
-  color: #333;
-  display: flex;
-  justify-content: center;
-  height: 100vh;
-  margin: 0; /* Remove margin for full-width */
-  margin-top: 80px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(180deg, #00de85, #004b2d);
+  color: #222;
+  margin: 0;
 }
 
 .home-container {
-  width: 1200px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  background-color: white;
-  border-radius: 20px; /* Rounded corners for the container */
-  padding: 20px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 20px;
   min-height: 100vh;
+  margin-top: 80px;
 }
 
 .main-content {
-  padding-top: 100px; /* Space for the navbar */
+  padding-top: 32px;
 }
 
 .features {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .features h2 {
@@ -49,16 +40,16 @@ body {
 .feature-box {
   background: #f0f0f0;
   border-radius: 10px;
-  padding: 80px;
+  padding: 40px 0;
   width: 200px;
   text-align: center;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.3s, color 0.3s;
 }
 
 .feature-box:hover {
   background: #00b16a;
-  color: white;
+  color: #fff;
 }
 
 .feature-box h3 {
@@ -84,9 +75,9 @@ body {
 }
 
 .card {
-  background: white;
+  background: #fff;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
   width: 300px;
   overflow: hidden;
   text-align: left;
@@ -102,7 +93,7 @@ body {
 .card h3 {
   font-size: 18px;
   padding: 10px 20px 0;
-  color: #333;
+  color: #222;
 }
 
 .card p {
