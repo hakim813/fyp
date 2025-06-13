@@ -19,7 +19,14 @@ import { styles, stylesHome } from "../styles";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../UserContext";
-import { ref, getDatabase, onValue, update, set } from "firebase/database";
+import {
+  ref,
+  getDatabase,
+  onValue,
+  update,
+  set,
+  remove,
+} from "firebase/database";
 import BottomBar from "./BottomBar";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -101,6 +108,19 @@ export default function HelpdeskHome() {
       })
       .catch((error) => {
         console.error("Error updating complaint:", error);
+      });
+  };
+
+  const deleteComplaint = (id) => {
+    const db = getDatabase();
+    const complaintRef = ref(db, `complaints/${id}`);
+
+    remove(complaintRef)
+      .then(() => {
+        console.log("Data deleted successfully!");
+      })
+      .catch((error) => {
+        console.error("Error deleting data: ", error);
       });
   };
 
@@ -687,7 +707,21 @@ export default function HelpdeskHome() {
                           >
                             <TouchableOpacity
                               onPress={() => {
-                                setResolved(item.id);
+                                Alert.alert(
+                                  "Delete Post",
+                                  "Are you sure you want to delete this issue?",
+                                  [
+                                    {
+                                      text: "Cancel",
+                                      style: "cancel", // Adds the "Cancel" style (button is usually grayed out)
+                                    },
+                                    {
+                                      text: "Delete",
+                                      style: "destructive", // Adds the "Delete" style (usually red)
+                                      onPress: () => deleteComplaint(item.id),
+                                    },
+                                  ]
+                                );
                               }}
                               style={{
                                 borderColor: item.status === "grey",

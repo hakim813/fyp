@@ -27,6 +27,8 @@ import { useFonts } from "expo-font";
 import RecordContribution from "./component/RecordContribution";
 import LandingPage from "./component/LandingPage";
 import ContributionRecord from "./component/ContributionRecord";
+import PetrolStationsMap from "./component/PetrolStationsMap";
+import EditProfile from "./component/EditProfile";
 import { Asset } from "expo-asset";
 import { Image } from "react-native";
 
@@ -93,6 +95,11 @@ const App = () => {
           <Stack.Screen name="LoginSuccessful" component={LoginSuccessful} />
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="AddComplaint" component={AddComplaint} />
+          <Stack.Screen name="EditProfile" component={EditProfile} />
+          <Stack.Screen
+            name="PetrolStationsMap"
+            component={PetrolStationsMap}
+          />
           <Stack.Screen
             name="RecordContribution"
             component={RecordContribution}

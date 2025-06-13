@@ -118,6 +118,12 @@ export const styles = StyleSheet.create({
     bottom: 0,
     borderRadius: 50,
   },
+
+  filler: {
+    height: "100%",
+    backgroundColor: "#3b5998",
+    borderRadius: 10,
+  },
 });
 
 export const stylesHome = StyleSheet.create({

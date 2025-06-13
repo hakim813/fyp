@@ -68,7 +68,11 @@ export default function Home() {
           let expense = 0;
 
           Object.values(allTransactions).forEach((transaction) => {
-            if (transaction.email === user.email) {
+            if (
+              transaction.email === user.email &&
+              new Date(transaction.date).toDateString() ==
+                new Date().toDateString()
+            ) {
               const amount = Number(transaction.value);
 
               if (transaction.type === "Income") {
@@ -518,7 +522,7 @@ export default function Home() {
                         padding: 20,
                       },
                     ]}
-                    onPress={() => navi.navigate("RewardRedemption")}
+                    onPress={() => navi.navigate("PetrolStationsMap")}
                   >
                     <Image
                       source={require("../assets/redeem.png")}
@@ -565,7 +569,11 @@ export default function Home() {
                   stylesHome.imageSlider,
                   { width: 300, marginRight: 16 },
                 ]}
-                onPress={() => Linking.openURL("https://youtube.com")}
+                onPress={() =>
+                  Linking.openURL(
+                    "https://help.grab.com/driver/en-my/115002266187-Driver-Benefits-and-Services"
+                  )
+                }
               >
                 <View style={{ alignItems: "center" }}>
                   <Text
