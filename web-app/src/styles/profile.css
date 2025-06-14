@@ -1,10 +1,13 @@
-body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f4f6f9;
+.profile-page {
+  min-height: 130vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff; /* or your preferred background */
 }
 
 .profile-wrapper {
-  max-width: 1000px;
+  width: 800px;
   margin: 40px auto;
   background: #fff;
   border-radius: 12px;

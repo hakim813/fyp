@@ -131,49 +131,44 @@ const Profile = () => {
   return (
     <>
       <Navbar />
-      <div className="profile-wrapper">
-        {/* Profile Completion Progress Bar */}
-        {/* <div className="completion-wrapper">
-          <div className="completion-bar">
-            <div className="completion-fill" style={{ width: `${percent}%` }} />
+      <div className="profile-page">
+        <div className="profile-wrapper">
+          <div className="profile-header">
+            <img
+              src={userData.profilePhoto || "/default-profile.png"}
+              alt="Profile"
+              className="profile-avatar"
+            />
+            <h2>{userData.fullName || "Unnamed User"}</h2>
+            <p>{userData.email}</p>
+            <Link to="/edit-profile">
+              <button className="edit-btn">Edit Profile</button>
+            </Link>
           </div>
-          <div className="completion-label">{percent}% Profile Completed</div>
-        </div> */}
-        <div className="profile-header">
-          <img
-            src={userData.profilePhoto || "/default-profile.png"}
-            alt="Profile"
-            className="profile-avatar"
-          />
-          <h2>{userData.fullName || "Unnamed User"}</h2>
-          <p>{userData.email}</p>
-          <Link to="/edit-profile">
-            <button className="edit-btn">Edit Profile</button>
-          </Link>
-        </div>
-        <div className="profile-body">
-          <div className="profile-sidebar">
-            {sections.map((section) => (
-              <button
-                key={section.name}
-                className={`tab-btn ${activeSection === section.name ? "active" : ""}`}
-                onClick={() => setActiveSection(section.name)}
-              >
-                {section.name}
-              </button>
-            ))}
-            <div className="completion-wrapper">
-          <div className="completion-bar">
-            <div className="completion-fill" style={{ width: `${percent}%` }} />
+          <div className="profile-body">
+            <div className="profile-sidebar">
+              {sections.map((section) => (
+                <button
+                  key={section.name}
+                  className={`tab-btn ${activeSection === section.name ? "active" : ""}`}
+                  onClick={() => setActiveSection(section.name)}
+                >
+                  {section.name}
+                </button>
+              ))}
+              <div className="completion-wrapper">
+            <div className="completion-bar">
+              <div className="completion-fill" style={{ width: `${percent}%` }} />
+            </div>
+            <div className="completion-label">{percent}% Profile Completion</div>
           </div>
-          <div className="completion-label">{percent}% Profile Completion</div>
-        </div>
-          </div>
-          <div className="profile-content">
-            <h3>{activeSection} Information</h3>
-            {sections
-              .find((section) => section.name === activeSection)
-              .fields.map(renderField)}
+            </div>
+            <div className="profile-content">
+              <h3>{activeSection} Information</h3>
+              {sections
+                .find((section) => section.name === activeSection)
+                .fields.map(renderField)}
+            </div>
           </div>
         </div>
       </div>

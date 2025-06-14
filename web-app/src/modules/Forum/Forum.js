@@ -1,20 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getDatabase, ref, onValue, set, remove, push, get } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { Link } from "react-router-dom";
 import Modal from "react-modal";
-import { FaThumbsUp, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+import { FaThumbsUp, FaTrash, FaPlus, FaTimes, FaFilter } from "react-icons/fa";
 import "../../styles/forum.css";
 
 Modal.setAppElement("#root");
 
 const CATEGORY_LIST = [
   "General",
-  "Platform Issue",
-  "Safety and Security",
-  "Vendor Issue",
-  "Incident",
-  "Others",
+  "Announcement",
+  "Accident",
+  "Event",
 ];
 
 export default function Forum() {
@@ -25,16 +23,15 @@ export default function Forum() {
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState([]);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("All");
-  const [sortLatest, setSortLatest] = useState(true);
+  const [category, setCategory] = useState("None");
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [sortLatest, setSortLatest] = useState(false); // false = Top, true = Latest
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [commentInput, setCommentInput] = useState("");
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-
-  // For image modal
   const [showImageModal, setShowImageModal] = useState(false);
-  const [modalImageUrl, setModalImageUrl] = useState("");
+  const [modalImageUrls, setModalImageUrls] = useState([]);
+  const [isAll, setIsAll] = useState(true); // All vs Your Post
 
   // Fetch posts and comments in real-time
   useEffect(() => {
@@ -76,10 +73,14 @@ export default function Forum() {
   // Filtering and sorting
   const filteredPosts = posts
     .filter((post) => {
+      // All vs Your Post
+      if (!isAll && post.email !== user?.email) return false;
+      // Search
       const matchesSearch =
         post.title?.toLowerCase().includes(search.toLowerCase()) ||
         post.content?.toLowerCase().includes(search.toLowerCase());
-      const matchesCategory = category === "All" || post.category === category;
+      // Category
+      const matchesCategory = category === "None" || post.category === category;
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
@@ -156,6 +157,12 @@ export default function Forum() {
     setShowCategoryModal(false);
   };
 
+  // Image modal
+  const openImageModal = (urls) => {
+    setModalImageUrls(urls);
+    setShowImageModal(true);
+  };
+
   return (
     <div className="forum-container">
       <div className="forum-header">
@@ -165,24 +172,45 @@ export default function Forum() {
         </Link>
       </div>
 
-      <div className="forum-filters">
+      <div className="forum-search">
         <input
           type="text"
-          placeholder="Search posts..."
+          placeholder="Search any content..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          style={{ flex: 1 }}
         />
+      </div>
+
+      <div className="forum-filters" style={{ alignItems: "center" }}>
         <button
-          className="forum-btn-outline"
+          className="forum-btn-outline forum-filter-btn"
           onClick={() => setShowCategoryModal(true)}
+          style={{ marginLeft: 8 }}
         >
-          {category === "All" ? "All Categories" : category}
+          <FaFilter style={{ marginRight: 5 }} />
+          {category === "None" ? "All Categories" : category}
         </button>
         <button
-          className="forum-btn-outline"
+          className="forum-btn-outline forum-filter-btn"
           onClick={() => setSortLatest((v) => !v)}
+          style={{ marginLeft: 8 }}
         >
           {sortLatest ? "Sort: Latest" : "Sort: Top"}
+        </button>
+        <button
+          className={isAll ? "forum-btn active forum-filter-btn" : "forum-btn-outline forum-filter-btn"}
+          onClick={() => setIsAll(true)}
+          style={{ marginLeft: 8 }}
+        >
+          All Posts
+        </button>
+        <button
+          className={!isAll ? "forum-btn active forum-filter-btn" : "forum-btn-outline forum-filter-btn"}
+          onClick={() => setIsAll(false)}
+          style={{ marginLeft: 4 }}
+        >
+          Your Posts
         </button>
       </div>
 
@@ -195,7 +223,7 @@ export default function Forum() {
       >
         <h3>Select Category</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <button className="forum-btn-outline" onClick={() => handleCategoryChange("All")}>
+          <button className="forum-btn-outline" onClick={() => handleCategoryChange("None")}>
             All
           </button>
           {CATEGORY_LIST.map((cat) => (
@@ -219,7 +247,7 @@ export default function Forum() {
 
       <div className="forum-list">
         {filteredPosts.length === 0 ? (
-          <p className="no-posts">No posts found.</p>
+          <p className="no-posts">No content available</p>
         ) : (
           filteredPosts.map((post) => (
             <div className="forum-card" key={post.id}>
@@ -237,22 +265,32 @@ export default function Forum() {
                   <div className="forum-author">{post.user || post.email}</div>
                   <div className="forum-category">{post.category}</div>
                 </div>
+                <div style={{ marginLeft: "auto", color: "#888", fontSize: 14 }}>
+                  {(() => {
+                    const d = new Date(post.date);
+                    const year = d.getFullYear();
+                    const month = String(d.getMonth() + 1).padStart(2, "0");
+                    const day = String(d.getDate()).padStart(2, "0");
+                    let hours = d.getHours();
+                    const minutes = String(d.getMinutes()).padStart(2, "0");
+                    const ampm = hours >= 12 ? "PM" : "AM";
+                    hours = hours % 12 || 12;
+                    return `${day}-${month}-${year}, ${hours}:${minutes} ${ampm}`;
+                  })()}
+                </div>
               </div>
               <div className="forum-card-body">
                 <div className="forum-title">{post.title}</div>
                 <div className="forum-content">{post.content}</div>
-                {post.imageURL && post.imageURL.length > 0 && (
-                  <div className="forum-images">
+                {post.imageURL && Array.isArray(post.imageURL) && post.imageURL.length > 0 && (
+                  <div className="forum-images" style={{ overflowX: "auto", display: "flex" }}>
                     {post.imageURL.map((url, idx) => (
                       <img
                         key={idx}
                         src={url}
                         alt="attachment"
                         className="forum-thumb"
-                        onClick={() => {
-                          setModalImageUrl(url);
-                          setShowImageModal(true);
-                        }}
+                        onClick={() => openImageModal(post.imageURL)}
                         style={{ cursor: "pointer" }}
                       />
                     ))}
@@ -404,17 +442,22 @@ export default function Forum() {
         >
           <FaTimes />
         </button>
-        <img
-          src={modalImageUrl}
-          alt="Full view"
-          style={{
-            maxWidth: "90vw",
-            maxHeight: "80vh",
-            borderRadius: 12,
-            margin: "0 auto",
-            display: "block",
-          }}
-        />
+        <div style={{ display: "flex", overflowX: "auto", maxWidth: "90vw", maxHeight: "80vh" }}>
+          {modalImageUrls.map((url, idx) => (
+            <img
+              key={idx}
+              src={url}
+              alt="Full view"
+              style={{
+                maxWidth: "90vw",
+                maxHeight: "80vh",
+                borderRadius: 12,
+                margin: "0 8px",
+                display: "block",
+              }}
+            />
+          ))}
+        </div>
       </Modal>
 
       {/* Floating Create Button */}

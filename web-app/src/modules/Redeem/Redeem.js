@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getDatabase, ref, get, set } from "firebase/database";
 import { Link } from "react-router-dom";
@@ -11,40 +11,13 @@ const requiredFields = [
   "workStatus", "workCategory", "experience", "languages",
   "bank", "bankAccountNumber", "insuranceCoverage", "socialSecurity", "licenses"
 ];
-
-const BRANDS = [
-  { label: "All", keyword: "", icon: "https://cdn-icons-png.flaticon.com/512/854/854878.png" },
-  { label: "Petronas", keyword: "Petronas", icon: "https://upload.wikimedia.org/wikipedia/commons/6/6b/Petronas_logo.svg" },
-  { label: "Shell", keyword: "Shell", icon: "https://upload.wikimedia.org/wikipedia/commons/2/2e/Shell_logo.svg" },
-  { label: "Petron", keyword: "Petron", icon: "https://upload.wikimedia.org/wikipedia/commons/7/7e/Petron_Corporation_logo.svg" }
-];
-
 const RANGES = [
   { label: "2 km", value: 2000 },
   { label: "5 km", value: 5000 },
   { label: "10 km", value: 10000 },
   { label: "20 km", value: 20000 }
 ];
-
-function getProfileCompletion(userData) {
-  const filled = requiredFields.filter(f => {
-    const v = userData[f];
-    if (Array.isArray(v)) return v.length > 0;
-    return v !== undefined && v !== null && v !== "";
-  }).length;
-  return Math.round((filled / requiredFields.length) * 100);
-}
-
-function getStatusBadge(status) {
-  if (status === "Unused") return <span className="badge badge-green">Unused</span>;
-  if (status === "Used") return <span className="badge badge-red">Used</span>;
-  return null;
-}
-
-const mapContainerStyle = {
-  width: "100%",
-  height: "340px"
-};
+const mapContainerStyle = { width: "100%", height: "340px" };
 
 export default function Redeem() {
   const [user, setUser] = useState(null);
@@ -52,7 +25,6 @@ export default function Redeem() {
   const [profilePercent, setProfilePercent] = useState(0);
   const [voucher, setVoucher] = useState(null);
   const [tab, setTab] = useState("voucher");
-  const [brand, setBrand] = useState(BRANDS[0].label);
   const [range, setRange] = useState(RANGES[2].value);
   const [location, setLocation] = useState(null);
   const [stations, setStations] = useState([]);
@@ -60,27 +32,23 @@ export default function Redeem() {
   const [copyMsg, setCopyMsg] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [tabAnim, setTabAnim] = useState("fade-in");
+  const [searchQuery, setSearchQuery] = useState("");
+  const mapRef = useRef(null);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyC_DEkV1SbS4oOawjSgzPfgdoattVhEaM8",
     libraries: ["places"]
   });
 
-  // Listen for Firebase Auth user
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-    });
-    return () => unsubscribe();
+    return onAuthStateChanged(auth, setUser);
   }, []);
 
-  // Fetch user data and voucher when user is available
   useEffect(() => {
     if (!user) return;
     const db = getDatabase();
-    const userRef = ref(db, `users/${user.uid}`);
-    get(userRef).then(snap => {
+    get(ref(db, `users/${user.uid}`)).then(snap => {
       if (snap.exists()) {
         const data = snap.val();
         setUserData(data);
@@ -88,69 +56,89 @@ export default function Redeem() {
       }
     });
     get(ref(db, `voucher/${user.uid}`)).then(snap => {
-      if (snap.exists()) {
-        setVoucher(snap.val());
-      }
+      if (snap.exists()) setVoucher(snap.val());
     });
   }, [user]);
 
-  // Get user location on mount
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => setLocation({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
-        }),
-        () => setLocation({ lat: 3.139, lng: 101.6869 }) // fallback: KL
-      );
-    } else {
-      setLocation({ lat: 3.139, lng: 101.6869 });
-    }
+    navigator.geolocation.getCurrentPosition(
+      pos => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => setLocation({ lat: 3.139, lng: 101.6869 })
+    );
   }, []);
 
-  // Fetch stations when map is loaded, location, brand, or range changes
+  // Fetch nearby petrol stations using Google Places API
   useEffect(() => {
     if (!isLoaded || !location) return;
     const service = new window.google.maps.places.PlacesService(document.createElement("div"));
-    service.nearbySearch(
-      {
-        location,
-        radius: range,
-        keyword: brand === "All" ? "" : brand,
-        type: "gas_station"
-      },
-      (results, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          const withDist = results.map(st => ({
-            ...st,
-            distance: getDistance(location, {
-              lat: st.geometry.location.lat(),
-              lng: st.geometry.location.lng()
-            })
-          }));
-          setStations(withDist.sort((a, b) => a.distance - b.distance));
-        } else {
-          setStations([]);
-        }
-      }
-    );
-  }, [isLoaded, location, brand, range]);
+    service.nearbySearch({
+      location,
+      radius: range,
+      type: "gas_station"
+    }, (results, status) => {
+      if (status === "OK") {
+        const enriched = results.map(st => ({
+          ...st,
+          distance: getDistance(location, {
+            lat: st.geometry.location.lat(),
+            lng: st.geometry.location.lng()
+          })
+        }));
+        setStations(enriched.sort((a, b) => a.distance - b.distance));
+      } else setStations([]);
+    });
+  }, [isLoaded, location, range]);
 
-  // Generate a one-time voucher (if not exists)
+  // Pan to searched station on the map
+  useEffect(() => {
+    if (!mapRef.current || !searchQuery || stations.length === 0) return;
+    const match = stations.find(st =>
+      (st.name && st.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (st.vicinity && st.vicinity.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (st.types && st.types.join(" ").toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+    if (match) {
+      mapRef.current.panTo({
+        lat: match.geometry.location.lat(),
+        lng: match.geometry.location.lng()
+      });
+    }
+  }, [searchQuery, stations]);
+
+  const getDistance = (loc1, loc2) => {
+    const R = 6371000, toRad = deg => deg * Math.PI / 180;
+    const dLat = toRad(loc2.lat - loc1.lat);
+    const dLng = toRad(loc2.lng - loc1.lng);
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(loc1.lat)) * Math.cos(toRad(loc2.lat)) *
+      Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
+
+  const getProfileCompletion = (data) => {
+    const filled = requiredFields.filter(f => {
+      const v = data[f];
+      return Array.isArray(v) ? v.length > 0 : v !== undefined && v !== null && v !== "";
+    }).length;
+    return Math.round((filled / requiredFields.length) * 100);
+  };
+
+  const getStatusBadge = status => (
+    status === "Unused"
+      ? <span className="badge badge-green">Unused</span>
+      : status === "Used"
+      ? <span className="badge badge-red">Used</span>
+      : null
+  );
+
   const handleGenerateVoucher = async () => {
     if (voucher) return;
     const code = "PETRO-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-    const newVoucher = {
-      code,
-      created: Date.now(),
-      status: "Unused",
-    };
+    const newVoucher = { code, created: Date.now(), status: "Unused" };
     await set(ref(getDatabase(), `voucher/${user.uid}`), newVoucher);
     setVoucher(newVoucher);
   };
 
-  // Mark voucher as used
   const handleMarkUsed = async () => {
     if (!voucher) return;
     await set(ref(getDatabase(), `voucher/${user.uid}/status`), "Used");
@@ -158,37 +146,32 @@ export default function Redeem() {
     setShowConfirm(false);
   };
 
-  // Copy voucher code to clipboard
   const handleCopy = code => {
     navigator.clipboard.writeText(code);
     setCopyMsg("Copied!");
     setTimeout(() => setCopyMsg(""), 1200);
   };
 
-  function getDistance(loc1, loc2) {
-    const toRad = deg => deg * Math.PI / 180;
-    const R = 6371000;
-    const dLat = toRad(loc2.lat - loc1.lat);
-    const dLng = toRad(loc2.lng - loc1.lng);
-    const a = Math.sin(dLat / 2) ** 2 +
-      Math.cos(toRad(loc1.lat)) * Math.cos(toRad(loc2.lat)) *
-      Math.sin(dLng / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  }
-
-  const handleTabChange = (newTab) => {
+  const handleTabChange = tab => {
     setTabAnim("fade-out");
     setTimeout(() => {
-      setTab(newTab);
+      setTab(tab);
       setTabAnim("fade-in");
     }, 180);
   };
+
+  // Filter stations by search query (name, brand, or location)
+  const filteredStations = stations.filter(st =>
+    (st.name && st.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (st.vicinity && st.vicinity.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (st.types && st.types.join(" ").toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <div className="redeem-glass-wrapper">
       <div className="redeem-glass-header">
         <h2>Redeem Petrol Voucher</h2>
-        <div className="redeem-glass-progress" title="Profile completion required for voucher access">
+        <div className="redeem-glass-progress">
           <div className="redeem-glass-progress-bar">
             <div className="redeem-glass-progress-fill" style={{ width: `${profilePercent}%` }} />
           </div>
@@ -196,12 +179,8 @@ export default function Redeem() {
         </div>
         {profilePercent < 100 && (
           <div className="redeem-glass-blocked">
-            <p>
-              Complete your profile to access voucher redemption.
-            </p>
-            <Link to="/edit-profile">
-              <button className="redeem-glass-btn">Complete Profile</button>
-            </Link>
+            <p>Complete your profile to access voucher redemption.</p>
+            <Link to="/edit-profile"><button className="redeem-glass-btn">Complete Profile</button></Link>
           </div>
         )}
       </div>
@@ -219,31 +198,27 @@ export default function Redeem() {
               <div className="redeem-glass-card voucher-card-glass">
                 <h3>Voucher Details</h3>
                 {voucher ? (
-                  <div>
+                  <>
                     <div className="voucher-code-row">
                       <span className="voucher-code">{voucher.code}</span>
-                      <button className="copy-btn" onClick={() => handleCopy(voucher.code)} title="Copy code">
-                        <svg width="18" height="18" fill="none" stroke="#1976d2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="12" height="12" rx="2"/><path d="M9 9h6v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6z"/></svg>
-                      </button>
+                      <button className="copy-btn" onClick={() => handleCopy(voucher.code)}>Copy</button>
                       {copyMsg && <span className="copy-msg">{copyMsg}</span>}
                     </div>
                     <div className="voucher-status-row">{getStatusBadge(voucher.status)}</div>
                     {voucher.status === "Unused" && (
                       <button className="redeem-glass-btn" onClick={() => setShowConfirm(true)}>Mark as Used</button>
                     )}
-                  </div>
+                  </>
                 ) : (
-                  <button className="redeem-glass-btn" onClick={handleGenerateVoucher}>
-                    Generate Voucher
-                  </button>
+                  <button className="redeem-glass-btn" onClick={handleGenerateVoucher}>Generate Voucher</button>
                 )}
                 {showConfirm && (
                   <div className="modal-overlay" onClick={() => setShowConfirm(false)}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
                       <h4>Confirm Redemption</h4>
                       <p>Are you sure you want to mark this voucher as used? This action cannot be undone.</p>
-                      <div style={{display: "flex", gap: 16, marginTop: 18}}>
-                        <button className="redeem-glass-btn" onClick={handleMarkUsed}>Yes, Mark as Used</button>
+                      <div style={{ display: "flex", gap: 16, marginTop: 18 }}>
+                        <button className="redeem-glass-btn" onClick={handleMarkUsed}>Yes</button>
                         <button className="redeem-glass-btn secondary" onClick={() => setShowConfirm(false)}>Cancel</button>
                       </div>
                     </div>
@@ -257,21 +232,22 @@ export default function Redeem() {
                 <h3>Find Petrol Stations</h3>
                 <div className="station-filters">
                   <label>
-                    Brand:
-                    <select value={brand} onChange={e => setBrand(e.target.value)}>
-                      {BRANDS.map(b => (
-                        <option key={b.label} value={b.label}>{b.label}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
                     Range:
-                    <select value={range} onChange={e => setRange(Number(e.target.value))}>
+                    <select value={range || 10000} onChange={e => setRange(Number(e.target.value))}>
                       {RANGES.map(r => (
-                        <option key={r.value} value={r.value}>{r.label}</option>
+                        <option key={r.value} value={r.value}>
+                          {r.label}
+                        </option>
                       ))}
                     </select>
                   </label>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Search by name, brand, or location"
+                    style={{ padding: "8px 12px", flex: 1 }}
+                  />
                 </div>
                 {location && (
                   <div className="location-info">
@@ -283,45 +259,28 @@ export default function Redeem() {
                     mapContainerStyle={mapContainerStyle}
                     center={location}
                     zoom={13}
+                    onLoad={map => mapRef.current = map}
                     options={{
-                      styles: [
-                        { featureType: "poi.business", stylers: [{ visibility: "off" }] },
-                        { featureType: "transit", stylers: [{ visibility: "off" }] }
-                      ],
                       mapTypeControl: false,
                       streetViewControl: false,
                       fullscreenControl: false
                     }}
                   >
-                    <Marker
-                      position={location}
-                      icon={{
-                        url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-                        scaledSize: { width: 40, height: 40 }
-                      }}
-                      title="Your Location"
-                      animation={window.google && window.google.maps.Animation.BOUNCE}
-                    />
-                    {stations.map((station, idx) => {
-                      let iconUrl = BRANDS.find(b => station.name && station.name.toLowerCase().includes(b.label.toLowerCase()))?.icon;
-                      if (!iconUrl || brand === "All") iconUrl = BRANDS[0].icon;
-                      return (
-                        <Marker
-                          key={idx}
-                          position={{
-                            lat: station.geometry.location.lat(),
-                            lng: station.geometry.location.lng()
-                          }}
-                          onClick={() => setSelectedStation(station)}
-                          title={station.name}
-                          icon={{
-                            url: iconUrl,
-                            scaledSize: { width: 36, height: 36 }
-                          }}
-                          animation={window.google && window.google.maps.Animation.DROP}
-                        />
-                      );
-                    })}
+                    <Marker position={location} title="Your Location" />
+                    {filteredStations.length === 0 && (
+                      <></>
+                    )}
+                    {filteredStations.map((station, idx) => (
+                      <Marker
+                        key={idx}
+                        position={{
+                          lat: station.geometry.location.lat(),
+                          lng: station.geometry.location.lng()
+                        }}
+                        onClick={() => setSelectedStation(station)}
+                        title={station.name}
+                      />
+                    ))}
                     {selectedStation && (
                       <InfoWindow
                         position={{
@@ -331,30 +290,49 @@ export default function Redeem() {
                         onCloseClick={() => setSelectedStation(null)}
                       >
                         <div className="station-info-window">
-                          <div className="station-info-header">
-                            <img
-                              src={
-                                BRANDS.find(b => selectedStation.name && selectedStation.name.toLowerCase().includes(b.label.toLowerCase()))?.icon ||
-                                BRANDS[0].icon
-                              }
-                              alt="brand"
-                              className="station-brand-logo"
-                            />
-                            <b>{selectedStation.name}</b>
-                          </div>
-                          <div className="station-address">{selectedStation.vicinity}</div>
-                          <div className="station-distance">Distance: {(selectedStation.distance / 1000).toFixed(2)} km</div>
-                          <a
-                            className="navigate-btn"
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(selectedStation.name + " " + selectedStation.vicinity)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >Navigate</a>
+                          <b>{selectedStation.name}</b>
+                          <div>{selectedStation.vicinity}</div>
+                          <div>Distance: {(selectedStation.distance / 1000).toFixed(2)} km</div>
                         </div>
                       </InfoWindow>
                     )}
                   </GoogleMap>
                 )}
+                <div style={{ marginTop: 24 }}>
+                  {filteredStations.length === 0 ? (
+                    <div style={{ color: "#888" }}>No stations found for "{searchQuery}"</div>
+                  ) : (
+                    filteredStations.slice(0, 10).map((station, idx) => (
+                      <div
+                        key={idx}
+                        className="station-card"
+                        style={{
+                          border: "1px solid #e0e0e0",
+                          borderRadius: 10,
+                          padding: 14,
+                          marginBottom: 12,
+                          background: "#fff",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                        }}
+                        onClick={() => {
+                          setSelectedStation(station);
+                          if (mapRef.current) {
+                            mapRef.current.panTo({
+                              lat: station.geometry.location.lat(),
+                              lng: station.geometry.location.lng()
+                            });
+                          }
+                        }}
+                      >
+                        <div style={{ fontWeight: "bold", fontSize: "1.08em" }}>{station.name}</div>
+                        <div style={{ color: "#1976d2", fontSize: "0.98em" }}>{station.vicinity}</div>
+                        <div style={{ color: "#888", fontSize: "0.95em" }}>
+                          Distance: {(station.distance / 1000).toFixed(2)} km
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             )}
 
@@ -367,12 +345,6 @@ export default function Redeem() {
                   <li>Use the map to find the nearest station and navigate there.</li>
                   <li>Mark your voucher as used after redemption.</li>
                 </ol>
-                <h4>FAQ</h4>
-                <ul>
-                  <li><b>Can I generate more than one voucher?</b> No, only one voucher per account.</li>
-                  <li><b>Can I use the voucher at any petrol station?</b> Yes, as long as the station accepts it.</li>
-                  <li><b>How do I find the nearest station?</b> Use the "Find Station" tab and filters.</li>
-                </ul>
               </div>
             )}
           </div>

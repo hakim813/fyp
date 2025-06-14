@@ -4,6 +4,7 @@
   margin: 0 auto 32px auto;
   padding: 96px 16px 32px 16px;
   font-family: 'Segoe UI', Arial, sans-serif;
+  background: #fff;
 }
 
 /* Header */
@@ -21,6 +22,13 @@
   letter-spacing: 1px;
 }
 
+.forum-search {
+  display: flex;
+  width: 500px;
+  align-items: center;
+  gap: 12px;
+}
+
 /* Buttons */
 .forum-btn,
 .forum-btn-outline {
@@ -34,6 +42,13 @@
   box-shadow: 0 2px 8px rgba(25,118,210,0.08);
   text-decoration: none;
   display: inline-block;
+}
+
+.forum-filter-btn {
+  padding: 3px 8px;
+  font-size: 14px !important;
+  height: 30px;
+  min-width: unset;
 }
 
 .forum-btn {
@@ -339,4 +354,9 @@
   .forum-create-form {
     padding: 16px 6px 16px 6px;
   }
+}
+.forum-btn.active {
+  background: #1976d2;
+  color: #fff;
+  border: 1px solid #1976d2;
 }

@@ -31,50 +31,52 @@ function Signup() {
     };
 
     return (
-        <div className="container">
-            <div className="signup-box">
-                <h1>Create an Account</h1>
-                {error && <div className="error-message">{error}</div>}
-                <form onSubmit={handleSignup}>
-                    <label htmlFor="email">Email address:</label>
-                    <input
-                        type="email"
-                        id="email"
-                        placeholder="Email address"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                    <label htmlFor="nricId">NRIC:</label>
-                    <input
-                        type="text"
-                        id="nricId"
-                        placeholder="NRIC"
-                        value={nricId}
-                        onChange={(e) => setNricId(e.target.value)}
-                        required
-                    />
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                    <label htmlFor="confirm-password">Confirm Password:</label>
-                    <input
-                        type="password"
-                        id="confirm-password"
-                        placeholder="Confirm Password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                    />
-                    <button type="submit" className="btn">Sign Up</button>
-                </form>
-                <p className="login-text">Already have an account? <a href="/login">Login</a></p>
+        <div className="signup-page">
+            <div className="signup-container">
+                <div className="signup-box">
+                    <h1>Create an Account</h1>
+                    {error && <div className="error-message">{error}</div>}
+                    <form onSubmit={handleSignup}>
+                        <label htmlFor="email">Email address:</label>
+                        <input
+                            type="email"
+                            id="email"
+                            placeholder="Email address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                        <label htmlFor="nricId">NRIC:</label>
+                        <input
+                            type="text"
+                            id="nricId"
+                            placeholder="NRIC"
+                            value={nricId}
+                            onChange={(e) => setNricId(e.target.value)}
+                            required
+                        />
+                        <label htmlFor="password">Password:</label>
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                        <label htmlFor="confirm-password">Confirm Password:</label>
+                        <input
+                            type="password"
+                            id="confirm-password"
+                            placeholder="Confirm Password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                        <button type="submit" className="btn">Sign Up</button>
+                    </form>
+                    <p className="login-text">Already have an account? <a href="/login">Login</a></p>
+                </div>
             </div>
         </div>
     );

@@ -1,3 +1,11 @@
+.helpdesk-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff; /* or your preferred background */
+}
+
 .helpdesk-container {
   width: 1000px;
   margin: 40px auto;

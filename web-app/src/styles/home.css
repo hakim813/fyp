@@ -1,8 +1,8 @@
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(180deg, #00de85, #004b2d);
   color: #222;
   margin: 0;
+  /* Remove background here! */
 }
 
 .home-container {

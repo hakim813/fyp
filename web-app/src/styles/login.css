@@ -4,14 +4,11 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Segoe UI', Arial, sans-serif;
+.login-page {
   background: linear-gradient(135deg, #00b16a 50%, #1dd187 100%);
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
+
 
 .login-container {
   display: flex;
@@ -30,7 +27,6 @@ body {
   max-width: 420px;
   text-align: center;
 }
-
 .login-box h1 {
   font-size: 38px;
   font-weight: bold;
