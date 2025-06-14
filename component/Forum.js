@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import {
   StatusBar,
   StyleSheet,
@@ -53,6 +53,7 @@ export default function Forum() {
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("None");
   const [selectedMedia, setSelectedMedia] = useState([]);
+  const flatListRef = useRef(null);
 
   //to write data into database
   const writeData = async (item) => {
@@ -144,7 +145,7 @@ export default function Forum() {
           console.log(`${updatedUpvoterId} has upvoted post ${item.id}`);
         } else {
           // Add the new commentId to the array
-          updatedUpvoterId = [...currentUpvoterId, user.uid]; // Append the new commentId
+          updatedUpvoterId = [...currentUpvoterId, user.uid];
         }
 
         set(postRef, {
@@ -249,6 +250,12 @@ export default function Forum() {
       >
         <View style={{ flex: 1 }}>
           <Text
+            onPress={() => {
+              flatListRef.current?.scrollToOffset({
+                offset: 0,
+                animated: true,
+              });
+            }}
             style={[
               stylesHome.welcomeText,
               { color: "#fafafa", marginHorizontal: 15 },
@@ -256,20 +263,52 @@ export default function Forum() {
           >
             Community Forum
           </Text>
-          <TextInput
-            style={[
-              styles.input,
-              {
-                backgroundColor: "#fdfdfd",
-                borderRadius: 20,
-                marginHorizontal: 10,
-                marginTop: 10,
-              },
-            ]}
-            placeholder="Search any content. . ."
-            value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)}
-          />
+          <View
+            flexDirection={"row"}
+            justifyContent={"space-evenly"}
+            alignItems={"center"}
+            marginRight={5}
+          >
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: "#fdfdfd",
+                  borderRadius: 20,
+                  marginHorizontal: 10,
+                  marginTop: 10,
+                  marginBottom: 15,
+                  width: "85%",
+                },
+              ]}
+              placeholder="Search any content. . ."
+              value={searchQuery}
+              onChangeText={(text) => setSearchQuery(text)}
+            />
+            <TouchableOpacity
+              onPressIn={() => setFilterModalVisible(true)}
+              style={{
+                height: 35,
+                width: 35,
+                borderColor: "#ededed",
+                borderWidth: 1,
+                borderRadius: 100,
+                marginRight: 10,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              // onPress={() => setShowHelp(!showHelp)}
+            >
+              <Icon
+                name={"filter"}
+                size={20}
+                style={{
+                  color: "#ededed",
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+
           {/* <TouchableOpacity
             style={[
               styles.input,
@@ -453,7 +492,7 @@ export default function Forum() {
             </View>
           ) : (
             <>
-              <View>
+              {/* <View>
                 <TouchableOpacity
                   onPress={() => setFilterModalVisible(true)}
                   style={[
@@ -474,9 +513,10 @@ export default function Forum() {
                     Filter
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </View> */}
 
               <FlatList //d6ffa7
+                ref={flatListRef}
                 style={{ paddingVertical: 10, backgroundColor: "#dedede" }}
                 data={filteredPosts}
                 keyExtractor={(item) => item.id}
@@ -651,10 +691,45 @@ export default function Forum() {
                               )}
                             />
                           ) : (
-                            <Text style={{ marginTop: 10, color: "gray" }}>
-                              No images attached
+                            <Text
+                              style={{
+                                // marginVertical: 10,
+                                marginLeft: 0,
+                                color: "gray",
+                              }}
+                            >
+                              {""}
                             </Text>
                           )}
+                          <Text
+                            style={{
+                              // marginRight: "auto",
+                              fontSize: 13,
+                              color: "grey",
+                              fontFamily: "Nunito-Regular",
+                            }}
+                          >
+                            {/* Written on{" "} */}
+                            {(() => {
+                              const d = new Date(item.date);
+                              const year = d.getFullYear();
+                              const month = String(d.getMonth() + 1).padStart(
+                                2,
+                                "0"
+                              );
+                              const day = String(d.getDate()).padStart(2, "0");
+
+                              let hours = d.getHours();
+                              const minutes = String(d.getMinutes()).padStart(
+                                2,
+                                "0"
+                              );
+                              const ampm = hours >= 12 ? "PM" : "AM";
+                              hours = hours % 12 || 12; // convert 0 to 12 for 12 AM
+
+                              return `${day}-${month}-${year}, ${hours}:${minutes} ${ampm}`;
+                            })()}
+                          </Text>
                         </View>
 
                         <View style={{ marginTop: 0 }}>
@@ -925,10 +1000,45 @@ export default function Forum() {
                               )}
                             />
                           ) : (
-                            <Text style={{ marginTop: 10, color: "gray" }}>
-                              No images attached
+                            <Text
+                              style={{
+                                marginTop: 10,
+                                marginLeft: 0,
+                                color: "gray",
+                              }}
+                            >
+                              {/* {"\n"} */}
                             </Text>
                           )}
+                          <Text
+                            style={{
+                              // marginRight: "auto",
+                              fontSize: 13,
+                              color: "grey",
+                              fontFamily: "Nunito-Regular",
+                            }}
+                          >
+                            {/* Written on{" "} */}
+                            {(() => {
+                              const d = new Date(item.date);
+                              const year = d.getFullYear();
+                              const month = String(d.getMonth() + 1).padStart(
+                                2,
+                                "0"
+                              );
+                              const day = String(d.getDate()).padStart(2, "0");
+
+                              let hours = d.getHours();
+                              const minutes = String(d.getMinutes()).padStart(
+                                2,
+                                "0"
+                              );
+                              const ampm = hours >= 12 ? "PM" : "AM";
+                              hours = hours % 12 || 12; // convert 0 to 12 for 12 AM
+
+                              return `${day}-${month}-${year}, ${hours}:${minutes} ${ampm}`;
+                            })()}
+                          </Text>
                         </View>
                         {/* comment */}
 
@@ -1086,6 +1196,15 @@ export default function Forum() {
                     }}
                   ></View>
                 }
+                // ListHeaderComponent={
+                //   <View marginVertical={5} marginHorizontal={20}>
+                //     <TouchableOpacity onPress={() => refresh()}>
+                //       <Text style={{ fontFamily: "Nunito-Bold", fontSize: 18 }}>
+                //         Reload content
+                //       </Text>
+                //     </TouchableOpacity>
+                //   </View>
+                // }
               />
             </>
           )}
@@ -1122,7 +1241,7 @@ export default function Forum() {
                 marginBottom: 10,
               }}
             >
-              Select Category
+              Filter Content Category
             </Text>
             <Picker
               selectedValue={selectedCategory}
