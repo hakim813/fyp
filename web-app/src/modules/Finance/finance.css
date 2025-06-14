@@ -1,0 +1,162 @@
+/* General container styles */
+.finance-manager,
+.finance-records,
+.finance-create,
+.finance-scan-receipt,
+.finance-add-plan {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #f6fff9;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0,177,106,0.10);
+  padding: 32px 28px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Section headings */
+.finance-manager h2,
+.finance-records h2,
+.finance-create h2,
+.finance-scan-receipt h2,
+.finance-add-plan h2 {
+  color: #009457;
+  margin-bottom: 24px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* Action buttons group */
+.finance-actions {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+/* Green button styles */
+.finance-btn {
+  background: #00b16a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 22px;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0,177,106,0.08);
+}
+.finance-btn:hover,
+.finance-btn:focus {
+  background: #009457;
+  outline: none;
+}
+
+/* Table styles */
+.finance-records table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 18px;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,177,106,0.04);
+}
+.finance-records th,
+.finance-records td {
+  border: 1px solid #e5e7eb;
+  padding: 10px 14px;
+  text-align: left;
+}
+.finance-records th {
+  background: #e6f9f1;
+  color: #009457;
+  font-weight: 600;
+  font-size: 1.05em;
+}
+.finance-records td {
+  font-size: 1em;
+}
+
+/* Form styles */
+.finance-create form,
+.finance-add-plan form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.finance-create label,
+.finance-add-plan label {
+  font-weight: 500;
+  color: #009457;
+  margin-bottom: 4px;
+}
+.finance-create input,
+.finance-create select,
+.finance-add-plan input,
+.finance-add-plan select {
+  padding: 8px 12px;
+  border: 1px solid #b2dfdb;
+  border-radius: 6px;
+  font-size: 1em;
+  background: #f6fff9;
+  color: #222;
+  margin-top: 2px;
+  margin-bottom: 8px;
+  transition: border 0.2s;
+}
+.finance-create input:focus,
+.finance-create select:focus,
+.finance-add-plan input:focus,
+.finance-add-plan select:focus {
+  border: 1.5px solid #00b16a;
+  outline: none;
+}
+
+/* Scan Receipt styles */
+.finance-scan-receipt input[type="file"] {
+  margin-bottom: 16px;
+}
+.finance-scan-receipt img {
+  display: block;
+  margin: 16px 0;
+  max-width: 320px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,177,106,0.10);
+}
+.finance-scan-receipt div {
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 1em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 700px) {
+  .finance-manager,
+  .finance-records,
+  .finance-create,
+  .finance-scan-receipt,
+  .finance-add-plan {
+    padding: 16px 4vw;
+    max-width: 98vw;
+  }
+  .finance-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .finance-records table,
+  .finance-records th,
+  .finance-records td {
+    font-size: 0.97em;
+    padding: 7px 6px;
+  }
+}
+
+/* Miscellaneous */
+.finance-create button[disabled],
+.finance-scan-receipt button[disabled] {
+  background: #b2dfdb;
+  color: #fff;
+  cursor: not-allowed;
+}

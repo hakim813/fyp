@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { UserProvider } from './utils/UserContext';
 import './styles/App.css';
-import "tailwindcss/tailwind.css";
 
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
@@ -23,6 +22,12 @@ import Redeem from './modules/Redeem/Redeem';
 
 import Forum from './modules/Forum/Forum';
 import CreatePost from './modules/Forum/CreatePost';
+
+import FinanceManager from './modules/Finance/FinanceManager';
+import FinancialRecord from './modules/Finance/FinancialRecord';
+import CreateFinanceRecord from './modules/Finance/CreateFinanceRecord';
+import ScanReceipt from './modules/Finance/ScanReceipt';
+import AddPlan from './modules/Finance/AddPlan';
 
 function App() {
   return (
@@ -47,6 +52,12 @@ function App() {
 
           <Route path="/forum" element={<><Navbar /><Forum /></>} />
           <Route path="/forum/create" element={<><Navbar /><CreatePost /></>} />
+
+          <Route path="/finance" element={<><Navbar /><FinanceManager /></>} />
+          <Route path="/finance/records" element={<><Navbar /><FinancialRecord /></>} />
+          <Route path="/finance/create" element={<><Navbar /><CreateFinanceRecord /></>} />
+          <Route path="/finance/scan" element={<><Navbar /><ScanReceipt /></>} />
+          <Route path="/finance/add-plan" element={<><Navbar /><AddPlan /></>} />
 
 
           {/* Sidebar for all routes except Login and Signup */}

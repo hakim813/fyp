@@ -1,6 +1,6 @@
 import React from 'react';
 import Navbar from '../../components/Navbar'; // Import Navbar component
-import "../../styles/home.css"; // Import the CSS file for Home page
+import "./home.css"; // Import the CSS file for Home page
 
 function Home() {
   return (

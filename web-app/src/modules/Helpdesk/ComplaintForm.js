@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { getAuth } from 'firebase/auth';
 import { getDatabase, ref, push, set } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import '../../styles/helpdesk.css';
+import './helpdesk.css';
 
 const ComplaintForm = ({ onClose }) => {
   const [title, setTitle] = useState('');

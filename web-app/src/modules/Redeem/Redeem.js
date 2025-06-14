@@ -3,7 +3,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getDatabase, ref, get, set } from "firebase/database";
 import { Link } from "react-router-dom";
 import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
-import "../../styles/redeem.css";
+import "./redeem.css";
 
 const requiredFields = [
   "fullName", "dob", "email", "phone", "address", "profilePhoto",
@@ -230,6 +230,15 @@ export default function Redeem() {
             {tab === "station" && (
               <div className="redeem-glass-card">
                 <h3>Find Petrol Stations</h3>
+                <div className="station-search">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                      placeholder="Search by name, brand, or location"
+                      style={{ padding: "8px 12px", flex: 1 }}
+                    />
+                  </div>
                 <div className="station-filters">
                   <label>
                     Range:
@@ -241,13 +250,6 @@ export default function Redeem() {
                       ))}
                     </select>
                   </label>
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Search by name, brand, or location"
-                    style={{ padding: "8px 12px", flex: 1 }}
-                  />
                 </div>
                 {location && (
                   <div className="location-info">
@@ -266,10 +268,14 @@ export default function Redeem() {
                       fullscreenControl: false
                     }}
                   >
-                    <Marker position={location} title="Your Location" />
-                    {filteredStations.length === 0 && (
-                      <></>
-                    )}
+                    <Marker
+                      position={location}
+                      title="Your Location"
+                      icon={{
+                        url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", // Blue pin
+                        scaledSize: new window.google.maps.Size(40, 40)
+                      }}
+                    />
                     {filteredStations.map((station, idx) => (
                       <Marker
                         key={idx}

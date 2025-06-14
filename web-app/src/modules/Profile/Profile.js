@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getAuth } from "firebase/auth";
 import { getDatabase, ref, get } from "firebase/database";
 import { Link } from "react-router-dom";
-import '../../styles/profile.css';
+import './profile.css';
 import Navbar from '../../components/Navbar';
 
 const fieldLabels = {

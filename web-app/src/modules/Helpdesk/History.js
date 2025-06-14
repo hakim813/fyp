@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { getAuth } from 'firebase/auth';
-import { getDatabase, ref, query, orderByChild, equalTo, onValue, remove } from 'firebase/database';
+import { getDatabase, ref, query, orderByChild, equalTo, onValue } from 'firebase/database';
 import Navbar from '../../components/Navbar';
-import '../../styles/helpdesk.css';
+import './helpdesk.css';
 import { useNavigate } from 'react-router-dom';
 
-const History = () => {
+export default function History() {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState("");
 
   const auth = getAuth();
   const db = getDatabase();
@@ -18,92 +20,140 @@ const History = () => {
     if (!user) return;
 
     const complaintsRef = ref(db, 'complaints');
-    const userComplaintsQuery = query(complaintsRef, orderByChild('userId'), equalTo(user.uid));
+    const userComplaintsQuery = query(
+      complaintsRef,
+      orderByChild('userId'),
+      equalTo(user.uid)
+    );
 
     const unsubscribe = onValue(userComplaintsQuery, snapshot => {
       const data = snapshot.val() || {};
-      const complaintList = Object.entries(data).map(([key, value]) => ({ id: key, ...value }));
-      setComplaints(complaintList);
+      const loaded = Object.entries(data)
+        .map(([key, complaint]) => ({ id: key, ...complaint }));
+      setComplaints(loaded);
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, [user, db]);
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this complaint?')) {
-      const complaintRef = ref(db, `complaints/${id}`);
-      remove(complaintRef).catch(err => {
-        alert('Failed to delete complaint.');
-        console.error(err);
-      });
-    }
+  // Show image modal
+  const handlePhotoClick = (url) => {
+    setModalImageUrl(url);
+    setShowImageModal(true);
   };
 
   return (
     <>
       <Navbar />
-      <div className="helpdesk-container">
-        <h2>Complaint History</h2>
+      <div className="helpdesk-page">
+        <div className="helpdesk-container">
+          <h2>Complaint History</h2>
 
-        <button 
-          onClick={() => navigate('/helpdesk')} 
-          className="back-btn"
-        >
-          &larr; Back
-        </button>
-
-        {loading && <p>Loading complaints...</p>}
-
-        <table className="complaints-table">
-          <thead>
-            <tr>
-              <th>Ticket Number</th>
-              <th>Title</th>
-              <th>Category</th> {/* Added Category column */}
-              <th>Status</th>
-              <th>Date Submitted</th>
-              <th>Photo</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {!loading && complaints.length === 0 ? (
+          {loading && <p>Loading complaints...</p>}
+          
+          <table className="complaints-table">
+            <thead>
               <tr>
-                <td colSpan="7" style={{ textAlign: 'center', fontStyle: 'italic' }}>
-                  No complaints submitted yet.
-                </td>
+                <th>Ticket Number</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Date Submitted</th>
+                <th>Photo</th>
               </tr>
-            ) : (
-              complaints.map(c => (
-                <tr key={c.id}>
-                  <td>{c.ticketNumber}</td>
-                  <td>{c.title}</td>
-                  <td>{c.category || 'N/A'}</td> {/* Display category */}
-                  <td>{c.status}</td>
-                  <td>{new Date(c.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    {c.photoURL ? (
-                      <img
-                        src={c.photoURL}
-                        alt="Complaint Attachment"
-                        style={{ maxWidth: '80px', maxHeight: '80px', borderRadius: '8px' }}
-                      />
-                    ) : (
-                      'No photo'
-                    )}
-                  </td>
-                  <td>
-                    <button className="delete-btn" onClick={() => handleDelete(c.id)}>Delete</button>
+            </thead>
+            <tbody>
+              {!loading && complaints.length === 0 ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: 'center', fontStyle: 'italic' }}>
+                    No complaints found.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                complaints.map(c => (
+                  <tr key={c.id}>
+                    <td>{c.ticketNumber}</td>
+                    <td>{c.title}</td>
+                    <td>{c.category || 'N/A'}</td>
+                    <td>{c.status}</td>
+                    <td>{new Date(c.createdAt).toLocaleDateString()}</td>
+                    <td>
+                      {c.photoURL ? (
+                        <img
+                          src={c.photoURL}
+                          alt="Complaint Attachment"
+                          style={{
+                            maxWidth: '80px',
+                            maxHeight: '80px',
+                            borderRadius: '8px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => handlePhotoClick(c.photoURL)}
+                        />
+                      ) : (
+                        'No photo'
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+
+          <div style={{ marginTop: '20px' }}>
+            <button
+              onClick={() => navigate('/helpdesk')}
+              className="view-history-btn"
+            >
+              Back to Helpdesk
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Image Modal */}
+      {showImageModal && (
+        <div
+          className="modal-overlay"
+          style={{
+            position: "fixed",
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: "rgba(30,40,60,0.25)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999
+          }}
+          onClick={() => setShowImageModal(false)}
+        >
+          <div
+            className="modal-content"
+            style={{
+              background: "#fff",
+              borderRadius: 12,
+              padding: 0,
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <img
+              src={modalImageUrl}
+              alt="Full view"
+              style={{
+                maxWidth: "90vw",
+                maxHeight: "90vh",
+                borderRadius: 12,
+                display: "block"
+              }}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
-};
-
-export default History;
+}

@@ -8,7 +8,7 @@ import {
   uploadBytes,
   getDownloadURL,
 } from "firebase/storage";
-import "../../styles/editProfile.css";
+import "./editProfile.css";
 
 const BANKS = [
   "AEON Bank", "Affin Bank", "Al-Rajhi Banking & Investment Corp", "Alliance Bank Malaysia", "AmBank Berhad", "Bank Islam Malaysia", "Bank Kerjasama Rakyat Malaysia", "Bank Muamalat", "Bank of America", "Bank of China", "Bank Pertanian Malaysia (AGROBANK)", "Bank Simpanan Nasional", "BNP Paribas Malaysia", "Bangkok Bank", "BigPay Malaysia", "Boost Bank", "Boost eWallet", "China Construction Bank", "CIMB Bank", "Citibank Berhad", "Co-opbank Pertama", "Deutsche Bank", "Finexus Cards", "GXBank", "Hong Leong", "HSBC Bank", "Industrial & Commercial Bank of China", "JP Morgan Chase Bank", "KAF Digital Bank", "Kuwait Finance House", "MBSB Bank", "Mizuho Bank", "MUFG Bank", "Merchantrade", "OCBC Bank", "Public Bank", "RHB Bank", "Ryt Bank", "Standard Chartered Bank", "Sumitomo Mitsui Banking", "United Overseas Bank"

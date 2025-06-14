@@ -4,7 +4,7 @@ import { getAuth } from "firebase/auth";
 import { Link } from "react-router-dom";
 import Modal from "react-modal";
 import { FaThumbsUp, FaTrash, FaPlus, FaTimes, FaFilter } from "react-icons/fa";
-import "../../styles/forum.css";
+import "./forum.css";
 
 Modal.setAppElement("#root");
 

@@ -3,7 +3,7 @@ import { getDatabase, ref, set, push, get, child, serverTimestamp } from "fireba
 import { getAuth } from "firebase/auth";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate } from "react-router-dom";
-import "../../styles/forum.css";
+import "./forum.css";
 
 const CATEGORY_LIST = [
   "General",
