@@ -50,9 +50,9 @@ export default function Profile() {
         console.log("Hereeee");
         if (snapshot.exists()) {
           const users = snapshot.val();
-          const existingUser = Object.values(users).find(
-            (u) => u.email === user.email
-          ); // Match email
+          const existingUser = user
+            ? Object.values(users).find((u) => u.email === user.email)
+            : null; // Match email
           console.log("Existing user: ", existingUser);
           setDetail(existingUser);
         } else {
@@ -67,6 +67,8 @@ export default function Profile() {
 
     if (user) {
       fetchUser();
+    } else {
+      setDetail(null); // Clear detail if user is null
     }
   }, [user]);
 
