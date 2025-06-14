@@ -196,7 +196,13 @@ export default function Forum() {
         if (isEnabled) {
           fetchedPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
         } else {
-          fetchedPosts.sort((a, b) => b.upvoter?.length - a.upvoter?.length);
+          fetchedPosts.sort((a, b) => {
+            const upvoteDiff =
+              (b.upvoter?.length || 0) - (a.upvoter?.length || 0);
+            if (upvoteDiff !== 0) return upvoteDiff;
+            // If upvoter length is equal, sort by latest date
+            return new Date(b.date) - new Date(a.date);
+          });
         }
 
         setPosts(fetchedPosts);

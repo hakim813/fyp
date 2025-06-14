@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   StatusBar,
-  Button,
+  ImageBackground,
 } from "react-native";
 import {
   ref,
@@ -103,12 +103,10 @@ export default function NotiReminder({ route }) {
     <View style={styles.container3}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <LinearGradient
-            colors={["#03633a", "#95f6cc"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+          <ImageBackground
+            source={require("../assets/bg-hibiscus.png")} // Your image path
             style={[
-              styles.container,
+              styles.background,
               {
                 paddingTop:
                   Platform.OS === "ios"
@@ -116,6 +114,7 @@ export default function NotiReminder({ route }) {
                     : StatusBar.currentHeight,
               },
             ]}
+            resizeMode="cover"
           >
             <Text style={styles.text}>Set Your{"\n"}Contribution Reminder</Text>
             <StatusBar style="auto" />
@@ -216,7 +215,7 @@ export default function NotiReminder({ route }) {
                 </Text>
               </TouchableOpacity>
             </View>
-          </LinearGradient>
+          </ImageBackground>
         </View>
       </TouchableWithoutFeedback>
     </View>

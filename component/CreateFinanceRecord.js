@@ -188,7 +188,7 @@ export default function CreateFinanceRecord({ route }) {
                 <TextInput
                   style={[styles.input]}
                   numberOfLines={10}
-                  placeholder="Write out your content"
+                  placeholder="Example: 2.50"
                   value={value}
                   onChangeText={setValue}
                 />
@@ -208,7 +208,7 @@ export default function CreateFinanceRecord({ route }) {
                 <TextInput
                   style={[styles.input]}
                   numberOfLines={10}
-                  placeholder="Write out your content"
+                  placeholder="Example: 2.50"
                   value={notes}
                   onChangeText={setNotes}
                 />

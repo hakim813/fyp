@@ -21,7 +21,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 export default function Login() {
   const [email, setEmail] = useState("hakimkvip1@gmail.com");
-  const [pw, setPw] = useState("hakimTest123");
+  const [pw, setPw] = useState("hakimTest1234");
   const navi = useNavigation();
   const { user, setUser } = useContext(UserContext);
 

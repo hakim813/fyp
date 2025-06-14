@@ -42,6 +42,8 @@ export default function HelpdeskHome() {
   const [mediaModalVisible, setMediaModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [isOngoingPage, setIsOngoingPage] = useState(true);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showStatus, setShowStatus] = useState(null);
   //   const { pDate, pTime } = route.params || {};
 
   const navi = useNavigation();
@@ -240,7 +242,62 @@ export default function HelpdeskHome() {
                 </View>
               </View>
             </Modal>
+            {showHelp && isOngoingPage && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 60, // adjust as needed
+                  right: 10,
+                  backgroundColor: "#fff",
+                  padding: 10,
+                  borderRadius: 10,
+                  borderWidth: 0.2,
+                  borderColor: "green",
+                  maxWidth: 200,
+                  zIndex: 100,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 3,
+                  elevation: 5,
+                }}
+              >
+                <Text style={{ color: "#222", textAlign: "auto" }}>
+                  The yellow face icon shows that your issue is not resolved.
+                  {"\n\n"}If your issue had been resolved, kindly use the 'Set
+                  as resolved' button to change the helpdesk ticket status.
+                </Text>
+              </View>
+            )}
 
+            {showHelp && !isOngoingPage && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 60, // adjust as needed
+                  right: 10,
+                  backgroundColor: "#fff",
+                  padding: 10,
+                  borderRadius: 10,
+                  borderWidth: 0.2,
+                  borderColor: "green",
+                  maxWidth: 200,
+                  zIndex: 100,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 3,
+                  elevation: 5,
+                }}
+              >
+                <Text style={{ color: "#222", textAlign: "auto" }}>
+                  The yellow face icon shows that your issue is not resolved,
+                  while the green one indicates that the issue had been solved.
+                  {"\n\n"}If your issue had been resolved, kindly use the 'Set
+                  as resolved' button to change the helpdesk ticket status.
+                </Text>
+              </View>
+            )}
             <View>
               {isOngoingPage ? (
                 <FlatList
@@ -318,7 +375,23 @@ export default function HelpdeskHome() {
                               }
                             )}
                           </Text>
-
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              fontSize: 18,
+                              fontFamily: "Nunito-Bold",
+                            }}
+                          >
+                            {item.title}
+                          </Text>
+                          {/* <Text
+                            style={{
+                              fontSize: 18,
+                              fontFamily: "Nunito-Regular",
+                            }}
+                          >
+                            {item.title}
+                          </Text>
                           <Text
                             style={{
                               marginTop: 5,
@@ -327,7 +400,7 @@ export default function HelpdeskHome() {
                             }}
                           >
                             Description
-                          </Text>
+                          </Text> */}
                           <Text
                             style={{
                               fontSize: 18,
@@ -416,7 +489,11 @@ export default function HelpdeskHome() {
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                              onPress={() => {}}
+                              onPress={() => {
+                                setShowStatus(
+                                  showStatus === item.id ? null : item.id
+                                );
+                              }}
                               style={{
                                 borderColor: item.status === "grey",
                                 paddingHorizontal: 10,
@@ -440,6 +517,54 @@ export default function HelpdeskHome() {
                                 style={{ color: "grey" }}
                               />
                             </TouchableOpacity>
+                            {showStatus === item.id && (
+                              <>
+                                <View
+                                  style={{
+                                    position: "absolute",
+                                    right: 5,
+                                    top: -10,
+                                    width: 0,
+                                    height: 0,
+                                    borderTopWidth: 10,
+                                    borderTopColor: "#fff",
+                                    borderLeftWidth: 10,
+                                    borderLeftColor: "transparent",
+                                    borderRightWidth: 0,
+                                    borderRightColor: "transparent",
+                                    zIndex: 100,
+                                    shadowColor: "#000",
+                                    shadowOffset: { width: 0, height: 2 },
+                                    shadowOpacity: 0.2,
+                                    shadowRadius: 3,
+                                    elevation: 5,
+                                  }}
+                                ></View>
+                                <View
+                                  style={{
+                                    position: "absolute",
+                                    top: -40, // adjust as needed
+                                    right: 5,
+                                    backgroundColor: "#fff",
+                                    padding: 10,
+                                    borderRadius: 10,
+                                    borderWidth: 0.2,
+                                    borderColor: "green",
+                                    maxWidth: 200,
+                                    zIndex: 100,
+                                    shadowColor: "#000",
+                                    shadowOffset: { width: 0, height: 2 },
+                                    shadowOpacity: 0.2,
+                                    shadowRadius: 3,
+                                    elevation: 5,
+                                  }}
+                                >
+                                  <Text style={{ color: "#222" }}>
+                                    Status : Ongoing
+                                  </Text>
+                                </View>
+                              </>
+                            )}
                           </View>
                         </View>
                       </View>
@@ -462,10 +587,20 @@ export default function HelpdeskHome() {
                       <View
                         style={{
                           // backgroundColor: "red",
+                          flexDirection: "row",
                           alignItems: "center",
-                          justifyContent: "center",
+                          justifyContent: "space-between",
                         }}
                       >
+                        <View
+                          style={{
+                            height: 30,
+                            width: 30,
+                            // backgroundColor: "red",
+                            borderRadius: 100,
+                            marginLeft: 15,
+                          }}
+                        ></View>
                         <View
                           flexDirection="row"
                           style={{
@@ -547,6 +682,27 @@ export default function HelpdeskHome() {
                           Set as resolved
                         </Text> */}
                         </View>
+                        <TouchableOpacity
+                          style={{
+                            height: 25,
+                            width: 25,
+                            borderColor: "green",
+                            borderWidth: 1,
+                            borderRadius: 100,
+                            marginRight: 15,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                          onPress={() => setShowHelp(!showHelp)}
+                        >
+                          <Icon
+                            name={"info"}
+                            size={16}
+                            style={{
+                              color: "green",
+                            }}
+                          />
+                        </TouchableOpacity>
                       </View>
                     </>
                   }
@@ -638,8 +794,25 @@ export default function HelpdeskHome() {
                               fontFamily: "Nunito-Bold",
                             }}
                           >
-                            Description
+                            {item.title}
                           </Text>
+                          {/* <Text
+                            style={{
+                              fontSize: 18,
+                              fontFamily: "Nunito-Regular",
+                            }}
+                          >
+                            {item.title}
+                          </Text>
+                          <Text
+                            style={{
+                              marginTop: 5,
+                              fontSize: 18,
+                              fontFamily: "Nunito-Bold",
+                            }}
+                          >
+                            Description
+                          </Text> */}
                           <Text
                             style={{
                               fontSize: 18,
@@ -745,19 +918,23 @@ export default function HelpdeskHome() {
                             </TouchableOpacity>
                             <TouchableOpacity
                               onPress={() => {
-                                if (item.status === "ongoing") {
-                                  Alert.alert(
-                                    "Ticket In Progress", // Title
-                                    "This means our team is still working on your helpdesk ticket. Thank you for your patience!", // Message
-                                    [{ text: "OK", onPress: () => {} }]
-                                  );
-                                } else {
-                                  Alert.alert(
-                                    "Ticket Is Resolved", // Title
-                                    "This means your helpdesk ticket is resolved. Thank you for using our service!", // ✅ Fixed message
-                                    [{ text: "OK", onPress: () => {} }]
-                                  );
-                                }
+                                // if (item.status === "ongoing") {
+                                //   Alert.alert(
+                                //     "Ticket In Progress", // Title
+                                //     "This means our team is still working on your helpdesk ticket. Thank you for your patience!", // Message
+                                //     [{ text: "OK", onPress: () => {} }]
+                                //   );
+                                // } else {
+                                //   Alert.alert(
+                                //     "Ticket Is Resolved", // Title
+                                //     "This means your helpdesk ticket is resolved. Thank you for using our service!", // ✅ Fixed message
+                                //     [{ text: "OK", onPress: () => {} }]
+                                //   );
+                                // }
+
+                                setShowStatus(
+                                  showStatus === item.id ? null : item.id
+                                );
                               }}
                               style={{
                                 borderColor: item.status === "grey",
@@ -787,6 +964,56 @@ export default function HelpdeskHome() {
                                 }}
                               />
                             </TouchableOpacity>
+                            {showStatus === item.id && (
+                              <>
+                                <View
+                                  style={{
+                                    position: "absolute",
+                                    right: 5,
+                                    top: -10,
+                                    width: 0,
+                                    height: 0,
+                                    borderTopWidth: 10,
+                                    borderTopColor: "#fff",
+                                    borderLeftWidth: 10,
+                                    borderLeftColor: "transparent",
+                                    borderRightWidth: 0,
+                                    borderRightColor: "transparent",
+                                    zIndex: 100,
+                                    shadowColor: "#000",
+                                    shadowOffset: { width: 0, height: 2 },
+                                    shadowOpacity: 0.2,
+                                    shadowRadius: 3,
+                                    elevation: 5,
+                                  }}
+                                ></View>
+                                <View
+                                  style={{
+                                    position: "absolute",
+                                    top: -40, // adjust as needed
+                                    right: 5,
+                                    backgroundColor: "#fff",
+                                    padding: 10,
+                                    borderRadius: 10,
+                                    borderWidth: 0.2,
+                                    borderColor: "green",
+                                    maxWidth: 200,
+                                    zIndex: 100,
+                                    shadowColor: "#000",
+                                    shadowOffset: { width: 0, height: 2 },
+                                    shadowOpacity: 0.2,
+                                    shadowRadius: 3,
+                                    elevation: 5,
+                                  }}
+                                >
+                                  <Text style={{ color: "#222" }}>
+                                    {item.status === "ongoing"
+                                      ? "Status : Ongoing"
+                                      : "Status : Resolved"}
+                                  </Text>
+                                </View>
+                              </>
+                            )}
                           </View>
                         </View>
                       </View>
@@ -808,11 +1035,32 @@ export default function HelpdeskHome() {
 
                       <View
                         style={{
-                          // backgroundColor: "red",
+                          flexDirection: "row",
                           alignItems: "center",
-                          justifyContent: "center",
+                          justifyContent: "space-between",
                         }}
                       >
+                        <TouchableOpacity
+                          style={{
+                            height: 25,
+                            width: 25,
+                            // borderColor: "green",
+                            // borderWidth: 1,
+                            borderRadius: 100,
+                            marginLeft: 15,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                          onPress={() => setShowHelp(!showHelp)}
+                        >
+                          {/* <Icon
+                            name={"info"}
+                            size={16}
+                            style={{
+                              color: "green",
+                            }}
+                          /> */}
+                        </TouchableOpacity>
                         <View
                           flexDirection="row"
                           style={{
@@ -894,6 +1142,27 @@ export default function HelpdeskHome() {
                           Set as resolved
                         </Text> */}
                         </View>
+                        <TouchableOpacity
+                          style={{
+                            height: 25,
+                            width: 25,
+                            borderColor: "green",
+                            borderWidth: 1,
+                            borderRadius: 100,
+                            marginRight: 15,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                          onPress={() => setShowHelp(!showHelp)}
+                        >
+                          <Icon
+                            name={"info"}
+                            size={16}
+                            style={{
+                              color: "green",
+                            }}
+                          />
+                        </TouchableOpacity>
                       </View>
                     </>
                   }

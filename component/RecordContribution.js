@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  ImageBackground,
   StatusBar,
 } from "react-native";
 import {
@@ -123,12 +124,10 @@ export default function RecordContribution({ route }) {
     <View style={styles.container3}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <LinearGradient
-            colors={["#03633a", "#95f6cc"]} // start to end gradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+          <ImageBackground
+            source={require("../assets/bg-hibiscus.png")} // Your image path
             style={[
-              styles.container,
+              styles.background,
               {
                 paddingTop:
                   Platform.OS === "ios"
@@ -136,6 +135,7 @@ export default function RecordContribution({ route }) {
                     : StatusBar.currentHeight,
               },
             ]}
+            resizeMode="cover"
           >
             <Text style={styles.text}>
               Record Your Social{"\n"}Protection Contribution.
@@ -220,7 +220,7 @@ export default function RecordContribution({ route }) {
                 </Text>
               </TouchableOpacity>
             </View>
-          </LinearGradient>
+          </ImageBackground>
         </View>
       </TouchableWithoutFeedback>
     </View>

@@ -135,6 +135,12 @@ const ScanReceipt = () => {
     return formattedDate;
   }
 
+  const handleDelete = (index) => {
+    // Remove from local state
+    setOcrLines((prev) => prev.filter((_, i) => i !== index));
+    // If you want to delete from backend, call your delete API here
+  };
+
   const formatText = (lines) => {
     const dateRegex =
       /^(?:[A-Z][a-z]{2}, \d{1,2} [A-Z][a-z]+|\d{1,2} [A-Z][a-z]{3} \d{4})$/;
@@ -340,22 +346,41 @@ const ScanReceipt = () => {
                     const date = new Date(line.dateObj);
                     const formattedDate = `${date.getDate()} ${date.toLocaleString(
                       "default",
-                      {
-                        month: "short",
-                      }
+                      { month: "short" }
                     )} ${date.getFullYear()}`;
 
                     return (
-                      <Text
+                      <View
                         key={index}
                         style={{
-                          marginBottom: 5,
-                          fontSize: 20,
-                          fontFamily: "Nunito",
+                          marginBottom: 10,
+                          width: "100%",
+                          alignItems: "center",
                         }}
                       >
-                        {`Date  :     ${formattedDate}\nTime  :     ${line.time}\nAmount:   ${line.cleaned}\nStatus:      ${line.status}\n`}
-                      </Text>
+                        <Text
+                          style={{
+                            marginBottom: 5,
+                            fontSize: 20,
+                            fontFamily: "Nunito",
+                          }}
+                        >
+                          {`Date      :       ${formattedDate}\nTime      :       ${line.time}\nAmount :       RM ${line.cleaned}\nStatus    :       ${line.status}`}
+                        </Text>
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "#E5533D",
+                            padding: 8,
+                            borderRadius: 5,
+                            marginBottom: 10,
+                          }}
+                          onPress={() => handleDelete(index)} // or handleDelete(line.id) if you have an id
+                        >
+                          <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                            Delete
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
                     );
                   })}
                 </View>

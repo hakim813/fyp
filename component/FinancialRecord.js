@@ -302,6 +302,17 @@ export default function FinancialRecord() {
                             >
                               RM {parseFloat(item.income).toFixed(2)}
                             </Text>
+                            <Text
+                              style={{
+                                fontFamily: "Nunito",
+                                fontSize: 15,
+                                marginLeft: "auto",
+                                marginTop: 10,
+                                color: "grey",
+                              }}
+                            >
+                              Show/hide transactions
+                            </Text>
                             {/* Nested conditional for FlatList */}
                             {isDetailedView && item.month === monthChosen ? (
                               <View
@@ -446,7 +457,12 @@ export default function FinancialRecord() {
                               // marginBottom: 10,
                             }}
                           >
-                            {item.date}
+                            {new Date(item.date).toLocaleDateString("en-GB", {
+                              weekday: "short",
+                              day: "2-digit",
+                              month: "short",
+                              // year: "numeric",
+                            })}
                           </Text>
 
                           <FlatList
@@ -542,7 +558,14 @@ export default function FinancialRecord() {
                                               fontSize: 15,
                                             }}
                                           >
-                                            {new Date(i.date).toDateString()}
+                                            {/* {new Date(
+                                              item.date
+                                            ).toLocaleDateString("en-GB", {
+                                              weekday: "short",
+                                              day: "2-digit",
+                                              month: "short",
+                                              // year: "numeric",
+                                            })} */}
                                           </Text>
                                         </View>
                                       </View>

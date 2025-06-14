@@ -85,6 +85,7 @@ export default function Profile() {
     : 0;
 
   const handleLogout = () => {
+    navi.navigate("LandingPage");
     auth.signOut(); // Sign out from Firebase
     setUser(null); // Clear user data from context
     setDetail(null);
@@ -102,8 +103,8 @@ export default function Profile() {
         <View
           style={{
             position: "absolute",
-            width: 700,
-            height: 300,
+            width: 600,
+            height: 235,
             backgroundColor: "#50c878",
             padding: 0,
             borderBottomLeftRadius: 1000,
@@ -127,7 +128,7 @@ export default function Profile() {
             resizeMode="cover"
           >
             {detail ? (
-              <>
+              <View alignItems={"center"}>
                 <Text
                   style={[
                     styles.text,
@@ -143,7 +144,7 @@ export default function Profile() {
                 >
                   {detail?.username}'s{"\n"}Profile
                 </Text>
-              </>
+              </View>
             ) : (
               <Text>Home</Text>
             )}
@@ -151,7 +152,7 @@ export default function Profile() {
         </View>
         <View
           style={{
-            marginTop: 230,
+            marginTop: 160,
             width: "100%",
             // height: 100,
             alignItems: "center",
@@ -170,16 +171,71 @@ export default function Profile() {
             }}
             resizeMode="cover"
           />
-          <TouchableOpacity
-            onPress={() =>
-              navi.navigate("EditProfile", {
-                section: "Profile Pic",
-                detail: detail,
-              })
-            }
+          <View
+            flexDirection={"row"}
+            justifyContent={"space-evenly"}
+            width={"100%"}
           >
-            <Text marginBottom={10}>Edit Profile Photo</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                navi.navigate("EditProfile", {
+                  section: "Profile Pic",
+                  detail: detail,
+                })
+              }
+              style={{
+                backgroundColor: "#ddd",
+                minWidth: 120,
+                borderRadius: 50,
+                marginBottom: 15,
+                padding: 10,
+                paddingHorizontal: 20,
+                alignItems: "center",
+                justifyContent: "center",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.25,
+                shadowRadius: 1.84,
+
+                // Shadow for Android
+                elevation: 2,
+              }}
+            >
+              <Text
+                // fontFamily={"Nunito-ExtraBold"}
+                style={{ color: "#222", fontFamily: "Nunito-Bold" }}
+              >
+                Edit Profile Photo
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                backgroundColor: "red",
+                minWidth: 130,
+                borderRadius: 50,
+                marginBottom: 15,
+                padding: 10,
+                paddingHorizontal: 20,
+                alignItems: "center",
+                justifyContent: "center",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.25,
+                shadowRadius: 1.84,
+
+                // Shadow for Android
+                elevation: 2,
+              }}
+              onPress={() => handleLogout()}
+            >
+              <Text
+                // fontFamily={"Nunito-ExtraBold"}
+                style={{ color: "#fdfdfd", fontFamily: "Nunito-Bold" }}
+              >
+                Log out
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           <View //progress completion
             style={{

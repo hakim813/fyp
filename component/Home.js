@@ -190,7 +190,9 @@ export default function Home() {
             )}
           </ImageBackground>
         </View>
-        <View
+        <TouchableOpacity
+          activeOpacity={0.99}
+          onPress={() => navi.navigate("FinanceManager")}
           style={{
             // flexDirection: "row",
             position: "absolute",
@@ -274,7 +276,7 @@ export default function Home() {
               </Text>
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View
           style={{

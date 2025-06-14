@@ -508,7 +508,7 @@ export default function FinanceManager() {
                     }}
                   >
                     <PieChart
-                      style={{ backgroundColor: "transparent" }}
+                      style={{ backgroundColor: "transparent" }} // not "styles"
                       data={nullChart}
                       donut
                       textSize={16}
@@ -546,7 +546,7 @@ export default function FinanceManager() {
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: 20,
-                      borderColor: "#3282F6",
+                      borderColor: "#20734f",
                       borderWidth: 3,
                       backgroundColor: "#000f44f4f",
                       padding: 10,
@@ -756,7 +756,7 @@ export default function FinanceManager() {
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: 20,
-                      borderColor: "#3282F6",
+                      borderColor: "#20734f",
                       borderWidth: 3,
                       backgroundColor: "#000f44f4f",
                       padding: 10,
