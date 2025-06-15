@@ -1,39 +1,159 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getDatabase, ref, get, set } from "firebase/database";
+import { getDatabase, ref, get, set, push, update, onValue } from "firebase/database";
 import { Link } from "react-router-dom";
 import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
 import "./redeem.css";
 
-const requiredFields = [
-  "fullName", "dob", "email", "phone", "address", "profilePhoto",
-  "nricId", "icPhotos", "taxId", "workPermit",
-  "workStatus", "workCategory", "experience", "languages",
-  "bank", "bankAccountNumber", "insuranceCoverage", "socialSecurity", "licenses"
+// Use the same sections and fields as Profile.js for consistent profile completion
+const sections = [
+  {
+    name: "Personal",
+    fields: ["fullName", "dob", "gender", "email", "phone", "address"]
+  },
+  {
+    name: "Identification",
+    fields: ["nricId", "icPhotos", "taxId", "workPermit"]
+  },
+  {
+    name: "Professional",
+    fields: ["workStatus", "workCategory", "experience", "languages", "platforms"]
+  },
+  {
+    name: "Finance",
+    fields: ["bank", "bankAccountNumber"]
+  },
+  {
+    name: "Compliance",
+    fields: ["insuranceCoverage", "socialSecurity", "licenses", "gdl"]
+  }
 ];
+
 const RANGES = [
   { label: "2 km", value: 2000 },
   { label: "5 km", value: 5000 },
   { label: "10 km", value: 10000 },
   { label: "20 km", value: 20000 }
 ];
+const VOUCHER_AMOUNTS = [10, 20, 30, 40, 50];
 const mapContainerStyle = { width: "100%", height: "340px" };
+
+function getDistance(loc1, loc2) {
+  const R = 6371000, toRad = deg => deg * Math.PI / 180;
+  const dLat = toRad(loc2.lat - loc1.lat);
+  const dLng = toRad(loc2.lng - loc1.lng);
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(loc1.lat)) * Math.cos(toRad(loc2.lat)) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function formatDate(ts) {
+  if (!ts) return "-";
+  const d = new Date(ts);
+  return d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function getExpiryCountdown(expiresAt) {
+  if (!expiresAt) return "";
+  const ms = expiresAt - Date.now();
+  if (ms <= 0) return "Expired";
+  const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((ms / (1000 * 60)) % 60);
+  const seconds = Math.floor((ms / 1000) % 60);
+  if (days > 0) return `Expires in ${days} day${days > 1 ? "s" : ""} ${hours}h`;
+  if (hours > 0) return `Expires in ${hours} hour${hours > 1 ? "s" : ""} ${minutes}m`;
+  if (minutes > 0) return `Expires in ${minutes} minute${minutes !== 1 ? "s" : ""} ${seconds}s`;
+  return `Expires in ${seconds} second${seconds !== 1 ? "s" : ""}`;
+}
+
+// Custom hook for live countdown (only for Unused vouchers)
+function useCountdown(expiresAt, status) {
+  const [countdown, setCountdown] = useState(getExpiryCountdown(expiresAt));
+  useEffect(() => {
+    if (status !== "Unused") return;
+    setCountdown(getExpiryCountdown(expiresAt));
+    const interval = setInterval(() => {
+      setCountdown(getExpiryCountdown(expiresAt));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [expiresAt, status]);
+  return countdown;
+}
+
+function VoucherCard({ voucher, getStatusBadge, handleCopy, copyMsg, showConfirm, setShowConfirm, handleMarkUsed }) {
+  const countdown = useCountdown(voucher.expiresAt, voucher.status);
+
+  return (
+    <div className="voucher-history-card">
+      <div className="voucher-header-row">
+        <span className="voucher-amount-value">RM{voucher.amount} Voucher</span>
+        {getStatusBadge(voucher.status)}
+      </div>
+      <div className="voucher-code-row">
+        <span className="voucher-code">{voucher.code}</span>
+        <button className="copy-btn" onClick={() => handleCopy(voucher.code)}>Copy</button>
+        {copyMsg && <span className="copy-msg">{copyMsg}</span>}
+      </div>
+      <div className="voucher-date-row">
+        <span>Generated: {formatDate(voucher.created)}</span>
+        <span>Expires: {formatDate(voucher.expiresAt)}</span>
+      </div>
+      {voucher.status === "Unused" && (
+        <div className="voucher-expiry-countdown">
+          {countdown}
+        </div>
+      )}
+      {voucher.incentive && (
+        <div className="voucher-incentive">
+          <strong>Incentive:</strong> {voucher.incentive}
+        </div>
+      )}
+      {voucher.description && (
+        <div className="voucher-description">
+          {voucher.description}
+        </div>
+      )}
+      <div className="voucher-instructions">
+        Show this code at the petrol station counter to redeem your voucher.
+      </div>
+      {voucher.status === "Unused" && (
+        <button className="redeem-glass-btn" onClick={() => setShowConfirm(voucher.id)}>Mark as Used</button>
+      )}
+      {showConfirm === voucher.id && (
+        <div className="modal-overlay" onClick={() => setShowConfirm(null)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h4>Confirm Redemption</h4>
+            <p>Are you sure you want to mark this voucher as used? This action cannot be undone.</p>
+            <div style={{ display: "flex", gap: 16, marginTop: 18 }}>
+              <button className="redeem-glass-btn" onClick={() => handleMarkUsed(voucher.id)}>Yes</button>
+              <button className="redeem-glass-btn secondary" onClick={() => setShowConfirm(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Redeem() {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState({});
   const [profilePercent, setProfilePercent] = useState(0);
-  const [voucher, setVoucher] = useState(null);
+  const [vouchers, setVouchers] = useState([]);
   const [tab, setTab] = useState("voucher");
   const [range, setRange] = useState(RANGES[2].value);
   const [location, setLocation] = useState(null);
   const [stations, setStations] = useState([]);
   const [selectedStation, setSelectedStation] = useState(null);
   const [copyMsg, setCopyMsg] = useState("");
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(null);
   const [tabAnim, setTabAnim] = useState("fade-in");
   const [searchQuery, setSearchQuery] = useState("");
   const mapRef = useRef(null);
+  const [showUnusedMsg, setShowUnusedMsg] = useState(false);
+  const [toastMsg, setToastMsg] = useState("");
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: "AIzaSyC_DEkV1SbS4oOawjSgzPfgdoattVhEaM8",
@@ -55,8 +175,23 @@ export default function Redeem() {
         setProfilePercent(getProfileCompletion(data));
       }
     });
-    get(ref(db, `voucher/${user.uid}`)).then(snap => {
-      if (snap.exists()) setVoucher(snap.val());
+    // Listen for all vouchers
+    const voucherRef = ref(db, `vouchers/${user.uid}`);
+    return onValue(voucherRef, (snap) => {
+      const data = snap.val();
+      let arr = [];
+      if (data) {
+        arr = Object.entries(data).map(([id, v]) => ({
+          id,
+          ...v,
+        }));
+        // Sort: Unused first, then Used, then Expired, then by date
+        arr.sort((a, b) => {
+          const order = { Unused: 0, Used: 1, Expired: 2 };
+          return order[a.status] - order[b.status] || (b.created - a.created);
+        });
+      }
+      setVouchers(arr);
     });
   }, [user]);
 
@@ -105,22 +240,33 @@ export default function Redeem() {
     }
   }, [searchQuery, stations]);
 
-  const getDistance = (loc1, loc2) => {
-    const R = 6371000, toRad = deg => deg * Math.PI / 180;
-    const dLat = toRad(loc2.lat - loc1.lat);
-    const dLng = toRad(loc2.lng - loc1.lng);
-    const a = Math.sin(dLat / 2) ** 2 +
-      Math.cos(toRad(loc1.lat)) * Math.cos(toRad(loc2.lat)) *
-      Math.sin(dLng / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  };
+  // Expiry check (mark expired if past expiresAt)
+  useEffect(() => {
+    if (!user || !vouchers.length) return;
+    const now = Date.now();
+    vouchers.forEach((v) => {
+      if (v.status === "Unused" && v.expiresAt && now > v.expiresAt) {
+        update(ref(getDatabase(), `vouchers/${user.uid}/${v.id}`), { status: "Expired" });
+      }
+    });
+    // eslint-disable-next-line
+  }, [vouchers]);
 
+  // --- Profile Completion Logic (same as Profile.js) ---
   const getProfileCompletion = (data) => {
-    const filled = requiredFields.filter(f => {
+    const allFields = sections.flatMap(s => s.fields);
+    if (data.gdl === "Yes") {
+      allFields.push("gdlDocument");
+    }
+    const filledCount = allFields.filter(f => {
       const v = data[f];
-      return Array.isArray(v) ? v.length > 0 : v !== undefined && v !== null && v !== "";
+      if (f === "platforms") return Array.isArray(v) && v.length > 0 && v.every(p => p.name && p.id);
+      if (["languages", "insuranceCoverage", "licenses", "icPhotos"].includes(f)) return Array.isArray(v) && v.length > 0;
+      if (f === "gdl") return v === "Yes" || v === "No";
+      if (f === "gdlDocument") return !!v;
+      return v !== undefined && v !== null && v !== "";
     }).length;
-    return Math.round((filled / requiredFields.length) * 100);
+    return Math.round((filledCount / allFields.length) * 100);
   };
 
   const getStatusBadge = status => (
@@ -128,22 +274,41 @@ export default function Redeem() {
       ? <span className="badge badge-green">Unused</span>
       : status === "Used"
       ? <span className="badge badge-red">Used</span>
+      : status === "Expired"
+      ? <span className="badge badge-grey">Expired</span>
       : null
   );
 
   const handleGenerateVoucher = async () => {
-    if (voucher) return;
+    if (vouchers.some(v => v.status === "Unused")) {
+      setShowUnusedMsg(true); // Show error only on click
+      setTimeout(() => setShowUnusedMsg(false), 2000);
+      return;
+    }
+    setShowUnusedMsg(false);
     const code = "PETRO-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-    const newVoucher = { code, created: Date.now(), status: "Unused" };
-    await set(ref(getDatabase(), `voucher/${user.uid}`), newVoucher);
-    setVoucher(newVoucher);
+    const now = Date.now();
+    const expiresAt = now + 1000 * 60 * 60 * 24 * 7; // 7 days expiry
+    const randomAmount = VOUCHER_AMOUNTS[Math.floor(Math.random() * VOUCHER_AMOUNTS.length)];
+    const newVoucher = {
+      code,
+      created: now,
+      expiresAt,
+      status: "Unused",
+      amount: randomAmount,
+      incentive: "Gig Worker Data Completion",
+      description: "Reward for completing your government-requested profile information."
+    };
+    await push(ref(getDatabase(), `vouchers/${user.uid}`), newVoucher);
+    setToastMsg("Voucher generated successfully!");
+    setTimeout(() => setToastMsg(""), 2000);
   };
 
-  const handleMarkUsed = async () => {
-    if (!voucher) return;
-    await set(ref(getDatabase(), `voucher/${user.uid}/status`), "Used");
-    setVoucher({ ...voucher, status: "Used" });
-    setShowConfirm(false);
+  const handleMarkUsed = async (id) => {
+    await update(ref(getDatabase(), `vouchers/${user.uid}/${id}`), { status: "Used" });
+    setShowConfirm(null);
+    setToastMsg("Voucher marked as used!");
+    setTimeout(() => setToastMsg(""), 2000);
   };
 
   const handleCopy = code => {
@@ -169,6 +334,9 @@ export default function Redeem() {
 
   return (
     <div className="redeem-container">
+      {toastMsg && (
+        <div className="toast-success">{toastMsg}</div>
+      )}
       <div className="redeem-glass-wrapper">
         <div className="redeem-glass-header">
           <h2>Redeem Petrol Voucher</h2>
@@ -191,40 +359,46 @@ export default function Redeem() {
             <div className="redeem-glass-tabs">
               <button className={tab === "voucher" ? "tab active" : "tab"} onClick={() => handleTabChange("voucher")}>My Voucher</button>
               <button className={tab === "station" ? "tab active" : "tab"} onClick={() => handleTabChange("station")}>Find Station</button>
-              <button className={tab === "help" ? "tab active" : "tab"} onClick={() => handleTabChange("help")}>Help</button>
+              <button className={tab === "guide" ? "tab active" : "tab"} onClick={() => handleTabChange("guide")}>Guide</button>
             </div>
 
             <div className={`redeem-glass-tab-content ${tabAnim}`}>
               {tab === "voucher" && (
                 <div className="redeem-glass-card voucher-card-glass">
-                  <h3>Voucher Details</h3>
-                  {voucher ? (
-                    <>
-                      <div className="voucher-code-row">
-                        <span className="voucher-code">{voucher.code}</span>
-                        <button className="copy-btn" onClick={() => handleCopy(voucher.code)}>Copy</button>
-                        {copyMsg && <span className="copy-msg">{copyMsg}</span>}
-                      </div>
-                      <div className="voucher-status-row">{getStatusBadge(voucher.status)}</div>
-                      {voucher.status === "Unused" && (
-                        <button className="redeem-glass-btn" onClick={() => setShowConfirm(true)}>Mark as Used</button>
-                      )}
-                    </>
-                  ) : (
-                    <button className="redeem-glass-btn" onClick={handleGenerateVoucher}>Generate Voucher</button>
-                  )}
-                  {showConfirm && (
-                    <div className="modal-overlay" onClick={() => setShowConfirm(false)}>
-                      <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <h4>Confirm Redemption</h4>
-                        <p>Are you sure you want to mark this voucher as used? This action cannot be undone.</p>
-                        <div style={{ display: "flex", gap: 16, marginTop: 18 }}>
-                          <button className="redeem-glass-btn" onClick={handleMarkUsed}>Yes</button>
-                          <button className="redeem-glass-btn secondary" onClick={() => setShowConfirm(false)}>Cancel</button>
+                  <h3>Voucher History</h3>
+                  <div>
+                    <div className="voucher-amount-row">
+                      <button
+                        className="redeem-glass-btn"
+                        onClick={handleGenerateVoucher}
+                      >
+                        Generate Voucher
+                      </button>
+                      {showUnusedMsg && (
+                        <div className="voucher-info-msg">
+                          You already have an unused voucher. Please use it before generating a new one.
                         </div>
-                      </div>
+                      )}
                     </div>
-                  )}
+                  </div>
+                  <div className="voucher-history-list">
+                    {vouchers.length === 0 ? (
+                      <div style={{ color: "#888", marginTop: 24 }}>No vouchers yet.</div>
+                    ) : (
+                      vouchers.map((voucher) => (
+                        <VoucherCard
+                          key={voucher.id}
+                          voucher={voucher}
+                          getStatusBadge={getStatusBadge}
+                          handleCopy={handleCopy}
+                          copyMsg={copyMsg}
+                          showConfirm={showConfirm}
+                          setShowConfirm={setShowConfirm}
+                          handleMarkUsed={handleMarkUsed}
+                        />
+                      ))
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -289,20 +463,31 @@ export default function Redeem() {
                         />
                       ))}
                       {selectedStation && (
-                        <InfoWindow
-                          position={{
-                            lat: selectedStation.geometry.location.lat(),
-                            lng: selectedStation.geometry.location.lng()
-                          }}
-                          onCloseClick={() => setSelectedStation(null)}
-                        >
-                          <div className="station-info-window">
-                            <b>{selectedStation.name}</b>
-                            <div>{selectedStation.vicinity}</div>
-                            <div>Distance: {(selectedStation.distance / 1000).toFixed(2)} km</div>
-                          </div>
-                        </InfoWindow>
-                      )}
+  <InfoWindow
+    position={{
+      lat: selectedStation.geometry.location.lat(),
+      lng: selectedStation.geometry.location.lng()
+    }}
+    onCloseClick={() => setSelectedStation(null)}
+  >
+    <div className="station-info-window">
+      <b>{selectedStation.name}</b>
+      <div>{selectedStation.vicinity}</div>
+      <div>Distance: {(selectedStation.distance / 1000).toFixed(2)} km</div>
+      <button
+        className="open-maps-btn"
+        onClick={() => {
+          const lat = selectedStation.geometry.location.lat();
+          const lng = selectedStation.geometry.location.lng();
+          window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, "_blank");
+        }}
+        style={{ marginTop: 8, padding: "6px 14px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}
+      >
+        Open in Google Maps
+      </button>
+    </div>
+  </InfoWindow>
+)}
                     </GoogleMap>
                   )}
                   <div style={{ marginTop: 24 }}>
@@ -343,15 +528,32 @@ export default function Redeem() {
                 </div>
               )}
 
-              {tab === "help" && (
+              {tab === "guide" && (
                 <div className="redeem-glass-card">
-                  <h3>How to Redeem</h3>
+                  <h3>How to Use the Petrol Voucher Feature</h3>
                   <ol>
-                    <li>Complete your profile 100%.</li>
-                    <li>Generate a voucher and show the code at the petrol station counter.</li>
-                    <li>Use the map to find the nearest station and navigate there.</li>
-                    <li>Mark your voucher as used after redemption.</li>
+                    <li>
+                      <b>Complete Your Profile:</b> Fill in all required information in your profile to reach 100% completion.
+                    </li>
+                    <li>
+                      <b>Generate a Voucher:</b> Once your profile is complete, click <b>Generate Voucher</b>. A petrol voucher will be given to you as an incentive.
+                    </li>
+                    <li>
+                      <b>View and Use Your Voucher:</b> Your voucher code, amount, and expiry will appear in your voucher history. Show this code at a participating petrol station to redeem.
+                    </li>
+                    <li>
+                      <b>Find Petrol Stations:</b> Use the <b>Find Station</b> tab to locate nearby petrol stations. You can open the location in Google Maps for navigation.
+                    </li>
+                    <li>
+                      <b>Mark as Used:</b> After redeeming your voucher, click <b>Mark as Used</b> to update your voucher status.
+                    </li>
+                    <li>
+                      <b>Voucher Expiry:</b> Each voucher has a validity period. Use it before it expires! Expired vouchers cannot be redeemed.
+                    </li>
                   </ol>
+                  <p style={{marginTop: 18, color: "#1976d2"}}>
+                    <b>Tip:</b> Keep your profile updated to receive more incentives in the future!
+                  </p>
                 </div>
               )}
             </div>

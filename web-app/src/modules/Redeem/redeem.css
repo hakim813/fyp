@@ -324,3 +324,434 @@
     padding: 16px 6px 16px 6px;
   }
 }
+
+.voucher-history-list {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.voucher-history-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+  padding: 18px 16px;
+  margin-bottom: 6px;
+  position: relative;
+  border: 1px solid #e3e8ef;
+}
+
+.voucher-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.voucher-amount-value {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 12px;
+  border-radius: 8px;
+  font-size: 0.98em;
+  font-weight: 600;
+  margin-left: 8px;
+}
+.badge-green {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+.badge-red {
+  background: #ffebee;
+  color: #d32f2f;
+}
+.badge-grey {
+  background: #f1f1f1;
+  color: #888;
+}
+
+.voucher-code-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.voucher-code {
+  font-family: monospace;
+  font-size: 1.08em;
+  background: #f6f8fa;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.copy-btn {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.98em;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.copy-btn:hover { background: #1565c0; }
+.copy-msg {
+  color: #1976d2;
+  font-size: 0.98em;
+  margin-left: 6px;
+}
+
+.voucher-date-row {
+  display: flex;
+  gap: 18px;
+  font-size: 0.97em;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.voucher-instructions {
+  font-size: 0.95em;
+  color: #1976d2;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+.voucher-info-msg {
+  color: #d32f2f;
+  font-size: 0.97em;
+  margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+  .voucher-history-card { padding: 12px 6px; }
+  .voucher-history-list { gap: 10px; }
+}
+
+.redeem-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+}
+
+.toast-success {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1976d2;
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 1.05em;
+  z-index: 9999;
+  box-shadow: 0 2px 12px rgba(25, 118, 210, 0.12);
+  animation: fadeInOut 2s;
+}
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.redeem-glass-wrapper {
+  width: 1000px;
+  margin: 96px auto 48px auto;
+  background: rgba(255,255,255,0.88);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,177,106,0.10);
+  padding: 0 0 32px 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  backdrop-filter: blur(6px);
+}
+
+.redeem-glass-header {
+  padding: 36px 48px 16px 48px;
+  border-bottom: 1px solid #e5e7eb;
+  background: rgba(255,255,255,0.95);
+  border-radius: 18px 18px 0 0;
+}
+
+.redeem-glass-header h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+}
+
+.redeem-glass-progress {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.redeem-glass-progress-bar {
+  width: 180px;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.redeem-glass-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1976d2);
+  border-radius: 6px 0 0 6px;
+  transition: width 0.4s;
+}
+
+.redeem-glass-progress-label {
+  font-size: 1rem;
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.redeem-glass-blocked {
+  background: #fefbe7;
+  color: #7a6f1a;
+  border: 1px solid #f9e79f;
+  border-radius: 8px;
+  padding: 18px;
+  margin: 18px 0 0 0;
+  max-width: 400px;
+}
+
+.redeem-glass-btn {
+  margin-top: 18px;
+  padding: 10px 32px;
+  background: #00b16a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,177,106,0.08);
+}
+.redeem-glass-btn.secondary {
+  background: #e6f9f1;
+  color: #00b16a;
+}
+.redeem-glass-btn:hover {
+  background: #009457;
+  box-shadow: 0 4px 16px rgba(0,177,106,0.13);
+}
+
+.redeem-glass-tabs {
+  display: flex;
+  gap: 2px;
+  margin: 32px 0 0 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab {
+  background: #e6f9f1;
+  color: #000000;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  padding: 12px 36px;
+  font-size: 1.1em;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+  letter-spacing: 0.5px;
+}
+.tab.active {
+  background: #fff;
+  color: #009457;
+  border-bottom: 2px solid #00b16a;
+  font-weight: 600;
+}
+
+.redeem-glass-tab-content {
+  padding: 32px 48px 0 48px;
+  min-height: 400px;
+  animation: fadeIn 0.3s;
+}
+.redeem-glass-tab-content.fade-in { animation: fadeIn 0.3s; }
+.redeem-glass-tab-content.fade-out { animation: fadeOut 0.18s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(16px);} to { opacity: 1; transform: none; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+.redeem-glass-card {
+  background: rgba(255,255,255,0.96);
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,177,106,0.06);
+  padding: 32px 32px 24px 32px;
+  margin-bottom: 32px;
+  backdrop-filter: blur(2px);
+  border: 1px solid #e5e7eb;
+  transition: box-shadow 0.2s;
+}
+.redeem-glass-card:hover {
+  box-shadow: 0 6px 24px rgba(0,177,106,0.10);
+}
+
+.voucher-card-glass {
+  border-left: 4px solid #00b16a;
+}
+
+.voucher-code-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.voucher-code {
+  font-size: 1.5em;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: #000000;
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  background: #e6f9f1;
+  border-radius: 6px;
+  padding: 4px 16px;
+  transition: background 0.2s;
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 2px;
+  display: flex;
+  align-items: center;
+  transition: transform 0.15s;
+}
+.copy-btn:active {
+  transform: scale(1.15);
+}
+.copy-msg {
+  color: #00b16a;
+  font-size: 1em;
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+.voucher-status-row {
+  margin-bottom: 18px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 16px;
+  border-radius: 12px;
+  font-size: 1em;
+  font-weight: 500;
+  margin-left: 2px;
+  letter-spacing: 1px;
+}
+.badge-green { background: #e6f9f1; color: #009e60; }
+.badge-red { background: #ffeaea; color: #d63031; }
+.badge-grey { background: #f1f1f1; color: #888; }
+
+.voucher-history-list {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.voucher-history-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+  padding: 18px 16px;
+  margin-bottom: 6px;
+  position: relative;
+  border: 1px solid #e3e8ef;
+}
+
+.voucher-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.voucher-amount-value {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.voucher-expiry-countdown {
+  font-size: 0.98em;
+  color: #d32f2f;
+  margin-bottom: 6px;
+}
+
+.voucher-incentive {
+  font-size: 0.98em;
+  color: #1976d2;
+  margin-bottom: 2px;
+}
+.voucher-description {
+  font-size: 0.97em;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.voucher-date-row {
+  display: flex;
+  gap: 18px;
+  font-size: 0.97em;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.voucher-instructions {
+  font-size: 0.95em;
+  color: #1976d2;
+  margin-top: 6px;
+  margin-bottom: 8px;
+}
+
+.voucher-info-msg {
+  color: #d32f2f;
+  font-size: 0.97em;
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .redeem-glass-wrapper, .redeem-glass-header, .redeem-glass-tab-content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .redeem-glass-card {
+    padding: 16px 6px 16px 6px;
+  }
+}
+
+@media (max-width: 600px) {
+  .voucher-history-card { padding: 12px 6px; }
+  .voucher-history-list { gap: 10px; }
+}
+
+.open-maps-btn {
+  margin-top: 8px;
+  padding: 6px 14px;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.open-maps-btn:hover {
+  background: #1251a3;
+}
