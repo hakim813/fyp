@@ -189,7 +189,7 @@ export default function EditProfile() {
       }
     } else {
       if (name === "phone") {
-        const digits = value.replace(/\D/g, "").slice(0, 10);
+        const digits = value.replace(/\D/g, "").slice(0, 11); // changed to 11
         setFormData((p) => ({ ...p, phone: digits }));
       } else if (name === "gdl") {
         setFormData((p) => ({ ...p, gdl: value, gdlDocument: null }));
@@ -279,7 +279,7 @@ export default function EditProfile() {
     if (formData.bankAccountNumber && !/^\d+$/.test(formData.bankAccountNumber)) err.bankAccountNumber = "Digits only";
     if (formData.taxId && !/^\d+$/.test(formData.taxId)) err.taxId = "Digits only";
     if (formData.workPermit && !/^\d+$/.test(formData.workPermit)) err.workPermit = "Digits only";
-    if (!/^\d{10}$/.test(formData.phone)) err.phone = "Phone must be exactly 10 digits";
+    if (!/^\d{1,11}$/.test(formData.phone)) err.phone = "Phone must be up to 11 digits";
     if (formData.platforms && formData.platforms.some(p => !p.name || !p.id)) {
       err.platforms = "Please fill in all Platform Name and Platform ID fields or remove empty rows.";
     }
@@ -373,10 +373,10 @@ export default function EditProfile() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                maxLength={10}
+                maxLength={11} // changed from 10 to 11
                 inputMode="numeric"
                 pattern="\d*"
-                placeholder="e.g. 0123456789"
+                placeholder="e.g. 01234567890"
               />
               {errors.phone && <div className="error">{errors.phone}</div>}
             </div>

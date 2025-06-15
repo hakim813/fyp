@@ -1,32 +1,16 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getDatabase, ref, get, set, push, update, onValue } from "firebase/database";
+import { getDatabase, ref, get, push, update, onValue } from "firebase/database";
 import { Link } from "react-router-dom";
 import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from "@react-google-maps/api";
 import "./redeem.css";
 
-// Use the same sections and fields as Profile.js for consistent profile completion
 const sections = [
-  {
-    name: "Personal",
-    fields: ["fullName", "dob", "gender", "email", "phone", "address"]
-  },
-  {
-    name: "Identification",
-    fields: ["nricId", "icPhotos", "taxId", "workPermit"]
-  },
-  {
-    name: "Professional",
-    fields: ["workStatus", "workCategory", "experience", "languages", "platforms"]
-  },
-  {
-    name: "Finance",
-    fields: ["bank", "bankAccountNumber"]
-  },
-  {
-    name: "Compliance",
-    fields: ["insuranceCoverage", "socialSecurity", "licenses", "gdl"]
-  }
+  { name: "Personal", fields: ["fullName", "dob", "gender", "email", "phone", "address"] },
+  { name: "Identification", fields: ["nricId", "icPhotos", "taxId", "workPermit"] },
+  { name: "Professional", fields: ["workStatus", "workCategory", "experience", "languages", "platforms"] },
+  { name: "Finance", fields: ["bank", "bankAccountNumber"] },
+  { name: "Compliance", fields: ["insuranceCoverage", "socialSecurity", "licenses", "gdl"] }
 ];
 
 const RANGES = [
@@ -35,7 +19,7 @@ const RANGES = [
   { label: "10 km", value: 10000 },
   { label: "20 km", value: 20000 }
 ];
-const VOUCHER_AMOUNTS = [10, 20, 30, 40, 50];
+const VOUCHER_AMOUNTS = [50];
 const mapContainerStyle = { width: "100%", height: "340px" };
 
 function getDistance(loc1, loc2) {
@@ -68,7 +52,6 @@ function getExpiryCountdown(expiresAt) {
   return `Expires in ${seconds} second${seconds !== 1 ? "s" : ""}`;
 }
 
-// Custom hook for live countdown (only for Unused vouchers)
 function useCountdown(expiresAt, status) {
   const [countdown, setCountdown] = useState(getExpiryCountdown(expiresAt));
   useEffect(() => {
@@ -142,6 +125,7 @@ export default function Redeem() {
   const [userData, setUserData] = useState({});
   const [profilePercent, setProfilePercent] = useState(0);
   const [vouchers, setVouchers] = useState([]);
+  const [hasGeneratedVoucher, setHasGeneratedVoucher] = useState(false);
   const [tab, setTab] = useState("voucher");
   const [range, setRange] = useState(RANGES[2].value);
   const [location, setLocation] = useState(null);
@@ -190,6 +174,9 @@ export default function Redeem() {
           const order = { Unused: 0, Used: 1, Expired: 2 };
           return order[a.status] - order[b.status] || (b.created - a.created);
         });
+        setHasGeneratedVoucher(arr.length > 0);
+      } else {
+        setHasGeneratedVoucher(false);
       }
       setVouchers(arr);
     });
@@ -202,7 +189,6 @@ export default function Redeem() {
     );
   }, []);
 
-  // Fetch nearby petrol stations using Google Places API
   useEffect(() => {
     if (!isLoaded || !location) return;
     const service = new window.google.maps.places.PlacesService(document.createElement("div"));
@@ -224,7 +210,6 @@ export default function Redeem() {
     });
   }, [isLoaded, location, range]);
 
-  // Pan to searched station on the map
   useEffect(() => {
     if (!mapRef.current || !searchQuery || stations.length === 0) return;
     const match = stations.find(st =>
@@ -240,7 +225,6 @@ export default function Redeem() {
     }
   }, [searchQuery, stations]);
 
-  // Expiry check (mark expired if past expiresAt)
   useEffect(() => {
     if (!user || !vouchers.length) return;
     const now = Date.now();
@@ -252,7 +236,6 @@ export default function Redeem() {
     // eslint-disable-next-line
   }, [vouchers]);
 
-  // --- Profile Completion Logic (same as Profile.js) ---
   const getProfileCompletion = (data) => {
     const allFields = sections.flatMap(s => s.fields);
     if (data.gdl === "Yes") {
@@ -280,9 +263,10 @@ export default function Redeem() {
   );
 
   const handleGenerateVoucher = async () => {
-    if (vouchers.some(v => v.status === "Unused")) {
-      setShowUnusedMsg(true); // Show error only on click
-      setTimeout(() => setShowUnusedMsg(false), 2000);
+    // Only allow if user has never generated any voucher
+    if (hasGeneratedVoucher) {
+      setShowUnusedMsg(true);
+      setTimeout(() => setShowUnusedMsg(false), 3000); // Show for 3 seconds
       return;
     }
     setShowUnusedMsg(false);
@@ -325,7 +309,6 @@ export default function Redeem() {
     }, 180);
   };
 
-  // Filter stations by search query (name, brand, or location)
   const filteredStations = stations.filter(st =>
     (st.name && st.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (st.vicinity && st.vicinity.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -371,12 +354,13 @@ export default function Redeem() {
                       <button
                         className="redeem-glass-btn"
                         onClick={handleGenerateVoucher}
+                        // Do NOT disable the button, so user can always click to see the message
                       >
                         Generate Voucher
                       </button>
                       {showUnusedMsg && (
                         <div className="voucher-info-msg">
-                          You already have an unused voucher. Please use it before generating a new one.
+                          You have already generated your voucher. Only one voucher is allowed per user.
                         </div>
                       )}
                     </div>
@@ -406,14 +390,14 @@ export default function Redeem() {
                 <div className="redeem-glass-card">
                   <h3>Find Petrol Stations</h3>
                   <div className="station-search">
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        placeholder="Search by name, brand, or location"
-                        style={{ padding: "8px 12px", flex: 1 }}
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                      placeholder="Search by name, brand, or location"
+                      style={{ padding: "8px 12px", flex: 1 }}
+                    />
+                  </div>
                   <div className="station-filters">
                     <label>
                       Range:
@@ -447,7 +431,7 @@ export default function Redeem() {
                         position={location}
                         title="Your Location"
                         icon={{
-                          url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", // Blue pin
+                          url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
                           scaledSize: new window.google.maps.Size(40, 40)
                         }}
                       />
@@ -463,31 +447,30 @@ export default function Redeem() {
                         />
                       ))}
                       {selectedStation && (
-  <InfoWindow
-    position={{
-      lat: selectedStation.geometry.location.lat(),
-      lng: selectedStation.geometry.location.lng()
-    }}
-    onCloseClick={() => setSelectedStation(null)}
-  >
-    <div className="station-info-window">
-      <b>{selectedStation.name}</b>
-      <div>{selectedStation.vicinity}</div>
-      <div>Distance: {(selectedStation.distance / 1000).toFixed(2)} km</div>
-      <button
-        className="open-maps-btn"
-        onClick={() => {
-          const lat = selectedStation.geometry.location.lat();
-          const lng = selectedStation.geometry.location.lng();
-          window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, "_blank");
-        }}
-        style={{ marginTop: 8, padding: "6px 14px", background: "#1976d2", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}
-      >
-        Open in Google Maps
-      </button>
-    </div>
-  </InfoWindow>
-)}
+                        <InfoWindow
+                          position={{
+                            lat: selectedStation.geometry.location.lat(),
+                            lng: selectedStation.geometry.location.lng()
+                          }}
+                          onCloseClick={() => setSelectedStation(null)}
+                        >
+                          <div className="station-info-window">
+                            <b>{selectedStation.name}</b>
+                            <div>{selectedStation.vicinity}</div>
+                            <div>Distance: {(selectedStation.distance / 1000).toFixed(2)} km</div>
+                            <button
+                              className="open-maps-btn"
+                              onClick={() => {
+                                const lat = selectedStation.geometry.location.lat();
+                                const lng = selectedStation.geometry.location.lng();
+                                window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, "_blank");
+                              }}
+                            >
+                              Open in Google Maps
+                            </button>
+                          </div>
+                        </InfoWindow>
+                      )}
                     </GoogleMap>
                   )}
                   <div style={{ marginTop: 24 }}>
