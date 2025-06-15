@@ -160,3 +160,69 @@
     padding: 20px;
   }
 }
+
+/* Modal overlay for full profile photo */
+.profile-photo-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(30,40,60,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s;
+}
+
+.profile-photo-modal-content {
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px 24px 16px 24px;
+  box-shadow: 0 4px 32px rgba(0,104,74,0.18);
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.2s;
+}
+
+.profile-photo-full {
+  max-width: 70vw;
+  max-height: 70vh;
+  border-radius: 12px;
+  object-fit: contain;
+  background: #f9fafb;
+  box-shadow: 0 2px 12px rgba(0,104,74,0.10);
+}
+
+.profile-photo-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 2.2em;
+  color: #00b16a;
+  cursor: pointer;
+  font-weight: bold;
+  transition: color 0.18s;
+}
+
+.profile-photo-modal-close:hover {
+  color: #009457;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px);}
+  to { opacity: 1; transform: none; }
+}
+
+.gdl-doc-link {
+  color: #0984e3;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.gdl-doc-link:hover {
+  color: #00b894;
+}

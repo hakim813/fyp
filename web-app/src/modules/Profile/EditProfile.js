@@ -15,6 +15,8 @@ const BANKS = [
 ];
 
 const LANGUAGES = ["English", "Malay", "Chinese", "Indian", "others"];
+const INSURANCE_OPTIONS = ["Health", "Accident", "Vehicle"];
+const LICENSES_OPTIONS = ["Car", "Motorcycle", "Heavy-weight Vehicle"];
 
 const sections = [
   "Personal",
@@ -28,6 +30,7 @@ const initialForm = {
   // Personal
   fullName: "",
   dob: "",
+  gender: "", // NEW FIELD
   email: "",
   phone: "",
   address: "",
@@ -42,18 +45,22 @@ const initialForm = {
   workCategory: "",
   experience: "",
   languages: [],
+  platforms: [],
   // Finance
   bank: "",
   bankAccountNumber: "",
   // Compliance
-  insuranceCoverage: "",
+  insuranceCoverage: [],
   socialSecurity: "",
-  licenses: "",
+  licenses: [],
+  gdl: "", // NEW FIELD
+  gdlDocument: null, // NEW FIELD
 };
 
 const fieldLabels = {
   fullName: "Full Name",
   dob: "Date of Birth",
+  gender: "Gender",
   email: "Email",
   phone: "Phone Number",
   address: "Address",
@@ -65,12 +72,15 @@ const fieldLabels = {
   workStatus: "Work Status",
   workCategory: "Work Category",
   experience: "Years of Experience",
-  languages: "Languages",
+  languages: "Spoken Language(s)",
+  platforms: "Platform(s) Worked For",
   bank: "Bank",
   bankAccountNumber: "Bank Account Number",
   insuranceCoverage: "Insurance Coverage",
   socialSecurity: "Social Security",
   licenses: "Licenses",
+  gdl: "Goods Driving License (GDL)",
+  gdlDocument: "Upload GDL Document",
 };
 
 function isFieldFilled(field, data) {
@@ -81,6 +91,13 @@ function isFieldFilled(field, data) {
   if (field === "email") return !!v && /\S+@\S+\.\S+/.test(v);
   if (field === "bankAccountNumber" || field === "taxId" || field === "workPermit") return /^\d+$/.test(v);
   if (field === "languages") return Array.isArray(v) && v.length > 0;
+  if (field === "platforms") return Array.isArray(v) && v.length > 0 && v.every(p => p.name && p.id);
+  if (field === "insuranceCoverage") return Array.isArray(v) && v.length > 0;
+  if (field === "licenses") return Array.isArray(v) && v.length > 0;
+  if (field === "gdl") {
+    if (v === "Yes") return !!data.gdlDocument;
+    return v === "No";
+  }
   return v !== undefined && v !== null && v !== "";
 }
 
@@ -94,6 +111,7 @@ export default function EditProfile() {
   const [previews, setPreviews] = useState({
     profilePhoto: null,
     icPhotos: [],
+    gdlDocument: null,
   });
   const [currentSection, setCurrentSection] = useState("Personal");
   const [errors, setErrors] = useState({});
@@ -112,10 +130,16 @@ export default function EditProfile() {
             ...data,
             icPhotos: data.icPhotos || [],
             languages: data.languages || [],
+            platforms: data.platforms || [],
+            insuranceCoverage: data.insuranceCoverage || [],
+            licenses: data.licenses || [],
+            gdl: data.gdl || "",
+            gdlDocument: data.gdlDocument || null,
           }));
           setPreviews({
             profilePhoto: data.profilePhoto || null,
             icPhotos: data.icPhotos || [],
+            gdlDocument: data.gdlDocument || null,
           });
         } else {
           setFormData((prev) => ({
@@ -131,11 +155,11 @@ export default function EditProfile() {
 
   // Section fields for ticks
   const sectionFields = {
-    Personal: ["fullName", "dob", "email", "phone", "address", "profilePhoto"],
+    Personal: ["fullName", "dob", "gender", "email", "phone", "address", "profilePhoto"],
     Identification: ["nricId", "icPhotos", "taxId", "workPermit"],
-    Professional: ["workStatus", "workCategory", "experience", "languages"],
+    Professional: ["workStatus", "workCategory", "experience", "languages", "platforms"],
     Finance: ["bank", "bankAccountNumber"],
-    Compliance: ["insuranceCoverage", "socialSecurity", "licenses"],
+    Compliance: ["insuranceCoverage", "socialSecurity", "licenses", "gdl"],
   };
 
   // Handlers
@@ -147,9 +171,7 @@ export default function EditProfile() {
         setFormData((p) => ({ ...p, profilePhoto: file }));
         setPreviews((pv) => ({ ...pv, profilePhoto: URL.createObjectURL(file) }));
       } else if (name === "icPhotos") {
-        // Merge new files with existing, max 2
         let existing = formData.icPhotos || [];
-        // Remove any File objects from existing if user re-selects
         existing = existing.filter(f => typeof f === "string");
         let arr = Array.from(files);
         let merged = [...existing, ...arr].slice(0, 2);
@@ -160,12 +182,18 @@ export default function EditProfile() {
             typeof f === "string" ? f : URL.createObjectURL(f)
           ),
         }));
+      } else if (name === "gdlDocument") {
+        const file = files[0];
+        setFormData((p) => ({ ...p, gdlDocument: file }));
+        setPreviews((pv) => ({ ...pv, gdlDocument: URL.createObjectURL(file) }));
       }
     } else {
       if (name === "phone") {
-        // Only allow numbers, max 10 digits
         const digits = value.replace(/\D/g, "").slice(0, 10);
         setFormData((p) => ({ ...p, phone: digits }));
+      } else if (name === "gdl") {
+        setFormData((p) => ({ ...p, gdl: value, gdlDocument: null }));
+        setPreviews((pv) => ({ ...pv, gdlDocument: null }));
       } else {
         setFormData((p) => ({ ...p, [name]: value }));
       }
@@ -188,6 +216,60 @@ export default function EditProfile() {
     setErrors((err) => ({ ...err, languages: undefined }));
   };
 
+  // Insurance Coverage: multiple checkboxes
+  const handleInsuranceChange = (e) => {
+    const { value, checked } = e.target;
+    setFormData((prev) => {
+      let arr = prev.insuranceCoverage || [];
+      if (checked) {
+        arr = [...arr, value];
+      } else {
+        arr = arr.filter((v) => v !== value);
+      }
+      return { ...prev, insuranceCoverage: arr };
+    });
+    setErrors((err) => ({ ...err, insuranceCoverage: undefined }));
+  };
+
+  // Licenses: multiple checkboxes
+  const handleLicensesChange = (e) => {
+    const { value, checked } = e.target;
+    setFormData((prev) => {
+      let arr = prev.licenses || [];
+      if (checked) {
+        arr = [...arr, value];
+      } else {
+        arr = arr.filter((v) => v !== value);
+      }
+      return { ...prev, licenses: arr };
+    });
+    setErrors((err) => ({ ...err, licenses: undefined }));
+  };
+
+  // Platform(s) Worked For handlers
+  const handlePlatformChange = (idx, field, value) => {
+    setFormData((prev) => {
+      const updated = [...(prev.platforms || [])];
+      updated[idx][field] = value;
+      return { ...prev, platforms: updated };
+    });
+  };
+
+  const handleAddPlatform = () => {
+    setFormData((prev) => ({
+      ...prev,
+      platforms: [...(prev.platforms || []), { name: "", id: "" }],
+    }));
+  };
+
+  const handleRemovePlatform = (idx) => {
+    setFormData((prev) => {
+      const updated = [...(prev.platforms || [])];
+      updated.splice(idx, 1);
+      return { ...prev, platforms: updated };
+    });
+  };
+
   // Only validate format if field is filled, not required
   const validate = () => {
     let err = {};
@@ -197,8 +279,13 @@ export default function EditProfile() {
     if (formData.bankAccountNumber && !/^\d+$/.test(formData.bankAccountNumber)) err.bankAccountNumber = "Digits only";
     if (formData.taxId && !/^\d+$/.test(formData.taxId)) err.taxId = "Digits only";
     if (formData.workPermit && !/^\d+$/.test(formData.workPermit)) err.workPermit = "Digits only";
-    // Phone: must be exactly 10 digits
     if (!/^\d{10}$/.test(formData.phone)) err.phone = "Phone must be exactly 10 digits";
+    if (formData.platforms && formData.platforms.some(p => !p.name || !p.id)) {
+      err.platforms = "Please fill in all Platform Name and Platform ID fields or remove empty rows.";
+    }
+    if (formData.gdl === "Yes" && !formData.gdlDocument) {
+      err.gdlDocument = "GDL Document is required if you have GDL.";
+    }
     return err;
   };
 
@@ -233,6 +320,15 @@ export default function EditProfile() {
       updated.icPhotos = urls;
     }
 
+    // Upload GDL Document
+    if (formData.gdl === "Yes" && formData.gdlDocument instanceof File) {
+      const r3 = storageRef(storage, `gdlDocuments/${u.uid}_${formData.gdlDocument.name}`);
+      await uploadBytes(r3, formData.gdlDocument);
+      updated.gdlDocument = await getDownloadURL(r3);
+    } else if (formData.gdl === "No") {
+      updated.gdlDocument = null;
+    }
+
     await update(dbRef(db, `users/${u.uid}`), updated);
     navigate("/profile");
   };
@@ -256,6 +352,14 @@ export default function EditProfile() {
               <label>{fieldLabels.dob}</label>
               <input type="date" name="dob" value={formData.dob} onChange={handleChange} />
               {errors.dob && <div className="error">{errors.dob}</div>}
+            </div>
+            <div className="input-group">
+              <label>{fieldLabels.gender}</label>
+              <select name="gender" value={formData.gender} onChange={handleChange}>
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
             </div>
             <div className="input-group">
               <label>{fieldLabels.email}</label>
@@ -363,6 +467,44 @@ export default function EditProfile() {
               </div>
               {errors.languages && <div className="error">{errors.languages}</div>}
             </div>
+            <div className="input-group">
+              <label>{fieldLabels.platforms}</label>
+              {(formData.platforms || []).map((platform, idx) => (
+                <div className="platform-row" key={idx}>
+                  <input
+                    type="text"
+                    placeholder="Platform Name (e.g. Grab, Lalamove)"
+                    value={platform.name}
+                    onChange={e => handlePlatformChange(idx, "name", e.target.value)}
+                    className="platform-input"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Platform ID / Account"
+                    value={platform.id}
+                    onChange={e => handlePlatformChange(idx, "id", e.target.value)}
+                    className="platform-input"
+                  />
+                  <button
+                    type="button"
+                    className="remove-platform-btn"
+                    onClick={() => handleRemovePlatform(idx)}
+                    title="Remove this platform"
+                    style={{ marginLeft: 8 }}
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="add-platform-btn"
+                onClick={handleAddPlatform}
+              >
+                + Add Platform
+              </button>
+              {errors.platforms && <div className="error">{errors.platforms}</div>}
+            </div>
           </>
         );
       case "Finance":
@@ -389,13 +531,21 @@ export default function EditProfile() {
           <>
             <div className="input-group">
               <label>{fieldLabels.insuranceCoverage}</label>
-              <select name="insuranceCoverage" value={formData.insuranceCoverage} onChange={handleChange}>
-                <option value="">Select</option>
-                <option value="None">None</option>
-                <option value="Health">Health</option>
-                <option value="Accident">Accident</option>
-                <option value="Vehicle">Vehicle</option>
-              </select>
+              <div className="checkbox-group">
+                {INSURANCE_OPTIONS.map((opt) => (
+                  <label key={opt} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="insuranceCoverage"
+                      value={opt}
+                      checked={formData.insuranceCoverage.includes(opt)}
+                      onChange={handleInsuranceChange}
+                    />
+                    {opt}
+                  </label>
+                ))}
+              </div>
+              {errors.insuranceCoverage && <div className="error">{errors.insuranceCoverage}</div>}
             </div>
             <div className="input-group">
               <label>{fieldLabels.socialSecurity}</label>
@@ -409,13 +559,50 @@ export default function EditProfile() {
             </div>
             <div className="input-group">
               <label>{fieldLabels.licenses}</label>
-              <select name="licenses" value={formData.licenses} onChange={handleChange}>
+              <div className="checkbox-group">
+                {LICENSES_OPTIONS.map((opt) => (
+                  <label key={opt} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="licenses"
+                      value={opt}
+                      checked={formData.licenses.includes(opt)}
+                      onChange={handleLicensesChange}
+                    />
+                    {opt}
+                  </label>
+                ))}
+              </div>
+              {errors.licenses && <div className="error">{errors.licenses}</div>}
+            </div>
+            <div className="input-group">
+              <label>{fieldLabels.gdl}</label>
+              <select name="gdl" value={formData.gdl} onChange={handleChange}>
                 <option value="">Select</option>
-                <option value="Car">Car</option>
-                <option value="Motorcycle">Motorcycle</option>
-                <option value="Heavy-weight Vehicle">Heavy-weight Vehicle</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
               </select>
             </div>
+            {formData.gdl === "Yes" && (
+              <div className="input-group">
+                <label>{fieldLabels.gdlDocument}</label>
+                <input
+                  type="file"
+                  name="gdlDocument"
+                  accept="application/pdf,image/*"
+                  onChange={handleChange}
+                />
+                {previews.gdlDocument && (
+                  <span
+                    className="gdl-doc-link"
+                    onClick={() => handleFileClick(previews.gdlDocument)}
+                  >
+                    View Uploaded GDL Document
+                  </span>
+                )}
+                {errors.gdlDocument && <div className="error">{errors.gdlDocument}</div>}
+              </div>
+            )}
           </>
         );
       default:

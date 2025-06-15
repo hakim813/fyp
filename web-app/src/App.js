@@ -4,10 +4,8 @@ import { UserProvider } from './utils/UserContext';
 import './styles/App.css';
 
 import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
 
 import Login from './modules/Authentication/Login';
-
 import Signup from './modules/Authentication/Signup';
 
 import Home from './modules/Home/Home';

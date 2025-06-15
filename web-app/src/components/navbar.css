@@ -2,58 +2,114 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #bcffe3;
-  padding: 0 24px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-  height: 64px;
+  background: #e6f9f1;
+  padding: 0 32px;
+  box-shadow: 0 4px 16px rgba(0,104,74,0.08);
+  height: 68px;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 100;
+  border-bottom: 2px solid #b2dfdb;
+  box-shadow: 0 6px 24px rgba(0, 104, 74, 0.16);
 }
+
 
 .navbar-logo-link {
   display: flex;
   align-items: center;
   text-decoration: none;
+  gap: 4px;
 }
 
 .navbar-logo-we {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: bold;
   color: #222;
   margin-left: 10px;
+  letter-spacing: 1px;
 }
 
 .navbar-logo-gig {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: bold;
   color: #00b16a;
+  letter-spacing: 1px;
 }
 
 .navbar-links {
   list-style: none;
   display: flex;
-  gap: 28px;
+  gap: 32px;
   margin-right: 10px;
   padding-left: 0;
 }
 
 .navbar-links li {
-  font-size: 16px;
+  font-size: 17px;
+  position: relative;
 }
 
 .navbar-links a {
   text-decoration: none;
-  color: #333;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: background 0.2s, color 0.2s;
+  color: #222;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: 
+    color 0.18s,
+    background 0.18s,
+    transform 0.18s;
+  font-weight: 500;
+  position: relative;
+  display: inline-block;
 }
 
 .navbar-links a:hover,
 .navbar-links .active {
   color: #00b16a;
-  background: #e3f9ef;
+  background: #d0f5e6;
+  transform: translateY(-2px) scale(1.06);
+}
+
+.navbar-links a.active::after,
+.navbar-links a:hover::after {
+  content: "";
+  display: block;
+  height: 3px;
+  border-radius: 2px;
+  background: #00b16a;
+  width: 70%;
+  margin: 0 auto;
+  margin-top: 4px;
+  transition: width 0.2s;
+}
+
+@media (max-width: 900px) {
+  .navbar {
+    padding: 0 10px;
+  }
+  .navbar-links {
+    gap: 16px;
+  }
+  .navbar-logo-we,
+  .navbar-logo-gig {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 8px 2vw;
+  }
+  .navbar-links {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+  }
+  .navbar-links li {
+    font-size: 15px;
+  }
 }
