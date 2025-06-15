@@ -19,6 +19,7 @@ body, .home-container {
   border: 1px solid #eaeaea;
 }
 
+/* Greeting */
 .greeting-row {
   display: flex;
   align-items: center;
@@ -31,8 +32,8 @@ body, .home-container {
 }
 
 .profile-photo {
-  width: 56px;
-  height: 56px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #eaeaea;
@@ -59,7 +60,7 @@ body, .home-container {
 }
 
 .progress-bar {
-  width: 110px;
+  width: 300px;
   height: 8px;
   background: #eaeaea;
   border-radius: 5px;
@@ -356,5 +357,139 @@ h2 {
     position: sticky;
     top: 32px;
     align-self: flex-start;
+  }
+}
+
+.finance-summary,
+.recent-vouchers {
+  font-size: 1.13em;
+  padding: 32px 28px 26px 28px;
+}
+
+.finance-summary h2,
+.recent-vouchers h2 {
+  font-size: 1.35em;
+  margin-bottom: 18px;
+}
+
+.finance-summary .finance-cards {
+  gap: 32px;
+  margin-bottom: 18px;
+}
+
+.finance-card {
+  min-width: 140px;
+  font-size: 1.13em;
+  padding: 22px 32px;
+}
+
+.finance-card .value {
+  font-size: 1.25em;
+}
+
+.recent-vouchers .voucher-list {
+  gap: 22px;
+}
+
+.voucher-card {
+  min-width: 180px;
+  font-size: 1.09em;
+  padding: 18px 18px 14px 18px;
+}
+
+
+
+/* Responsive adjustments for larger cards */
+@media (max-width: 700px) {
+  .finance-summary,
+  .recent-vouchers {
+    padding: 18px 8px 14px 8px;
+    font-size: 1em;
+  }
+  .finance-summary h2,
+  .recent-vouchers h2 {
+    font-size: 1.08em;
+  }
+  .voucher-card {
+    min-width: 120px;
+    font-size: 1em;
+    padding: 12px 8px 10px 8px;
+  }
+}
+
+/* Quick Actions: grid layout, more spacing, uniform button size, subtle hover effect */
+.quick-actions .actions-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+  margin: 14px 0 4px 0;
+}
+
+@media (max-width: 600px) {
+  .quick-actions .actions-list {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+.action-btn {
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  font-size: 1.08em;
+  font-weight: 600;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #f8fafb 60%, #e3f2fd 100%);
+  color: #1976d2;
+  border: 1.5px solid #eaeaea;
+  box-shadow: 0 1px 4px rgba(25, 118, 210, 0.04);
+  transition: background 0.18s, color 0.18s, border 0.18s, box-shadow 0.18s, transform 0.18s;
+  display: flex;
+  gap: 10px;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1.2;
+}
+
+.action-btn:hover {
+  background: linear-gradient(90deg, #1976d2 60%, #009457 100%);
+  color: #fff;
+  border: 1.5px solid #1976d2;
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.13);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.quick-actions h2 {
+  margin-bottom: 8px;
+  font-size: 1.18em;
+  color: #1976d2;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Remove underline from links inside .actions-list */
+.quick-actions .actions-list a {
+  text-decoration: none !important;
+  width: 100%;
+  display: block;
+}
+
+/* Make sure all buttons are the same height even if text wraps */
+.action-btn {
+  height: 54px;
+  white-space: normal;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+/* Optional: Reduce font size for smaller screens */
+@media (max-width: 400px) {
+  .action-btn {
+    font-size: 0.98em;
+    height: 46px;
   }
 }

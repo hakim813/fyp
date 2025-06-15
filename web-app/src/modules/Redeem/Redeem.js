@@ -38,6 +38,7 @@ function formatDate(ts) {
   return d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+// Updated expiry countdown to always show days, hours, minutes, seconds
 function getExpiryCountdown(expiresAt) {
   if (!expiresAt) return "";
   const ms = expiresAt - Date.now();
@@ -47,13 +48,7 @@ function getExpiryCountdown(expiresAt) {
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
   const seconds = Math.floor((ms / 1000) % 60);
 
-  let parts = [];
-  if (days > 0) parts.push(`${days} day${days > 1 ? "s" : ""}`);
-  if (hours > 0 || days > 0) parts.push(`${hours}h`);
-  if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes}m`);
-  parts.push(`${seconds}s`);
-
-  return `Expires in ${parts.join(" ")}`;
+  return `Expires in ${days} day${days !== 1 ? "s" : ""} ${hours}h ${minutes}m ${seconds}s`;
 }
 
 function useCountdown(expiresAt, status) {
@@ -358,7 +353,6 @@ export default function Redeem() {
                       <button
                         className="redeem-glass-btn"
                         onClick={handleGenerateVoucher}
-                        // Do NOT disable the button, so user can always click to see the message
                       >
                         Generate Voucher
                       </button>

@@ -67,7 +67,7 @@ function Home() {
             setUserData({
               ...data,
               profilePercent: getProfileCompletion(data),
-              photoURL: data.photoURL || ""
+              photoURL: data.profilePhoto || data.photoURL || ""
             });
           }
         });
@@ -136,19 +136,6 @@ function Home() {
     return () => raf && cancelAnimationFrame(raf);
   }, [userData.profilePercent]);
 
-  // Voucher countdown
-  function getVoucherCountdown(expiresAt) {
-    if (!expiresAt) return "";
-    const ms = expiresAt - Date.now();
-    if (ms <= 0) return "Expired";
-    const hours = Math.floor(ms / (1000 * 60 * 60));
-    const minutes = Math.floor((ms / (1000 * 60)) % 60);
-    const seconds = Math.floor((ms / 1000) % 60);
-    if (hours > 0) return `Expires in ${hours}h ${minutes}m`;
-    if (minutes > 0) return `Expires in ${minutes}m ${seconds}s`;
-    return `Expires in ${seconds}s`;
-  }
-
   return (
     <div className="home-container">
       <header className="home-header">
@@ -193,7 +180,6 @@ function Home() {
         <div className="main-col main-col-left">
           <section className="finance-summary minimalist-card">
             <h2>
-              <FaMoneyBillWave style={{ marginRight: 8, color: "#009457" }} />
               Today's Financial Summary
             </h2>
             <div className="finance-cards">
@@ -211,7 +197,6 @@ function Home() {
 
           <section className="recent-vouchers minimalist-card">
             <h2>
-              <FaGasPump style={{ marginRight: 8, color: "#1976d2" }} />
               Recent Vouchers
             </h2>
             {loading ? (
@@ -249,19 +234,19 @@ function Home() {
             </h2>
             <div className="actions-list">
               <Link to="/redeem">
-                <button className="action-btn"><FaGasPump /> Redeem Voucher</button>
+                <button className="action-btn"> Redeem Voucher</button>
               </Link>
               <Link to="/find-station">
-                <button className="action-btn"><FaMapMarkedAlt /> Find Petrol Station</button>
+                <button className="action-btn"> Find Petrol Station</button>
               </Link>
               <Link to="/edit-profile">
-                <button className="action-btn"><FaUserEdit /> Edit Profile</button>
+                <button className="action-btn"> Edit Profile</button>
               </Link>
               <Link to="/forum">
-                <button className="action-btn"><FaComments /> Forum</button>
+                <button className="action-btn"> Forum</button>
               </Link>
               <Link to="/helpdesk">
-                <button className="action-btn"><FaHandsHelping /> Helpdesk</button>
+                <button className="action-btn"> Helpdesk</button>
               </Link>
             </div>
           </section>
@@ -333,12 +318,12 @@ function getCountdown(expiresAt) {
   if (!expiresAt) return "";
   const ms = expiresAt - Date.now();
   if (ms <= 0) return "Expired";
-  const hours = Math.floor(ms / (1000 * 60 * 60));
+  const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
   const seconds = Math.floor((ms / 1000) % 60);
-  if (hours > 0) return `Expires in ${hours}h ${minutes}m`;
-  if (minutes > 0) return `Expires in ${minutes}m ${seconds}s`;
-  return `Expires in ${seconds}s`;
+
+  return `Expires in ${days} day${days !== 1 ? "s" : ""} ${hours}h ${minutes}m ${seconds}s`;
 }
 
 // Human-readable time ago
