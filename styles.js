@@ -175,14 +175,14 @@ export const stylesHome = StyleSheet.create({
 
   imageSlider: {
     backgroundColor: "#1b434d",
-    paddingVertical: 15,
-    paddingRight: 25,
+    // paddingVertical: 15,
+    // paddingRight: 25,
     borderRadius: 30,
     marginVertical: 5,
     marginRight: 10,
     height: 150,
     width: 230,
-    opacity: 0.5,
+    // opacity: 0.5,
     alignSelf: "center",
   },
 

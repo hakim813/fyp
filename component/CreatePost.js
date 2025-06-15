@@ -85,7 +85,7 @@ export default function CreatePost() {
     console.log("Writing data to Firebase...");
 
     if (!content) {
-      Alert.alert("No content is written.");
+      Alert.alert("Empty content", "Please fill in the content field.");
       return;
     }
 
@@ -304,9 +304,30 @@ export default function CreatePost() {
                   onChangeText={setTitle}
                 />
 
-                <Text style={[styles.labelInput, { fontSize: 20 }]}>
-                  Content
-                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <Text style={[styles.labelInput, { fontSize: 20 }]}>
+                    Content
+                  </Text>
+                  <Text
+                    style={[
+                      styles.labelInput,
+                      {
+                        fontFamily: "Nunito-Regular",
+                        fontSize: 15,
+                        color: "grey",
+                        marginRight: 10,
+                      },
+                    ]}
+                  >
+                    Required
+                  </Text>
+                </View>
                 <TextInput
                   style={[styles.input, { paddingTop: 10, height: 200 }]}
                   multiline={true}
@@ -565,29 +586,35 @@ export default function CreatePost() {
                       style={{ width: "100%" }}
                       onValueChange={(itemValue) => setCategory(itemValue)}
                     >
+                      {/* <Picker.Item label=" " value={null} color="black" /> */}
                       <Picker.Item
-                        label="Platform Issue"
+                        label="General"
                         value={categoryList[0]}
                         color="black"
                       />
                       <Picker.Item
-                        label="Safety and Security"
+                        label="Platform Issue"
                         value={categoryList[1]}
                         color="black"
                       />
                       <Picker.Item
-                        label="Vendor Issue"
+                        label="Safety and Security"
                         value={categoryList[2]}
                         color="black"
                       />
                       <Picker.Item
-                        label="Incident"
+                        label="Vendor Issue"
                         value={categoryList[3]}
                         color="black"
                       />
                       <Picker.Item
-                        label="Others"
+                        label="Incident"
                         value={categoryList[4]}
+                        color="black"
+                      />
+                      <Picker.Item
+                        label="Others"
+                        value={categoryList[5]}
                         color="black"
                       />
                       {/* Add more categories as needed */}

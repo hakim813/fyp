@@ -6,6 +6,7 @@ import {
   Button,
   Alert,
   TouchableOpacity,
+  ImageBackground,
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
@@ -71,12 +72,10 @@ const ForgotPassword = () => {
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <LinearGradient
-            colors={["#03633a", "#95f6cc"]} // start to end gradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+          <ImageBackground
+            source={require("../../assets/bg-hibiscus.png")} // Your image path
             style={[
-              styles.container,
+              styles.background,
               {
                 paddingTop:
                   Platform.OS === "ios"
@@ -84,16 +83,26 @@ const ForgotPassword = () => {
                     : StatusBar.currentHeight,
               },
             ]}
+            resizeMode="cover"
           >
             <Text style={styles.text}>
               Forgot{"\n"}
               Password?
             </Text>
             <StatusBar style="auto" />
-            <View style={[styles.container2, { paddingTop: 150 }]}>
-              <Text style={[styles.labelInput, { fontSize: 20 }]}>
-                Email Address
-              </Text>
+            <View
+              style={[
+                styles.container2,
+                {
+                  justifyContent: "center",
+                  marginHorizontal: 15,
+                  flex: 0,
+                  paddingVertical: 100,
+                  paddingTop: 100,
+                },
+              ]}
+            >
+              <Text style={[styles.labelInput]}>Email Address</Text>
               <TextInput
                 style={styles.input}
                 placeholder="Example : user123@mail.com"
@@ -117,7 +126,7 @@ const ForgotPassword = () => {
                 }}
               >
                 <TouchableOpacity
-                  style={[styles.button, { fontFamily: "Nunito" }]}
+                  style={[styles.button, { backgroundColor: "#20734f" }]}
                   onPress={() => {
                     handleForgotPassword();
                   }}
@@ -127,7 +136,7 @@ const ForgotPassword = () => {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.button, { fontFamily: "Nunito" }]}
+                  style={[styles.button, { backgroundColor: "#20734f" }]}
                   onPress={() => {
                     navi.navigate("Login");
                   }}
@@ -138,7 +147,7 @@ const ForgotPassword = () => {
                 </TouchableOpacity>
               </View>
             </View>
-          </LinearGradient>
+          </ImageBackground>
         </View>
       </TouchableWithoutFeedback>
     </View>

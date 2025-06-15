@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import {
+  Alert,
   StyleSheet,
   StatusBar,
   Text,
@@ -141,8 +142,14 @@ export default function AddComplaint() {
 
     console.log("Writing data to Firebase...");
 
+    // if (!title) {
+    //   Alert.alert("No title is written.");
+    //   return;
+    // }
+
     if (!description) {
-      Alert.alert("No content is written.");
+      Alert.alert("No dexription is written.");
+      console.log("Des celre");
       return;
     }
 
@@ -402,9 +409,36 @@ export default function AddComplaint() {
               </View>
             </Modal>
 
-            <Text style={[styles.labelInput, { fontSize: 20, marginTop: 20 }]}>
+            {/* <Text style={[styles.labelInput, { fontSize: 20, marginTop: 20 }]}>
               Title
-            </Text>
+            </Text> */}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "flex-end",
+              }}
+            >
+              <Text
+                style={[styles.labelInput, { fontSize: 20, marginTop: 30 }]}
+              >
+                Title
+              </Text>
+              {/* <Text
+                style={[
+                  styles.labelInput,
+                  {
+                    fontFamily: "Nunito-Regular",
+                    fontSize: 15,
+                    color: "grey",
+                    marginRight: 10,
+                    marginTop: 40,
+                  },
+                ]}
+              >
+                Required
+              </Text> */}
+            </View>
             <TextInput
               style={[styles.input, { fontFamily: "Nunito", color: "#303030" }]}
               placeholder="What is your issue briefly about?"
@@ -412,9 +446,30 @@ export default function AddComplaint() {
               onChangeText={setTitle}
             />
 
-            <Text style={[styles.labelInput, { fontSize: 20 }]}>
-              Description
-            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "flex-end",
+              }}
+            >
+              <Text style={[styles.labelInput, { fontSize: 20 }]}>
+                Description
+              </Text>
+              <Text
+                style={[
+                  styles.labelInput,
+                  {
+                    fontFamily: "Nunito-Regular",
+                    fontSize: 15,
+                    color: "grey",
+                    marginRight: 10,
+                  },
+                ]}
+              >
+                Required
+              </Text>
+            </View>
             <TextInput
               style={[
                 styles.input,

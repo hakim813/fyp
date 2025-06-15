@@ -30,6 +30,7 @@ export default function Login() {
       //verify no missing
       if (email == "" || pw == "") {
         Alert.alert(`Please fill in the field.`);
+        return;
       } else {
         //if okay, user can login
         const userCredential = await signInWithEmailAndPassword(
@@ -46,12 +47,12 @@ export default function Login() {
         navi.navigate("LoginSuccessful");
       }
     } catch (error) {
-      console.error("Error during login:", error.message);
+      // console.error("Error during login:", error.message);
       Alert.alert(
         "Error",
-        error.message == "Firebase: Error (auth/invalid-credential)."
+        "Firebase: Error (auth/invalid-credential)."
           ? "Invalid credential"
-          : error.message
+          : "Error during authentication"
       );
     }
   };
@@ -96,7 +97,10 @@ export default function Login() {
               />
               {/* <Button title="Click Me"></Button> */}
               <TouchableOpacity
-                style={[styles.button, { paddingHorizontal: 40 }]}
+                style={[
+                  styles.button,
+                  { backgroundColor: "#20734f", paddingHorizontal: 40 },
+                ]}
                 onPress={() => {
                   handleSubmit();
                 }}
@@ -112,7 +116,7 @@ export default function Login() {
                   Log in
                 </Text>
               </TouchableOpacity>
-              <Text style={[styles.texttosignin, { marginTop: 100 }]}>
+              <Text style={[styles.texttosignin, { marginTop: 50 }]}>
                 No account yet?
                 <Text
                   style={{ fontWeight: "bold" }}

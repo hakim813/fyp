@@ -39,19 +39,31 @@ export default function Register() {
   const [idNo, setIdNo] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const passwordRule = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+  // At least 8 characters, one uppercase letter, one number
   const navi = useNavigation();
 
   const handleAuthentication = async () => {
     try {
       //ensuring no missing field when submit
       if (!username || !email || !idNo || !password || !confirmPassword) {
-        Alert.alert("Fill in the field.");
-        console.log("Email:     ", email ? email : "missing");
-        console.log("NRIC:      ", idNo ? idNo : "missing");
-        console.log("Pass:      ", password ? password : "missing");
-        console.log(
-          "ConfirmPW: ",
-          confirmPassword ? confirmPassword : "missing"
+        Alert.alert("Missing field", "Please fill in all fields.");
+
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        Alert.alert(
+          "Invalid email format.",
+          "Please enter a valid email address."
+        );
+        return;
+      }
+
+      if (!passwordRule.test(password)) {
+        Alert.alert(
+          "Password must be at least 8 characters, include an uppercase letter and a number."
         );
         return;
       }
@@ -156,6 +168,9 @@ export default function Register() {
               placeholder="Example : user123@mail.com"
               value={email}
               onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
             />
 
             <Text style={styles.labelInput}>NRIC ID</Text>
@@ -185,7 +200,10 @@ export default function Register() {
             />
 
             <TouchableOpacity
-              style={[styles.button, { paddingHorizontal: 40 }]}
+              style={[
+                styles.button,
+                { backgroundColor: "#20734f", paddingHorizontal: 40 },
+              ]}
               onPress={() => handleAuthentication()}
             >
               <Text

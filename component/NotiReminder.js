@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import {
+  Alert,
   Text,
   Platform,
   View,
@@ -46,6 +47,22 @@ export default function NotiReminder({ route }) {
 
   const setReminder = async (existingId) => {
     try {
+      const now = new Date();
+      const selectedDateTime = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        time.getHours(),
+        time.getMinutes()
+      );
+
+      if (selectedDateTime < now) {
+        Alert.alert(
+          "Invalid Date/Time",
+          "Please select a future date and time."
+        );
+        return;
+      }
       console.log("Setting reminder for ID:", existingId);
 
       const recordRef = ref(database, `socialplan/${existingId}`);
@@ -73,12 +90,26 @@ export default function NotiReminder({ route }) {
 
   const onChangeDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
+    // if (currentDate < new Date()) {
+    //   Alert.alert("Invalid Date", "Please select a future date and time.");
+    //   return;
+    // }
     setShowDatePicker(Platform.OS === "ios"); // Only stays open on iOS
     setDate(currentDate);
   };
 
   const onChangeTime = (event, selectedTime) => {
     const currentTime = selectedTime || time;
+
+    const now = new Date();
+
+    // Set the date part of currentTime to today for accurate comparison
+    currentTime.setFullYear(now.getFullYear(), now.getMonth(), now.getDate());
+
+    // if (currentTime < now) {
+    //   Alert.alert("Invalid Time", "Please select a future time.");
+    //   return;
+    // }
     setShowTimePicker(Platform.OS === "ios"); // Only stays open on iOS
     setTime(currentTime);
   };
@@ -205,7 +236,10 @@ export default function NotiReminder({ route }) {
               </View>
 
               <TouchableOpacity
-                style={[styles.button, { marginTop: 20 }]}
+                style={[
+                  styles.button,
+                  { marginTop: 20, backgroundColor: "#20734f" },
+                ]}
                 onPress={() => {
                   setReminder(id);
                 }}

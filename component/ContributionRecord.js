@@ -763,28 +763,6 @@ export default function ContributionRecord() {
             {/* for adding space at bottom */}
           </View>
 
-          <TouchableOpacity
-            style={{
-              backgroundColor: "green",
-              position: "absolute",
-              right: 20,
-              bottom: 115,
-              width: 70, // set width
-              height: 70, // set height
-              borderRadius: 35, // half of width/height for a circle
-              alignItems: "center",
-              justifyContent: "center",
-              elevation: 4, // optional: shadow on Android
-              shadowColor: "#000", // optional: shadow on iOS
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.3,
-              shadowRadius: 3,
-            }}
-            onPress={() => navi.navigate("AddComplaint")}
-          >
-            <Text style={{ fontSize: 40, color: "#fdfdfd" }}>+</Text>
-          </TouchableOpacity>
-
           <BottomBar></BottomBar>
         </ImageBackground>
       </View>

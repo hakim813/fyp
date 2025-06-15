@@ -47,6 +47,14 @@ export default function RecordContribution({ route }) {
   };
 
   const writeData = async () => {
+    if (month <= 0) {
+      Alert.alert(
+        "Missing field data",
+        "Please state hwo many months to cover for SOCSO plan."
+      );
+      return;
+    }
+
     console.log("Writing data...");
     const db = getDatabase(); // Initialize Firebase Realtime Database
     const dbRef = ref(db); // Reference to the database
@@ -183,7 +191,28 @@ export default function RecordContribution({ route }) {
                 <View></View>
               ) : (
                 <>
-                  <Text style={styles.labelInput}>Months Covered</Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "flex-end",
+                    }}
+                  >
+                    <Text style={[styles.labelInput]}>Months covered</Text>
+                    <Text
+                      style={[
+                        styles.labelInput,
+                        {
+                          fontFamily: "Nunito-Regular",
+                          fontSize: 15,
+                          color: "grey",
+                          marginRight: 10,
+                        },
+                      ]}
+                    >
+                      Required
+                    </Text>
+                  </View>
                   <TextInput
                     style={styles.input}
                     placeholder="How many months you have covered?"
@@ -212,7 +241,7 @@ export default function RecordContribution({ route }) {
 
               {/* <Button title="Click Me"></Button> */}
               <TouchableOpacity
-                style={styles.button}
+                style={[styles.button, { backgroundColor: "#20734f" }]}
                 onPress={() => writeData()}
               >
                 <Text style={{ color: "#fdfdfd", fontWeight: "bold" }}>

@@ -22,6 +22,7 @@ import { UserContext } from "../UserContext";
 import {
   ref,
   getDatabase,
+  get,
   onValue,
   update,
   set,
@@ -44,6 +45,7 @@ export default function HelpdeskHome() {
   const [isOngoingPage, setIsOngoingPage] = useState(true);
   const [showHelp, setShowHelp] = useState(false);
   const [showStatus, setShowStatus] = useState(null);
+  const [profilePercent, setProfilePercent] = useState(0);
   //   const { pDate, pTime } = route.params || {};
 
   const navi = useNavigation();
@@ -98,6 +100,24 @@ export default function HelpdeskHome() {
       setAllData(allComplaints);
     });
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const db = getDatabase();
+    const userRef = ref(db, `users/${user.uid}`);
+    get(userRef).then((snap) => {
+      if (snap.exists()) {
+        const data = snap.val();
+        setUserData(data);
+        setProfilePercent(getProfileCompletion(data));
+      }
+    });
+    get(ref(db, `voucher/${user.uid}`)).then((snap) => {
+      if (snap.exists()) {
+        setVoucher(snap.val());
+      }
+    });
+  }, [user]);
 
   const setResolved = (id) => {
     const db = getDatabase();

@@ -231,7 +231,7 @@ export default function FinancialRecord() {
                       <View style={{ padding: 5 }}>
                         <Text
                           style={{
-                            fontWeight: "bold",
+                            fontFamily: "Nunito-Bold",
                             fontSize: 25,
                             marginBottom: 10,
                           }}
@@ -406,7 +406,7 @@ export default function FinancialRecord() {
                                               <Text
                                                 style={{
                                                   fontFamily: "Nunito",
-                                                  fontSize: 20,
+                                                  fontSize: 15,
                                                 }}
                                               >
                                                 {i.notes}

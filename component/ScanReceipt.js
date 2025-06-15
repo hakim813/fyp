@@ -229,7 +229,7 @@ const ScanReceipt = () => {
         email: user.email,
         type: expenseArr[i].status === "Gained" ? "Income" : "Expense",
         value: parseFloat(parseFloat(expenseArr[i].cleaned).toFixed(2)), // Use the parsed numeric value
-        notes: "",
+        notes: "Gig Transaction History",
         date: expenseArr[i].dateObj,
       })
         .then(() => {
@@ -415,10 +415,17 @@ const ScanReceipt = () => {
                   minWidth: 150,
                   padding: 10,
                   margin: 5,
-                  backgroundColor: "#06a561",
+                  backgroundColor: "#20734f",
                   borderRadius: 50,
                   alignItems: "center",
                   justifyContent: "center",
+                  // Shadow for iOS
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 3,
+                  // Shadow for Android
+                  elevation: 4,
                 }}
               >
                 <Text
@@ -441,10 +448,17 @@ const ScanReceipt = () => {
                   padding: 10,
                   margin: 5,
                   backgroundColor:
-                    imageUri && ocrLines.length > 0 ? "#06a561" : "#A9A9A9",
+                    imageUri && ocrLines.length > 0 ? "#20734f" : "#A9A9A9",
                   borderRadius: 50,
                   alignItems: "center",
                   justifyContent: "center",
+                  // Shadow for iOS
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 3,
+                  // Shadow for Android
+                  elevation: 4,
                 }}
               >
                 <Text

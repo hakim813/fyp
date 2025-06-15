@@ -271,6 +271,9 @@ export default function EditProfile({ route }) {
             `profilePhotos/${user.uid}.jpg`
           );
           updates.profilePhoto = url;
+        } else {
+          Alert.alert("No image is selected. Please select an image.");
+          return;
         }
       }
 
@@ -291,6 +294,10 @@ export default function EditProfile({ route }) {
       }
 
       if (section === "Professional") {
+        if (selectedLanguages.length === 0) {
+          Alert.alert("Please select at least one language.");
+          return;
+        }
         updates.workStatus = selectedStatus;
         updates.workCategory = selectedWorkCategory;
         updates.experience = experience;

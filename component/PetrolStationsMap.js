@@ -20,6 +20,7 @@ import MapView, { Marker, Callout, Circle } from "react-native-maps";
 import { styles, stylesHome } from "../styles";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { getDistance } from "geolib";
 import {
   ref,
   get,
@@ -561,7 +562,7 @@ export default function PetrolStationsMap() {
                           paddingHorizontal: 15,
                           paddingVertical: 10,
                           borderRadius: 15,
-                          alignSelf: "flex-start", // ✅ Prevents full-width expansion
+                          // alignSelf: "flex-start", // ✅ Prevents full-width expansion
                           alignItems: "center",
                         }}
                       >
@@ -961,6 +962,97 @@ export default function PetrolStationsMap() {
                       </Marker>
                     ))}
                   </MapView>
+                  <View style={{ width: "100%", marginTop: 15 }}>
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 18,
+                        marginBottom: 8,
+                        textAlign: "center",
+                      }}
+                    >
+                      Nearby Petrol Stations
+                    </Text>
+                    {stations.length === 0 ? (
+                      <Text style={{ textAlign: "center", color: "grey" }}>
+                        No stations found in this radius.
+                      </Text>
+                    ) : (
+                      stations.map((station, idx) => {
+                        const distance =
+                          location &&
+                          getDistance(
+                            {
+                              latitude: location.latitude,
+                              longitude: location.longitude,
+                            },
+                            {
+                              latitude: station.geometry.location.lat,
+                              longitude: station.geometry.location.lng,
+                            }
+                          );
+                        const distanceKm = (distance / 1000).toFixed(2);
+
+                        return (
+                          <View
+                            key={idx}
+                            style={{
+                              backgroundColor: "#fff",
+                              borderRadius: 10,
+                              marginVertical: 6,
+                              marginHorizontal: 10,
+                              padding: 12,
+                              shadowColor: "#000",
+                              shadowOffset: { width: 0, height: 1 },
+                              shadowOpacity: 0.1,
+                              shadowRadius: 2,
+                              elevation: 2,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Bold",
+                                fontSize: 16,
+                              }}
+                            >
+                              {station.name}
+                            </Text>
+                            <Text style={{ color: "#555" }}>
+                              {station.vicinity}
+                            </Text>
+                            <Text style={{ color: "#20734f", marginBottom: 6 }}>
+                              {distanceKm} km away
+                            </Text>
+                            <TouchableOpacity
+                              onPress={() =>
+                                openNavigationOptions(
+                                  station.geometry.location.lat,
+                                  station.geometry.location.lng,
+                                  station.name
+                                )
+                              }
+                              style={{
+                                backgroundColor: "#20734f",
+                                paddingVertical: 8,
+                                paddingHorizontal: 16,
+                                borderRadius: 8,
+                                alignSelf: "flex-start",
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  color: "#fff",
+                                  fontFamily: "Nunito-Bold",
+                                }}
+                              >
+                                Tap to Navigate
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        );
+                      })
+                    )}
+                  </View>
                 </View>
               )}
             </ScrollView>
