@@ -1,20 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Legend, CartesianGrid } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Legend,
+  CartesianGrid,
+} from "recharts";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { useUser } from "../../utils/UserContext";
 import { useNavigate } from "react-router-dom";
 import "./finance.css";
 
-const COLORS = ["#20734f", "#ec2d01"];
+const COLORS = ["#00684a", "#ea5455"];
 
 export default function FinanceManager() {
   const { user } = useUser();
   const [data, setData] = useState({});
   const [isMonthly, setIsMonthly] = useState(false);
-  const [totalIncome, setTotalIncome] = useState(0);
-  const [totalExpense, setTotalExpense] = useState(0);
-  const [totalIncomeMonthly, setTotalIncomeMonthly] = useState(0);
-  const [totalExpenseMonthly, setTotalExpenseMonthly] = useState(0);
+  const [totals, setTotals] = useState({
+    dailyIncome: 0,
+    dailyExpense: 0,
+    monthlyIncome: 0,
+    monthlyExpense: 0,
+  });
 
   const navigate = useNavigate();
 
@@ -22,242 +36,161 @@ export default function FinanceManager() {
     if (!user) return;
     const db = getDatabase();
     const recordsRef = ref(db, "financeRecords");
-    const unsubscribe = onValue(recordsRef, (snapshot) => {
-      const data = snapshot.val() || {};
-      setData(data);
 
-      let income = 0, expense = 0, incomeM = 0, expenseM = 0;
-      Object.values(data).forEach((transaction) => {
-        if (transaction.email === user.email) {
-          const tDate = new Date(transaction.date);
-          const now = new Date();
-          // Daily
-          if (tDate.toDateString() === now.toDateString()) {
-            if (transaction.type === "Income") income += parseFloat(transaction.value);
-            if (transaction.type === "Expense") expense += parseFloat(transaction.value);
-          }
-          // Monthly
-          if (tDate.getMonth() === now.getMonth() && tDate.getFullYear() === now.getFullYear()) {
-            if (transaction.type === "Income") incomeM += parseFloat(transaction.value);
-            if (transaction.type === "Expense") expenseM += parseFloat(transaction.value);
-          }
+    const unsubscribe = onValue(recordsRef, (snapshot) => {
+      const records = snapshot.val() || {};
+      setData(records);
+
+      let dailyIncome = 0, dailyExpense = 0, monthlyIncome = 0, monthlyExpense = 0;
+      const today = new Date();
+
+      Object.values(records).forEach(({ email, type, date, value }) => {
+        if (email !== user.email) return;
+        const tDate = new Date(date);
+
+        if (tDate.toDateString() === today.toDateString()) {
+          type === "Income" ? dailyIncome += +value : dailyExpense += +value;
+        }
+
+        if (tDate.getMonth() === today.getMonth() && tDate.getFullYear() === today.getFullYear()) {
+          type === "Income" ? monthlyIncome += +value : monthlyExpense += +value;
         }
       });
-      setTotalIncome(income);
-      setTotalExpense(expense);
-      setTotalIncomeMonthly(incomeM);
-      setTotalExpenseMonthly(expenseM);
+
+      setTotals({ dailyIncome, dailyExpense, monthlyIncome, monthlyExpense });
     });
+
     return () => unsubscribe();
   }, [user]);
 
-  // Weekly data for line chart
-  const getLast7Days = () => {
-    const days = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      days.push(d);
-    }
-    return days;
-  };
-  const getWeeklyData = () => {
-    const days = getLast7Days();
-    return days.map((date) => {
+  // Chart data helpers
+  const getLast7Days = () => [...Array(7)].map((_, i) => new Date(new Date().setDate(new Date().getDate() - (6 - i))));
+  const getLast6Months = () => [...Array(6)].map((_, i) => new Date(new Date().getFullYear(), new Date().getMonth() - (5 - i), 1));
+
+  const generateChartData = (rangeFunc, matchFn) => {
+    const range = rangeFunc();
+    return range.map((date) => {
       let income = 0, expense = 0;
-      if (data) {
-        Object.values(data).forEach((transaction) => {
-          const tDate = new Date(transaction.date);
-          if (
-            transaction.email === user.email &&
-            tDate.toDateString() === date.toDateString()
-          ) {
-            if (transaction.type === "Income") income += parseFloat(transaction.value);
-            if (transaction.type === "Expense") expense += parseFloat(transaction.value);
-          }
-        });
-      }
+      Object.values(data).forEach(({ email, type, date: tDate, value }) => {
+        if (email !== user.email) return;
+        const d = new Date(tDate);
+        if (matchFn(d, date)) {
+          type === "Income" ? income += +value : expense += +value;
+        }
+      });
       return {
-        name: date.toLocaleDateString("en-US", { weekday: "short" }),
+        name: rangeFunc === getLast6Months
+          ? date.toLocaleDateString("en-US", { month: "short" })
+          : date.toLocaleDateString("en-US", { weekday: "short" }),
         Income: income,
         Expense: expense,
       };
     });
   };
 
-  // 6-month data for line chart
-  const getLast6Months = () => {
-    const months = [];
-    const today = new Date();
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-      months.push(d);
-    }
-    return months;
-  };
-  const getMonthlyData = () => {
-    const months = getLast6Months();
-    return months.map((date) => {
-      let income = 0, expense = 0;
-      if (data) {
-        Object.values(data).forEach((transaction) => {
-          const tDate = new Date(transaction.date);
-          if (
-            transaction.email === user.email &&
-            tDate.getMonth() === date.getMonth() &&
-            tDate.getFullYear() === date.getFullYear()
-          ) {
-            if (transaction.type === "Income") income += parseFloat(transaction.value);
-            if (transaction.type === "Expense") expense += parseFloat(transaction.value);
-          }
-        });
-      }
-      return {
-        name: date.toLocaleDateString("en-US", { month: "short" }),
-        Income: income,
-        Expense: expense,
-      };
-    });
-  };
+  const lineData = isMonthly
+    ? generateChartData(getLast6Months, (a, b) => a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear())
+    : generateChartData(getLast7Days, (a, b) => a.toDateString() === b.toDateString());
 
-  // Pie chart data
-  const pieChartDataDaily = [
-    { name: "Income", value: totalIncome },
-    { name: "Expense", value: totalExpense },
-  ];
-  const pieChartDataMonthly = [
-    { name: "Income", value: totalIncomeMonthly },
-    { name: "Expense", value: totalExpenseMonthly },
-  ];
+  const pieData = isMonthly
+    ? [
+        { name: "Income", value: totals.monthlyIncome },
+        { name: "Expense", value: totals.monthlyExpense },
+      ]
+    : [
+        { name: "Income", value: totals.dailyIncome },
+        { name: "Expense", value: totals.dailyExpense },
+      ];
 
-  // Net profit
   const netProfit = isMonthly
-    ? totalIncomeMonthly - totalExpenseMonthly
-    : totalIncome - totalExpense;
+    ? totals.monthlyIncome - totals.monthlyExpense
+    : totals.dailyIncome - totals.dailyExpense;
 
   return (
-    <div className="finance-manager">
-      <h2>Expense Manager</h2>
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
-        <span style={{ marginRight: 12, color: "#009457", fontWeight: 500 }}>Daily</span>
-        <label className="switch">
-          <input
-            type="checkbox"
-            checked={isMonthly}
-            onChange={() => setIsMonthly((v) => !v)}
-          />
-          <span className="slider round"></span>
-        </label>
-        <span style={{ marginLeft: 12, color: "#009457", fontWeight: 500 }}>Monthly</span>
-      </div>
+    <div className="finance-page">
+      <div className="finance-container">
+        <h2>
+          Expense Manager
+        </h2>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 32, justifyContent: "center" }}>
-        <div style={{ minWidth: 260, flex: 1 }}>
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie
-                data={isMonthly ? pieChartDataMonthly : pieChartDataDaily}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={90}
-                innerRadius={55}
-                label
-              >
-                {pieChartDataDaily.map((entry, idx) => (
-                  <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-          <div style={{ textAlign: "center", marginTop: 8 }}>
-            <div style={{ fontWeight: 600, fontSize: 18 }}>
-              {isMonthly
-                ? new Date().toLocaleDateString("en-US", { month: "long" })
-                : new Date().toLocaleDateString("en-US", { day: "numeric", month: "short" })}
-            </div>
-            <div style={{ fontWeight: 600, fontSize: 18 }}>Net profit</div>
-            <div style={{ fontSize: 28, color: netProfit >= 0 ? "#28C76F" : "#EA5455" }}>
-              {netProfit >= 0 ? "RM " : "- RM "}
-              {Math.abs(netProfit).toFixed(2)}
+        <div className="toggle-row">
+          <span className={!isMonthly ? "toggle-label active" : "toggle-label"}>Daily</span>
+          <label className="switch">
+            <input type="checkbox" checked={isMonthly} onChange={() => setIsMonthly((v) => !v)} />
+            <span className="slider"></span>
+          </label>
+          <span className={isMonthly ? "toggle-label active" : "toggle-label"}>Monthly</span>
+        </div>
+
+        <div className="dashboard-row">
+          <div className="card">
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={90}
+                  label
+                >
+                  {pieData.map((entry, idx) => (
+                    <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="summary">
+              <div className="summary-date">
+                {isMonthly
+                  ? new Date().toLocaleDateString("en-US", { month: "long" })
+                  : new Date().toLocaleDateString("en-US", { day: "numeric", month: "short" })}
+              </div>
+              <div className="summary-label">Net Profit</div>
+              <div className={`summary-profit${netProfit < 0 ? " negative" : ""}`}>
+                {netProfit >= 0 ? "RM " : "- RM "}
+                {Math.abs(netProfit).toFixed(2)}
+              </div>
             </div>
           </div>
-        </div>
-        <div style={{ minWidth: 320, flex: 2 }}>
-          <div style={{
-            background: "#e6f9f1",
-            borderRadius: 12,
-            padding: 18,
-            marginBottom: 18,
-            boxShadow: "0 2px 8px rgba(0,177,106,0.04)"
-          }}>
-            <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 8 }}>
-              {isMonthly ? "Monthly" : "Weekly"} Income vs Expense
-            </div>
-            <ResponsiveContainer width="100%" height={180}>
-              <LineChart
-                data={isMonthly ? getMonthlyData() : getWeeklyData()}
-                margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
-              >
+
+          <div className="card">
+            <div className="chart-title">{isMonthly ? "Monthly" : "Weekly"} Income vs Expense</div>
+            <ResponsiveContainer width="100%" height={320}>
+              <LineChart data={lineData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="Income" stroke="#20734f" strokeWidth={3} />
-                <Line type="monotone" dataKey="Expense" stroke="#ec2d01" strokeWidth={3} />
+                <Line type="monotone" dataKey="Income" stroke="#00684a" strokeWidth={3} />
+                <Line type="monotone" dataKey="Expense" stroke="#ea5455" strokeWidth={3} />
               </LineChart>
             </ResponsiveContainer>
-          </div>
-          <div style={{
-            display: "flex",
-            justifyContent: "space-evenly",
-            alignItems: "center",
-            gap: 16,
-            marginBottom: 18
-          }}>
-            <div style={{
-              borderRadius: 20,
-              border: "3px solid #20734f",
-              background: "#f6fff9",
-              padding: "10px 18px",
-              fontWeight: 600,
-              color: "#20734f"
-            }}>
-              Gain: RM {isMonthly ? totalIncomeMonthly : totalIncome}
-            </div>
-            <div style={{
-              borderRadius: 20,
-              border: "3px solid #ec2d01",
-              background: "#f6fff9",
-              padding: "10px 18px",
-              fontWeight: 600,
-              color: "#ec2d01"
-            }}>
-              Spent: RM {isMonthly ? totalExpenseMonthly : totalExpense}
+            <div className="gain-spent-row">
+              <div className="gain">Gain: RM {isMonthly ? totals.monthlyIncome : totals.dailyIncome}</div>
+              <div className="spent">Spent: RM {isMonthly ? totals.monthlyExpense : totals.dailyExpense}</div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="finance-actions" style={{ marginTop: 32 }}>
-        <button className="finance-btn" onClick={() => navigate("/finance/create", { state: { type: "Income" } })}>
-          Add Income
-        </button>
-        <button className="finance-btn" onClick={() => navigate("/finance/create", { state: { type: "Expense" } })}>
-          Add Expense
-        </button>
-        <button className="finance-btn" onClick={() => navigate("/finance/records")}>
-          See Records
-        </button>
-        <button className="finance-btn" onClick={() => navigate("/finance/scan")}>
-          Scan Gig History
-        </button>
-        <button className="finance-btn" onClick={() => navigate("/finance/add-plan")}>
-          Add Plan
-        </button>
+        <div className="actions">
+          <button className="btn" onClick={() => navigate("/finance/create", { state: { type: "Income" } })}>
+            Add Income
+          </button>
+          <button className="btn" onClick={() => navigate("/finance/create", { state: { type: "Expense" } })}>
+            Add Expense
+          </button>
+          <button className="btn" onClick={() => navigate("/finance/records")}>
+            See Records
+          </button>
+          <button className="btn" onClick={() => navigate("/finance/scan")}>
+            Scan Gig History
+          </button>
+        </div>
       </div>
     </div>
   );

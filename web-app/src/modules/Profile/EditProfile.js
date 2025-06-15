@@ -424,41 +424,43 @@ export default function EditProfile() {
   };
 
   return (
-    <div className="edit-container">
-      <div className="sidebar">
-        <h2>WeGig</h2>
-        {sections.map((sec) => (
-          <div
-            key={sec}
-            className={`sidebar-item ${currentSection === sec ? "active" : ""}`}
-            onClick={() => setCurrentSection(sec)}
-          >
-            {sec}
-            {sectionFields[sec].every((f) => isFieldFilled(f, formData)) && (
-              <span className="tick">✔</span>
-            )}
-          </div>
-        ))}
-      </div>
-      <div className="edit-form">
-        <h2>{currentSection} Information</h2>
-        <form onSubmit={handleSubmit}>
-          {renderSection()}
-          <div className="form-actions">
-            <button type="submit" className="save-btn">
-              Save
-            </button>
-            <button type="button" className="cancel-btn" onClick={() => navigate("/profile")}>
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-      {showImage && (
-        <div className="modal" onClick={closeModal}>
-          <img src={showImage} alt="Preview" className="modal-img" />
+    <div className="edit-page">
+      <div className="edit-container">
+        <div className="sidebar">
+          <h2>WeGig</h2>
+          {sections.map((sec) => (
+            <div
+              key={sec}
+              className={`sidebar-item ${currentSection === sec ? "active" : ""}`}
+              onClick={() => setCurrentSection(sec)}
+            >
+              {sec}
+              {sectionFields[sec].every((f) => isFieldFilled(f, formData)) && (
+                <span className="tick">✔</span>
+              )}
+            </div>
+          ))}
         </div>
-      )}
+        <div className="edit-form">
+          <h2>{currentSection} Information</h2>
+          <form onSubmit={handleSubmit}>
+            {renderSection()}
+            <div className="form-actions">
+              <button type="submit" className="save-btn">
+                Save
+              </button>
+              <button type="button" className="cancel-btn" onClick={() => navigate("/profile")}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+        {showImage && (
+          <div className="modal" onClick={closeModal}>
+            <img src={showImage} alt="Preview" className="modal-img" />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, useLocation } from "react-router-dom"; // Import useLocation
+import { NavLink, useLocation } from "react-router-dom";
 import "./navbar.css";
 
 function Navbar() {
@@ -40,6 +40,14 @@ function Navbar() {
         </li>
         <li>
           <NavLink
+            to="/social"
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            Social Security
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
             to="/helpdesk"
             className={({ isActive }) => (isActive ? "active" : "")}
           >
@@ -57,7 +65,6 @@ function Navbar() {
         <li>
           <NavLink
             to="/profile"
-            // Check isActive OR location.pathname === '/edit-profile'
             className={({ isActive }) =>
               isActive || location.pathname === "/edit-profile" ? "active" : ""
             }

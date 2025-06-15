@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getDatabase, ref, onValue, remove } from "firebase/database";
 import { useUser } from "../../utils/UserContext";
+import { useNavigate } from "react-router-dom";
 import "./finance.css";
 
 const MONTHS = [
@@ -10,6 +11,7 @@ const MONTHS = [
 
 export default function FinancialRecord() {
   const { user } = useUser();
+  const navigate = useNavigate();
   const [records, setRecords] = useState([]);
   const [monthlyData, setMonthlyData] = useState([]);
   const [dailyData, setDailyData] = useState([]);
@@ -79,129 +81,124 @@ export default function FinancialRecord() {
   };
 
   return (
-    <div className="finance-records">
-      <h2>Financial Records</h2>
-      <div style={{ marginBottom: 18 }}>
-        <label style={{ fontWeight: 500, color: "#009457", marginRight: 12 }}>
-          <input
-            type="checkbox"
-            checked={isMonthlyView}
-            onChange={() => {
-              setIsMonthlyView((v) => !v);
-              setDetailedMonth(null);
-            }}
-            style={{ marginRight: 8 }}
-          />
-          Monthly View
-        </label>
-      </div>
+    <div className="finance-records-container">
+      <div className="finance-records">
+        <h2>Financial Records</h2>
+        <div style={{ marginBottom: 18 }}>
+          <label style={{ fontWeight: 500, color: "#009457", marginRight: 12 }}>
+            <input
+              type="checkbox"
+              checked={isMonthlyView}
+              onChange={() => {
+                setIsMonthlyView((v) => !v);
+                setDetailedMonth(null);
+              }}
+              style={{ marginRight: 8 }}
+            />
+            Monthly View
+          </label>
+        </div>
 
-      {isMonthlyView ? (
-        <div>
-          {monthlyData.map((m) => (
-            <div key={m.month} style={{
-              background: "#e6f9f1",
-              borderRadius: 8,
-              marginBottom: 18,
-              padding: 16,
-              boxShadow: "0 2px 8px rgba(0,177,106,0.04)"
-            }}>
-              <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-                onClick={() => setDetailedMonth(detailedMonth === m.month ? null : m.month)}
-              >
-                <div style={{ fontWeight: "bold", fontSize: 22, flex: 1 }}>{m.month}</div>
-                <div style={{ marginRight: 18 }}>
-                  <span style={{ color: "#EA5455", fontWeight: 600 }}>Expense: RM {m.expense.toFixed(2)}</span>
-                  <span style={{ marginLeft: 18, color: "#28C76F", fontWeight: 600 }}>Income: RM {m.income.toFixed(2)}</span>
+        {isMonthlyView ? (
+          <div>
+            {monthlyData.map((m) => (
+              <div key={m.month} className="record-monthly-card">
+                <div className="record-monthly-header"
+                  onClick={() => setDetailedMonth(detailedMonth === m.month ? null : m.month)}
+                >
+                  <div className="record-monthly-title">{m.month}</div>
+                  <div className="record-monthly-summary">
+                    <span className="spent">Expense: RM {m.expense.toFixed(2)}</span>
+                    <span className="gain">Income: RM {m.income.toFixed(2)}</span>
+                  </div>
+                  <span className="record-monthly-arrow">
+                    {detailedMonth === m.month ? "▲" : "▼"}
+                  </span>
                 </div>
-                <span style={{ color: "#888", fontSize: 15 }}>
-                  {detailedMonth === m.month ? "▲" : "▼"}
-                </span>
-              </div>
-              {detailedMonth === m.month && (
-                <div style={{ marginTop: 12 }}>
-                  {m.items.length === 0 ? (
-                    <div style={{ fontStyle: "italic", color: "#888" }}>No data available yet.</div>
-                  ) : (
-                    <table style={{ width: "100%", marginTop: 8 }}>
-                      <thead>
-                        <tr>
-                          <th>Date</th>
-                          <th>Type</th>
-                          <th>Value</th>
-                          <th>Notes</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {m.items
-                          .sort((a, b) => b.date - a.date)
-                          .map((rec) => (
-                          <tr key={rec.id}>
-                            <td>{new Date(rec.date).toLocaleDateString()}</td>
-                            <td>{rec.type}</td>
-                            <td style={{ color: rec.type === "Income" ? "#28C76F" : "#EA5455" }}>
-                              RM {parseFloat(rec.value).toFixed(2)}
-                            </td>
-                            <td>{rec.notes}</td>
-                            <td>
-                              <button className="finance-btn" onClick={() => handleDelete(rec.id)}>
-                                Delete
-                              </button>
-                            </td>
+                {detailedMonth === m.month && (
+                  <div style={{ marginTop: 12 }}>
+                    {m.items.length === 0 ? (
+                      <div className="record-empty">No data available yet.</div>
+                    ) : (
+                      <table className="record-table">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Notes</th>
+                            <th>Action</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div>
-          {dailyData.map((d) => (
-            <div key={d.date} style={{
-              background: "#fff",
-              borderRadius: 8,
-              marginBottom: 18,
-              padding: 16,
-              boxShadow: "0 2px 8px rgba(0,177,106,0.04)"
-            }}>
-              <div style={{ fontWeight: "bold", fontSize: 20, marginBottom: 8 }}>
-                {d.date}
+                        </thead>
+                        <tbody>
+                          {m.items
+                            .sort((a, b) => b.date - a.date)
+                            .map((rec) => (
+                            <tr key={rec.id}>
+                              <td>{new Date(rec.date).toLocaleDateString()}</td>
+                              <td>{rec.type}</td>
+                              <td style={{ color: rec.type === "Income" ? "#28C76F" : "#EA5455" }}>
+                                RM {parseFloat(rec.value).toFixed(2)}
+                              </td>
+                              <td>{rec.notes}</td>
+                              <td>
+                                <button className="btn btn-delete" onClick={() => handleDelete(rec.id)}>
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                )}
               </div>
-              <table style={{ width: "100%" }}>
-                <thead>
-                  <tr>
-                    <th>Type</th>
-                    <th>Value</th>
-                    <th>Notes</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {d.items.map((rec) => (
-                    <tr key={rec.id}>
-                      <td>{rec.type}</td>
-                      <td style={{ color: rec.type === "Income" ? "#28C76F" : "#EA5455" }}>
-                        RM {parseFloat(rec.value).toFixed(2)}
-                      </td>
-                      <td>{rec.notes}</td>
-                      <td>
-                        <button className="finance-btn" onClick={() => handleDelete(rec.id)}>
-                          Delete
-                        </button>
-                      </td>
+            ))}
+          </div>
+        ) : (
+          <div>
+            {dailyData.map((d) => (
+              <div key={d.date} className="record-daily-card">
+                <div className="record-daily-title">
+                  {d.date}
+                </div>
+                <table className="record-table">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Value</th>
+                      <th>Notes</th>
+                      <th>Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
+                  </thead>
+                  <tbody>
+                    {d.items.map((rec) => (
+                      <tr key={rec.id}>
+                        <td>{rec.type}</td>
+                        <td style={{ color: rec.type === "Income" ? "#28C76F" : "#EA5455" }}>
+                          RM {parseFloat(rec.value).toFixed(2)}
+                        </td>
+                        <td>{rec.notes}</td>
+                        <td>
+                          <button className="btn btn-delete" onClick={() => handleDelete(rec.id)}>
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="actions" style={{ marginTop: 24 }}>
+          <button className="btn btn-back" onClick={() => navigate("/finance")}>
+            Back
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 }

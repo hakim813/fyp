@@ -1,3 +1,11 @@
+.edit-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+}
+
 .edit-container {
   display: flex;
   min-height: 80vh;

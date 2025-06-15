@@ -27,7 +27,12 @@ import FinanceManager from './modules/Finance/FinanceManager';
 import FinancialRecord from './modules/Finance/FinancialRecord';
 import CreateFinanceRecord from './modules/Finance/CreateFinanceRecord';
 import ScanReceipt from './modules/Finance/ScanReceipt';
-import AddPlan from './modules/Finance/AddPlan';
+
+import SPHome from "./modules/SocialProtection/SPHome";
+import AddPlan from './modules/SocialProtection/AddPlan';
+import ContributionRecord from "./modules/SocialProtection/ContributionRecord";
+import RecordContribution from "./modules/SocialProtection/RecordContribution";
+import NotiReminder from "./modules/SocialProtection/NotiReminder";
 
 function App() {
   return (
@@ -57,7 +62,13 @@ function App() {
           <Route path="/finance/records" element={<><Navbar /><FinancialRecord /></>} />
           <Route path="/finance/create" element={<><Navbar /><CreateFinanceRecord /></>} />
           <Route path="/finance/scan" element={<><Navbar /><ScanReceipt /></>} />
-          <Route path="/finance/add-plan" element={<><Navbar /><AddPlan /></>} />
+
+
+          <Route path="/social" element={<SPHome />} />
+          <Route path="/social/add-plan" element={<><Navbar /><AddPlan /></>} />
+          <Route path="/social/contributions" element={<ContributionRecord />} />
+          <Route path="/social/record-contribution" element={<RecordContribution />} />
+          <Route path="/social/reminder" element={<NotiReminder />} />
 
 
           {/* Sidebar for all routes except Login and Signup */}

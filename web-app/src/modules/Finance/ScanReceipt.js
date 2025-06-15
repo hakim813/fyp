@@ -223,6 +223,21 @@ export default function ScanReceipt() {
         >
           {image && ocrLines.length > 0 ? "Record Expense" : "Upload Receipt First"}
         </button>
+        <button
+          className="finance-btn btn-cancel"
+          type="button"
+          onClick={() => navigate("/finance")}
+          style={{
+            background: "#e3e8ef",
+            color: "#222",
+            border: "1px solid #e3e8ef",
+            minWidth: 80,
+            maxWidth: 120,
+            width: "auto"
+          }}
+        >
+          Cancel
+        </button>
       </div>
     </div>
   );

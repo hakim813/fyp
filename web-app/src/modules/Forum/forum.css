@@ -18,7 +18,7 @@
 .forum-header h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #222;
+  color: #00684a;
   letter-spacing: 1px;
 }
 
@@ -39,7 +39,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px rgba(25,118,210,0.08);
+  box-shadow: 0 2px 8px rgba(0,104,74,0.08);
   text-decoration: none;
   display: inline-block;
 }
@@ -52,23 +52,23 @@
 }
 
 .forum-btn {
-  background: #1976d2;
+  background: #00684a;
   color: #fff;
 }
 
 .forum-btn:hover {
-  background: #1251a3;
+  background: #009457;
 }
 
 .forum-btn-outline {
   background: #fff;
-  color: #1976d2;
-  border: 1px solid #1976d2;
+  color: #00684a;
+  border: 1px solid #00684a;
 }
 
 .forum-btn-outline:hover {
-  background: #e3f0fd;
-  color: #1251a3;
+  background: #e6f9f1;
+  color: #009457;
 }
 
 /* Filters */
@@ -84,23 +84,23 @@
 .forum-filters button {
   padding: 8px 14px;
   border-radius: 6px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #b2dfdb;
   font-size: 1em;
   background: #f9fafb;
   outline: none;
 }
 
 .forum-filters button {
-  border: 1px solid #1976d2;
+  border: 1px solid #00684a;
   background: #fff;
-  color: #1976d2;
+  color: #00684a;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
 
 .forum-filters button:hover {
-  background: #e3f0fd;
-  color: #1251a3;
+  background: #e6f9f1;
+  color: #009457;
 }
 
 /* Post List */
@@ -114,7 +114,7 @@
 .forum-card {
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 12px rgba(0,104,74,0.06);
   padding: 24px 28px 18px 28px;
   border: 1px solid #e5e7eb;
   display: flex;
@@ -124,7 +124,7 @@
 }
 
 .forum-card:hover {
-  box-shadow: 0 6px 24px rgba(25,118,210,0.10);
+  box-shadow: 0 6px 24px rgba(0,104,74,0.10);
   transform: translateY(-2px) scale(1.01);
 }
 
@@ -141,7 +141,7 @@
   height: 48px;
   border-radius: 50%;
   overflow: hidden;
-  background: #e3f0fd;
+  background: #e6f9f1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,13 +156,13 @@
 
 .forum-avatar-placeholder {
   font-size: 1.5em;
-  color: #1976d2;
+  color: #00684a;
   font-weight: bold;
 }
 
 .forum-author {
   font-weight: 600;
-  color: #1976d2;
+  color: #00684a;
   font-size: 1.1em;
 }
 
@@ -179,12 +179,12 @@
 .forum-title {
   font-size: 1.15em;
   font-weight: 600;
-  color: #222;
+  color: #00684a;
   margin-bottom: 4px;
 }
 
 .forum-content {
-  color: #444;
+  color: #222;
   font-size: 1em;
   margin-bottom: 8px;
 }
@@ -207,7 +207,7 @@
 }
 
 .forum-thumb:hover {
-  box-shadow: 0 2px 8px rgba(25,118,210,0.18);
+  box-shadow: 0 2px 8px rgba(0,104,74,0.18);
 }
 
 /* Card Footer */
@@ -233,7 +233,7 @@
   position: fixed;
   bottom: 36px;
   right: 36px;
-  background: #1976d2;
+  background: #00684a;
   color: #fff;
   border-radius: 50%;
   width: 60px;
@@ -242,14 +242,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 16px rgba(25,118,210,0.18);
+  box-shadow: 0 4px 16px rgba(0,104,74,0.18);
   z-index: 200;
   transition: background 0.2s;
   text-decoration: none;
 }
 
 .forum-fab:hover {
-  background: #00b16a;
+  background: #009457;
   color: #fff;
 }
 
@@ -260,7 +260,7 @@
   gap: 18px;
   background: #fff;
   border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 12px rgba(0,104,74,0.06);
   padding: 32px 32px 24px 32px;
   margin-bottom: 32px;
   border: 1px solid #e5e7eb;
@@ -271,7 +271,7 @@
 
 .forum-create-form label {
   font-weight: 500;
-  color: #222;
+  color: #00684a;
   margin-bottom: 4px;
   display: flex;
   flex-direction: column;
@@ -283,7 +283,7 @@
 .forum-create-form select {
   padding: 10px;
   border-radius: 6px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #b2dfdb;
   font-size: 1em;
   background: #f9fafb;
   margin-bottom: 0;
@@ -315,7 +315,7 @@
   border-radius: 12px;
   padding: 28px 36px;
   min-width: 320px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 16px rgba(0,104,74,0.12);
   position: relative;
   animation: fadeIn 0.2s;
   max-width: 400px;
@@ -356,7 +356,7 @@
   }
 }
 .forum-btn.active {
-  background: #1976d2;
+  background: #00684a;
   color: #fff;
-  border: 1px solid #1976d2;
+  border: 1px solid #00684a;
 }

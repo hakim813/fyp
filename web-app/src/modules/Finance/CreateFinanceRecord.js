@@ -64,54 +64,65 @@ export default function CreateFinanceRecord() {
       });
     }
     setLoading(false);
-    navigate("/finance/records");
+    navigate("/finance");
   };
 
   return (
-    <div className="finance-create">
-      <h2>{id ? "Edit" : "Add"} {type} Record</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Type:
-          <input
-            type="text"
-            value={type}
-            readOnly
-            style={{ fontWeight: "bold", background: "#e6f9f1", color: "#009457" }}
-          />
-        </label>
-        <label>
-          Value (RM):
-          <input
-            type="number"
-            value={value}
-            onChange={e => setValue(e.target.value)}
-            placeholder="Example: 2.50"
-            min="0"
-            required
-          />
-        </label>
-        <label>
-          Notes:
-          <input
-            type="text"
-            value={notes}
-            onChange={e => setNotes(e.target.value)}
-            placeholder="Notes"
-          />
-        </label>
-        <button className="finance-btn" type="submit" disabled={loading}>
-          {loading ? "Saving..." : id ? "Update Transaction" : "Record Transaction"}
-        </button>
-        <button
-          type="button"
-          className="finance-btn"
-          style={{ marginLeft: 12, background: "#009457" }}
-          onClick={() => navigate("/finance/scan")}
-        >
-          Scan Gig History
-        </button>
-      </form>
+    <div className="finance-create-container">
+      <div className="finance-create">
+        <h2>{id ? "Edit" : "Add"} {type} Record</h2>
+        <form onSubmit={handleSubmit}>
+          <label>
+            Type:
+            <input
+              type="text"
+              value={type}
+              readOnly
+              style={{ fontWeight: "bold", background: "#e6f9f1", color: "#009457" }}
+            />
+          </label>
+          <label>
+            Value (RM):
+            <input
+              type="number"
+              value={value}
+              onChange={e => setValue(e.target.value)}
+              placeholder="Example: 2.50"
+              min="0"
+              required
+            />
+          </label>
+          <label>
+            Notes:
+            <input
+              type="text"
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="Notes"
+            />
+          </label>
+          <div className="form-actions">
+            <button className="btn" type="submit" disabled={loading}>
+              {loading ? "Saving..." : id ? "Update Transaction" : "Record Transaction"}
+            </button>
+            <button
+              type="button"
+              className="btn"
+              style={{ background: "#009457" }}
+              onClick={() => navigate("/finance/scan")}
+            >
+              Scan Gig History
+            </button>
+            <button
+              type="button"
+              className="btn btn-cancel"
+              onClick={() => navigate("/finance")}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

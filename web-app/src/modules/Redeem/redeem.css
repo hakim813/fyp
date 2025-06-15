@@ -1,5 +1,13 @@
+.redeem-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+}
+
 .redeem-glass-wrapper {
-  max-width: 900px;
+  width: 1000px;
   margin: 96px auto 48px auto;
   background: rgba(255,255,255,0.88);
   border-radius: 18px;

@@ -1,0 +1,163 @@
+.sp-container {
+  width: 1000px;
+  margin: 48px auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(30, 41, 59, 0.10);
+  padding: 40px 32px 32px 32px;
+}
+
+.sp-container h2 {
+  color: #00684a;
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 18px;
+  letter-spacing: 0.5px;
+}
+
+.sp-history-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+.sp-history-btn {
+  background: #e3e8ef;
+  color: #00684a;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 22px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.sp-history-btn:hover,
+.sp-history-btn:focus {
+  background: #00684a;
+  color: #fff;
+}
+
+.sp-cards-row {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  margin-bottom: 32px;
+  padding-bottom: 8px;
+}
+
+.sp-card {
+  min-width: 220px;
+  background: #f9fafb;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,177,106,0.04);
+  border: 1px solid #e3e8ef;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  cursor: pointer;
+  transition: border 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+.sp-card.selected,
+.sp-card:focus {
+  border: 2px solid #00684a;
+  box-shadow: 0 4px 16px rgba(0,104,74,0.10);
+}
+.sp-scheme {
+  font-weight: 700;
+  color: #00684a;
+  font-size: 1.1em;
+  margin-bottom: 4px;
+}
+.sp-plan {
+  color: #444;
+  font-size: 1em;
+  margin-bottom: 8px;
+}
+.sp-total {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 8px;
+}
+.sp-reminder {
+  font-size: 0.95em;
+  color: #888;
+  margin-bottom: 8px;
+}
+.sp-card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.sp-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 0.98em;
+  font-weight: 600;
+  cursor: pointer;
+  background: #00684a;
+  color: #fff;
+  transition: background 0.18s, box-shadow 0.18s;
+}
+.sp-btn:hover,
+.sp-btn:focus {
+  background: #009457;
+}
+
+.sp-add-card {
+  background: #00684a;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px dashed #b2dfdb;
+  min-width: 180px;
+}
+.sp-add-icon {
+  font-size: 3em;
+  font-weight: 800;
+  color: #b2dfdb;
+  margin-bottom: 8px;
+}
+.sp-add-label {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: #fff;
+}
+
+.sp-benefits-section {
+  margin-top: 32px;
+}
+.sp-benefits-title {
+  font-weight: 700;
+  font-size: 1.2em;
+  color: #00684a;
+  margin-bottom: 10px;
+}
+.sp-benefits-list {
+  list-style: disc inside;
+  color: #222;
+  font-size: 1em;
+  padding-left: 18px;
+}
+.sp-benefits-list li {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 700px) {
+  .sp-container {
+    padding: 14px 2vw;
+    max-width: 99vw;
+  }
+  .sp-cards-row {
+    gap: 10px;
+  }
+  .sp-card, .sp-add-card {
+    min-width: 160px;
+    padding: 12px 6px;
+  }
+}
