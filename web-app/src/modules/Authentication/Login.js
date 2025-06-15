@@ -15,8 +15,16 @@ function Login() {
     e.preventDefault();
     signInWithEmailAndPassword(auth, email, password)
       .then(() => navigate("/home"))
-      .catch(() => {
-        setErrorMessage("Your email address and password don’t match. Try again.");
+      .catch((error) => {
+        if (
+          error.code === "auth/user-not-found" ||
+          error.code === "auth/wrong-password" ||
+          error.code === "auth/invalid-credential"
+        ) {
+          setErrorMessage("Invalid email or password.");
+        } else {
+          setErrorMessage(error.message);
+        }
       });
   };
 

@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 
 import Login from './modules/Authentication/Login';
 import Signup from './modules/Authentication/Signup';
+import ForgotPassword from './modules/Authentication/ForgotPassword';
 
 import Home from './modules/Home/Home';
 
@@ -41,6 +42,7 @@ function App() {
           
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           <Route path="/home" element={<><Navbar /><Home /></>} />
 
