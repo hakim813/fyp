@@ -1,0 +1,73 @@
+/* landing.css */
+.landing-green-bg {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #00b16a;
+  font-family: 'Inter', sans-serif;
+  padding: 1rem;
+}
+
+.landing-box {
+  background: #fff;
+  border-radius: 18px;
+  padding: 3rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+.landing-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.brand .we {
+  color: #111;
+}
+.brand .gig {
+  color: #00b16a;
+}
+
+.landing-subtitle {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 2rem;
+}
+
+.landing-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.9rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn.primary {
+  background: #00b16a;
+  color: #fff;
+  border: none;
+}
+.btn.primary:hover {
+  background: #00b16a;
+}
+
+.btn.outline {
+  background: transparent;
+  color: #00b16a;
+  border: 2px solid #00b16a;
+}
+.btn.outline:hover {
+  background: #00b16a;
+  color: white;
+}
