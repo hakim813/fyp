@@ -188,136 +188,133 @@ function Home() {
         </div>
       </header>
 
-      <main className="main-content">
-        <section className="finance-summary minimalist-card">
-          <h2>
-            <FaMoneyBillWave style={{ marginRight: 8, color: "#009457" }} />
-            Today's Financial Summary
-          </h2>
-          <div className="finance-cards">
-            <div className="finance-card income">
-              <span className="label">Income</span>
-              <span className="value">RM{finance.income || 0}</span>
+      <main className="main-content-grid">
+        {/* Left Column */}
+        <div className="main-col main-col-left">
+          <section className="finance-summary minimalist-card">
+            <h2>
+              <FaMoneyBillWave style={{ marginRight: 8, color: "#009457" }} />
+              Today's Financial Summary
+            </h2>
+            <div className="finance-cards">
+              <div className="finance-card income">
+                <span className="label">Income</span>
+                <span className="value">RM{finance.income || 0}</span>
+              </div>
+              <div className="finance-card expense">
+                <span className="label">Expense</span>
+                <span className="value">RM{finance.expense || 0}</span>
+              </div>
             </div>
-            <div className="finance-card expense">
-              <span className="label">Expense</span>
-              <span className="value">RM{finance.expense || 0}</span>
-            </div>
-          </div>
-          <Link to="/finance" className="view-finance-link">View full finance manager</Link>
-        </section>
+            <Link to="/finance" className="view-finance-link">View full finance manager</Link>
+          </section>
 
-        <section className="quick-actions minimalist-card">
-          <h2>
-            Quick Actions
-          </h2>
-          <div className="actions-list">
-            <Link to="/redeem">
-              <button className="action-btn"><FaGasPump /> Redeem Voucher</button>
-            </Link>
-            <Link to="/find-station">
-              <button className="action-btn"><FaMapMarkedAlt /> Find Petrol Station</button>
-            </Link>
-            <Link to="/edit-profile">
-              <button className="action-btn"><FaUserEdit /> Edit Profile</button>
-            </Link>
-            <Link to="/forum">
-              <button className="action-btn"><FaComments /> Forum</button>
-            </Link>
-            <Link to="/helpdesk">
-              <button className="action-btn"><FaHandsHelping /> Helpdesk</button>
-            </Link>
-          </div>
-        </section>
-
-        <section className="info-shortcuts minimalist-card">
-          <h2>Information & Benefits</h2>
-          <div className="info-cards">
-            <a
-              className="info-card"
-              href="https://www.perkeso.gov.my/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img src="https://www.perkeso.gov.my/images/logo_perkeso.png" alt="SOCSO" />
-              <div className="info-title">SOCSO Protection</div>
-            </a>
-            <a
-              className="info-card"
-              href="https://www.grab.com/my/driver/driver-benefits/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img src="https://assets.grab.com/wp-content/uploads/media/2022/07/Grab-Logo.png" alt="Grab" />
-              <div className="info-title">Grab Benefits</div>
-            </a>
-            <a
-              className="info-card"
-              href="https://www.kwsp.gov.my/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img src="https://www.kwsp.gov.my/documents/20126/0/Logo_KWSP.png" alt="KWSP" />
-              <div className="info-title">KWSP (EPF)</div>
-            </a>
-          </div>
-        </section>
-
-        <section className="recent-vouchers minimalist-card">
-          <h2>
-            <FaGasPump style={{ marginRight: 8, color: "#1976d2" }} />
-            Recent Vouchers
-          </h2>
-          {loading ? (
-            <div className="empty-state">Loading...</div>
-          ) : recentVouchers.length === 0 ? (
-            <div className="empty-state">No vouchers yet. <Link to="/redeem">Generate your first voucher!</Link></div>
-          ) : (
-            <div className="voucher-list">
-              {recentVouchers.map((v, idx) => (
-                <div className={`voucher-card ${v.status === "Unused" ? "highlight" : ""}`} key={idx}>
-                  <div>
-                    <span className="voucher-amount">RM{v.amount}</span>
-                    <span className={`voucher-status ${v.status ? v.status.toLowerCase() : ""}`}>{v.status}</span>
+          <section className="recent-vouchers minimalist-card">
+            <h2>
+              <FaGasPump style={{ marginRight: 8, color: "#1976d2" }} />
+              Recent Vouchers
+            </h2>
+            {loading ? (
+              <div className="empty-state">Loading...</div>
+            ) : recentVouchers.length === 0 ? (
+              <div className="empty-state">No vouchers yet. <Link to="/redeem">Generate your first voucher!</Link></div>
+            ) : (
+              <div className="voucher-list">
+                {recentVouchers.map((v, idx) => (
+                  <div className={`voucher-card ${v.status === "Unused" ? "highlight" : ""}`} key={idx}>
+                    <div>
+                      <span className="voucher-amount">RM{v.amount}</span>
+                      <span className={`voucher-status ${v.status ? v.status.toLowerCase() : ""}`}>{v.status}</span>
+                    </div>
+                    <div className="voucher-code">{v.code}</div>
+                    <div className="voucher-expiry">
+                      {v.status === "Unused" && v.expiresAt
+                        ? <VoucherCountdown expiresAt={v.expiresAt} />
+                        : v.status === "Used"
+                        ? "Used"
+                        : "Expired"}
+                    </div>
                   </div>
-                  <div className="voucher-code">{v.code}</div>
-                  <div className="voucher-expiry">
-                    {v.status === "Unused" && v.expiresAt
-                      ? <VoucherCountdown expiresAt={v.expiresAt} />
-                      : v.status === "Used"
-                      ? "Used"
-                      : "Expired"}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+
+        {/* Right Column */}
+        <div className="main-col main-col-right">
+          <section className="quick-actions minimalist-card">
+            <h2>
+              Quick Actions
+            </h2>
+            <div className="actions-list">
+              <Link to="/redeem">
+                <button className="action-btn"><FaGasPump /> Redeem Voucher</button>
+              </Link>
+              <Link to="/find-station">
+                <button className="action-btn"><FaMapMarkedAlt /> Find Petrol Station</button>
+              </Link>
+              <Link to="/edit-profile">
+                <button className="action-btn"><FaUserEdit /> Edit Profile</button>
+              </Link>
+              <Link to="/forum">
+                <button className="action-btn"><FaComments /> Forum</button>
+              </Link>
+              <Link to="/helpdesk">
+                <button className="action-btn"><FaHandsHelping /> Helpdesk</button>
+              </Link>
             </div>
-          )}
-        </section>
+          </section>
 
-        <section className="activity-feed minimalist-card">
-          <h2>
-            Recent Activity
-          </h2>
-          {activityFeed.length === 0 ? (
-            <div className="empty-state">No recent activity.</div>
-          ) : (
-            <ul className="activity-list">
-              {activityFeed.map((a, idx) => (
-                <li key={idx} className="activity-item">
-                  <span className="activity-dot" />
-                  <span className="activity-msg">{a.message}</span>
-                  <span className="activity-time">{timeAgo(a.time)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+          <section className="info-shortcuts minimalist-card">
+            <h2>Information & Benefits</h2>
+            <div className="info-cards">
+              <a
+                className="info-card"
+                href="https://www.perkeso.gov.my/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src="https://images.seeklogo.com/logo-png/28/1/perkeso-socso-logo-png_seeklogo-284443.png" alt="SOCSO" />
+                <div className="info-title">SOCSO Protection</div>
+              </a>
+              <a
+                className="info-card"
+                href="https://www.kwsp.gov.my/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src="https://images.seeklogo.com/logo-png/29/1/kwsp-logo-png_seeklogo-298804.png" alt="KWSP" />
+                <div className="info-title">KWSP (EPF)</div>
+              </a>
+            </div>
+          </section>
 
-        <section className="tip-section minimalist-card">
-          <div className="tip-content">
-            <span>{tip}</span>
-          </div>
-        </section>
+          <section className="activity-feed minimalist-card">
+            <h2>
+              Recent Activity
+            </h2>
+            {activityFeed.length === 0 ? (
+              <div className="empty-state">No recent activity.</div>
+            ) : (
+              <ul className="activity-list">
+                {activityFeed.map((a, idx) => (
+                  <li key={idx} className="activity-item">
+                    <span className="activity-dot" />
+                    <span className="activity-msg">{a.message}</span>
+                    <span className="activity-time">{timeAgo(a.time)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="tip-section minimalist-card">
+            <div className="tip-content">
+              <span>{tip}</span>
+            </div>
+          </section>
+        </div>
       </main>
     </div>
   );

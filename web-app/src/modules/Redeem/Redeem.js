@@ -46,10 +46,14 @@ function getExpiryCountdown(expiresAt) {
   const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
   const seconds = Math.floor((ms / 1000) % 60);
-  if (days > 0) return `Expires in ${days} day${days > 1 ? "s" : ""} ${hours}h`;
-  if (hours > 0) return `Expires in ${hours} hour${hours > 1 ? "s" : ""} ${minutes}m`;
-  if (minutes > 0) return `Expires in ${minutes} minute${minutes !== 1 ? "s" : ""} ${seconds}s`;
-  return `Expires in ${seconds} second${seconds !== 1 ? "s" : ""}`;
+
+  let parts = [];
+  if (days > 0) parts.push(`${days} day${days > 1 ? "s" : ""}`);
+  if (hours > 0 || days > 0) parts.push(`${hours}h`);
+  if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes}m`);
+  parts.push(`${seconds}s`);
+
+  return `Expires in ${parts.join(" ")}`;
 }
 
 function useCountdown(expiresAt, status) {
