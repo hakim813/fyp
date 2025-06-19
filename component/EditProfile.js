@@ -55,14 +55,33 @@ export default function EditProfile({ route }) {
   const { section } = route.params;
   const { detail } = route.params;
   const navi = useNavigation();
-  const [date, setDate] = useState(new Date(detail.dob) || new Date());
+  const [date, setDate] = useState(
+    detail?.dob ? new Date(detail.dob) : new Date()
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [gender, setGender] = useState(detail?.gender || "Male");
 
   const [fullName, setFullName] = useState(detail.fullName || "");
   const [dob, setDOB] = useState(new Date());
   // const [e, setFullName] = useState("")
   const [phone, setPhone] = useState(detail.phone || "");
   const [address, setAddress] = useState(detail.address || "");
+
+  const [gdl, setgdl] = useState(detail.gdl || "No");
+  const [gdlDocument, setGdlDocument] = useState(null);
+
+  // 2. Function to pick GDL document (image or PDF)
+  const pickGdlDocument = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All, // allows images and PDFs
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setGdlDocument(result.assets[0]);
+    }
+  };
 
   const [nricId, setNRICId] = useState(detail.nricId || "");
   const [icImages, setIcImages] = useState([]); // Array to hold up to 2 images
@@ -81,13 +100,9 @@ export default function EditProfile({ route }) {
   const [selectedBank, setSelectedBank] = useState(detail.bank || "");
   const [modalBankVisible, setModalBankVisible] = useState("");
   //compliance
-  const [selectedInsurance, setSelectedInsurance] = useState(
-    detail.insuranceCoverage || ""
-  );
+  const [selectedInsurance, setSelectedInsurances] = useState([]);
   const [selectedSSP, setSelectedSSP] = useState(detail.socialSecurity || "");
-  const [selectedLicenses, setSelectedLicenses] = useState(
-    detail.licenses || ""
-  );
+  const [selectedLicenses, setSelectedLicenses] = useState([]);
   const [modalHealthVisible, setModalHealthVisible] = useState(false);
   const [modalSSPVisible, setModalSSPVisible] = useState(false);
   const [modalLicensesVisible, setModalLicensesVisible] = useState(false);
@@ -196,6 +211,35 @@ export default function EditProfile({ route }) {
       prev.includes(lang) ? prev.filter((l) => l !== lang) : [...prev, lang]
     );
   };
+
+  const [platforms, setPlatforms] = useState(detail?.platforms || []);
+
+  const handlePlatformChange = (idx, key, value) => {
+    const updated = platforms.map((p, i) =>
+      i === idx ? { ...p, [key]: value } : p
+    );
+    setPlatforms(updated);
+  };
+
+  const handleAddPlatform = () => {
+    setPlatforms([...platforms, { name: "", id: "" }]);
+  };
+
+  const handleRemovePlatform = (idx) => {
+    setPlatforms(platforms.filter((_, i) => i !== idx));
+  };
+
+  const toggleLicense = (lis) => {
+    setSelectedLicenses((prev) =>
+      prev.includes(lis) ? prev.filter((l) => l !== lis) : [...prev, lis]
+    );
+  };
+
+  const toggleInsurance = (ins) => {
+    setSelectedInsurances((prev) =>
+      prev.includes(ins) ? prev.filter((l) => l !== ins) : [...prev, ins]
+    );
+  };
   const LANGUAGES = ["English", "Malay", "Chinese", "Indian", "others"];
 
   const onChangeDate = (event, selectedDate) => {
@@ -261,6 +305,7 @@ export default function EditProfile({ route }) {
           dob: formatDateForDB(date),
           phone,
           address,
+          gender,
         };
       }
 
@@ -298,6 +343,7 @@ export default function EditProfile({ route }) {
           Alert.alert("Please select at least one language.");
           return;
         }
+        updates.platforms = platforms;
         updates.workStatus = selectedStatus;
         updates.workCategory = selectedWorkCategory;
         updates.experience = experience;
@@ -313,6 +359,15 @@ export default function EditProfile({ route }) {
         updates.insuranceCoverage = selectedInsurance;
         updates.socialSecurity = selectedSSP;
         updates.licenses = selectedLicenses;
+        updates.gdl = gdl;
+        if (gdl === "Yes" && gdlDocument) {
+          // Upload and save GDL document URL
+          const url = await uploadImageAsync(
+            gdlDocument.uri,
+            `gdlDocuments/${user.uid}.${gdlDocument.uri.split(".").pop()}`
+          );
+          updates.gdlDocument = url;
+        }
       }
 
       await update(dbRef, updates);
@@ -331,40 +386,6 @@ export default function EditProfile({ route }) {
     await uploadBytes(imgRef, blob);
     return await getDownloadURL(imgRef);
   };
-
-  //   const writeData = async () => {
-  //     const recordRef = ref(database, "financeRecords/"); // Parent path where data will be stored
-  //     const newRecordRef = push(recordRef);
-
-  //     // Parse and validate value
-  //     const numericValue = parseFloat(value);
-
-  //     if (isNaN(numericValue) || value.trim() === "") {
-  //       Alert.alert("Please enter a valid number.");
-  //       return;
-  //     } else if (numericValue <= 0) {
-  //       Alert.alert("Invalid value. Please enter a positive number.");
-  //       return;
-  //     } else {
-  //       set(newRecordRef, {
-  //         email: user.email,
-  //         type: type,
-  //         value: numericValue, // Use the parsed numeric value
-  //         notes: notes,
-  //         date: serverTimestamp(),
-  //       })
-  //         .then(() => {
-  //           console.log(
-  //             type === "Expense"
-  //               ? `Expense from ${user.email} with value RM ${numericValue} recorded.`
-  //               : `Income from ${user.email} with value RM ${numericValue} recorded.`
-  //           );
-  //         })
-  //         .catch((error) => console.error("Error writing data: ", error));
-
-  //       navi.navigate("FinanceManager");
-  //     }
-  //   };
 
   return (
     <KeyboardAvoidingView
@@ -547,6 +568,51 @@ export default function EditProfile({ route }) {
                           fontSize: 20,
                           fontFamily: "Nunito-Bold",
                           marginBottom: 5,
+                          // marginTop: 1,
+                        },
+                      ]}
+                    >
+                      Gender
+                    </Text>
+                    <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor:
+                            gender === "Male" ? "#296746" : "#ccc",
+                          borderRadius: 15,
+                          padding: 10,
+                          minWidth: 100,
+                          marginRight: 10,
+                          alignItems: "center",
+                        }}
+                        onPress={() => setGender("Male")}
+                      >
+                        <Text style={{ color: "#fff" }}>Male</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor:
+                            gender === "Female" ? "#296746" : "#ccc",
+                          borderRadius: 15,
+                          padding: 10,
+                          minWidth: 100,
+                          marginRight: 10,
+                          alignItems: "center",
+                        }}
+                        onPress={() => setGender("Female")}
+                      >
+                        <Text style={{ color: "#fff" }}>Female</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <Text
+                      style={[
+                        styles.labelInput,
+                        {
+                          fontSize: 20,
+                          fontFamily: "Nunito-Bold",
+                          marginBottom: 5,
+                          marginTop: 15,
                         },
                       ]}
                     >
@@ -950,6 +1016,81 @@ export default function EditProfile({ route }) {
                         </Text>
                       </View>
                     ))}
+                    <Text
+                      style={{
+                        fontFamily: "Nunito-Bold",
+                        fontSize: 18,
+                        marginBottom: 5,
+                        marginTop: 20,
+                      }}
+                    >
+                      Platforms
+                    </Text>
+                    {platforms.map((platform, idx) => (
+                      <View
+                        key={idx}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+
+                          marginBottom: 8,
+                        }}
+                      >
+                        <TextInput
+                          style={[styles.input, { flex: 1, marginRight: 5 }]}
+                          placeholder="Platform Name (e.g. Grab, Lalamove)"
+                          value={platform.name}
+                          onChangeText={(text) =>
+                            handlePlatformChange(idx, "name", text)
+                          }
+                        />
+                        <TextInput
+                          style={[styles.input, { flex: 1, marginRight: 5 }]}
+                          placeholder="Platform ID / Account"
+                          value={platform.id}
+                          onChangeText={(text) =>
+                            handlePlatformChange(idx, "id", text)
+                          }
+                        />
+                        <TouchableOpacity
+                          onPress={() => handleRemovePlatform(idx)}
+                          style={{
+                            backgroundColor: "#e74c3c",
+                            borderRadius: 50,
+                            padding: 7,
+                            marginLeft: 5,
+                          }}
+                          title="Remove this platform"
+                        >
+                          <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                            -
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                    <TouchableOpacity
+                      onPress={handleAddPlatform}
+                      style={{
+                        backgroundColor: "#20734f",
+                        borderRadius: 20,
+                        paddingVertical: 8,
+                        paddingHorizontal: 16,
+                        alignSelf: "flex-start",
+                        marginVertical: 15,
+                      }}
+                    >
+                      <Text
+                        style={{ color: "#fff", fontFamily: "Nunito-Bold" }}
+                      >
+                        + Add Platform
+                      </Text>
+                    </TouchableOpacity>
+                    {/* Optionally show error */}
+                    {/* {errors?.platforms && (
+                      <Text style={{ color: "red", marginTop: 5 }}>
+                        {errors.platforms}
+                      </Text>
+                    )} */}
                   </View>
                 )}
 
@@ -1385,7 +1526,38 @@ export default function EditProfile({ route }) {
                     >
                       Insurance Coverage
                     </Text>
-                    <TouchableOpacity
+                    {INSURANCE.map((ins) => (
+                      <View
+                        key={ins}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginBottom: 5,
+                          marginLeft: 10,
+                        }}
+                      >
+                        <Checkbox
+                          value={selectedInsurance.includes(ins)}
+                          onValueChange={() => toggleInsurance(ins)}
+                          color={
+                            selectedInsurance.includes(ins)
+                              ? "#296746"
+                              : undefined
+                          }
+                        />
+                        <Text
+                          style={{
+                            marginLeft: 8,
+                            fontFamily: "Nunito-Regular",
+                            fontSize: 16,
+                          }}
+                        >
+                          {ins}
+                        </Text>
+                      </View>
+                    ))}
+
+                    {/* <TouchableOpacity
                       style={[styles.input, { justifyContent: "center" }]}
                       onPress={() => setModalHealthVisible(true)}
                     >
@@ -1399,7 +1571,7 @@ export default function EditProfile({ route }) {
                           ? selectedInsurance
                           : "Select Insurance"}
                       </Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     <Text
                       style={[
@@ -1408,10 +1580,11 @@ export default function EditProfile({ route }) {
                           fontSize: 20,
                           fontFamily: "Nunito-Bold",
                           marginBottom: 5,
+                          marginTop: 20,
                         },
                       ]}
                     >
-                      Socaial Security Protection Scheme
+                      Social Security Protection Scheme
                     </Text>
                     <TouchableOpacity
                       style={[styles.input, { justifyContent: "center" }]}
@@ -1439,7 +1612,150 @@ export default function EditProfile({ route }) {
                     >
                       Licenses
                     </Text>
-                    <TouchableOpacity
+                    {LICENSE.map((lis) => (
+                      <View
+                        key={lis}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginBottom: 5,
+                          marginLeft: 10,
+                        }}
+                      >
+                        <Checkbox
+                          value={selectedLicenses.includes(lis)}
+                          onValueChange={() => toggleLicense(lis)}
+                          color={
+                            selectedLicenses.includes(lis)
+                              ? "#296746"
+                              : undefined
+                          }
+                        />
+                        <Text
+                          style={{
+                            marginLeft: 8,
+                            fontFamily: "Nunito-Regular",
+                            fontSize: 16,
+                          }}
+                        >
+                          {lis}
+                        </Text>
+                      </View>
+                    ))}
+
+                    <Text
+                      style={[
+                        styles.labelInput,
+                        {
+                          fontSize: 20,
+                          fontFamily: "Nunito-Bold",
+                          marginBottom: 5,
+                          marginTop: 20,
+                        },
+                      ]}
+                    >
+                      Do you have GDL?
+                    </Text>
+                    <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: gdl === "Yes" ? "#296746" : "#ccc",
+                          borderRadius: 15,
+                          padding: 10,
+                          minWidth: 100,
+                          marginRight: 10,
+                          alignItems: "center",
+                        }}
+                        onPress={() => setgdl("Yes")}
+                      >
+                        <Text style={{ color: "#fff" }}>Yes</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: gdl === "No" ? "#296746" : "#ccc",
+                          borderRadius: 15,
+                          padding: 10,
+                          minWidth: 100,
+                          marginRight: 10,
+                          alignItems: "center",
+                        }}
+                        onPress={() => setgdl("No")}
+                      >
+                        <Text style={{ color: "#fff" }}>No</Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    {/* GDL Document Upload (only if Yes) */}
+                    {gdl === "Yes" && (
+                      <View style={{ marginBottom: 10 }}>
+                        <Text
+                          style={[
+                            styles.labelInput,
+                            {
+                              fontSize: 18,
+                              fontFamily: "Nunito-Bold",
+                              marginBottom: 5,
+                              marginTop: 20,
+                            },
+                          ]}
+                        >
+                          Upload GDL Document (Image or PDF)
+                        </Text>
+                        <TouchableOpacity
+                          onPress={pickGdlDocument}
+                          style={{
+                            backgroundColor: "#efefef",
+                            borderWidth: 0.3,
+                            paddingHorizontal: 20,
+                            paddingVertical: 10,
+                            borderRadius: 8,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontFamily: "Nunito-Bold",
+                              color: "#101010",
+                            }}
+                          >
+                            {gdlDocument
+                              ? "Change Document"
+                              : "Attach Document"}
+                          </Text>
+                        </TouchableOpacity>
+                        {gdlDocument && (
+                          <View style={{ marginTop: 10 }}>
+                            <Text style={{ fontFamily: "Nunito-Regular" }}>
+                              Selected:{" "}
+                              {gdlDocument.fileName || gdlDocument.uri}
+                            </Text>
+                            {/* If image, show preview */}
+                            {gdlDocument.type &&
+                              gdlDocument.type.startsWith("image") && (
+                                <Image
+                                  source={{ uri: gdlDocument.uri }}
+                                  style={{
+                                    width: 100,
+                                    height: 100,
+                                    marginTop: 5,
+                                  }}
+                                  resizeMode="contain"
+                                />
+                              )}
+                            {/* If PDF, just show file name */}
+                            {gdlDocument.type &&
+                              gdlDocument.type === "application/pdf" && (
+                                <Text style={{ color: "blue" }}>
+                                  PDF selected
+                                </Text>
+                              )}
+                          </View>
+                        )}
+                      </View>
+                    )}
+
+                    {/* <TouchableOpacity
                       style={[styles.input, { justifyContent: "center" }]}
                       onPress={() => setModalLicensesVisible(true)}
                     >
@@ -1451,7 +1767,7 @@ export default function EditProfile({ route }) {
                       >
                         {selectedLicenses ? selectedLicenses : "Select License"}
                       </Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 )}
 

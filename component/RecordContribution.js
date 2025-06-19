@@ -47,7 +47,7 @@ export default function RecordContribution({ route }) {
   };
 
   const writeData = async () => {
-    if (month <= 0) {
+    if (month <= 0 && scheme !== "i-Saraan KWSP") {
       Alert.alert(
         "Missing field data",
         "Please state hwo many months to cover for SOCSO plan."

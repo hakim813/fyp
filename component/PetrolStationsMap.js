@@ -51,7 +51,7 @@ export default function PetrolStationsMap() {
   const [isOngoingPage, setIsOngoingPage] = useState(true);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [percent, setPercent] = useState(0);
-  const percentValue = percent.percent ?? percent;
+  // const percentValue = percent.percent ?? percent;
 
   const { user } = useContext(UserContext);
   const navi = useNavigation();
@@ -66,6 +66,7 @@ export default function PetrolStationsMap() {
     "nricId",
     "icPhotos",
     "taxId",
+    "gender",
     "workPermit",
     "workStatus",
     "workCategory",
@@ -76,6 +77,8 @@ export default function PetrolStationsMap() {
     "insuranceCoverage",
     "socialSecurity",
     "licenses",
+    "platforms",
+    "gdl",
   ];
   const BRANDS = [
     {
@@ -144,6 +147,7 @@ export default function PetrolStationsMap() {
         const data = snap.val();
         setUserData(data);
         setPercent(getProfileCompletion(data));
+        console.log("Percent", percent);
       }
     });
     get(ref(db, `voucher/${user.uid}`)).then((snap) => {
@@ -152,6 +156,24 @@ export default function PetrolStationsMap() {
       }
     });
   }, [user]);
+
+  // useEffect(() => {
+  //   console.log("Hello");
+  //   if (!user) {
+  //     console.log("rar");
+  //   }
+  //   const db = getDatabase();
+  //   get(ref(db, `users/${user.uid}`)).then((snap) => {
+  //     if (snap.exists()) {
+  //       const data = snap.val();
+  //       setUserData(data);
+  //       setProfilePercent(getProfileCompletion(data));
+  //       console.log("User", user.uid);
+  //     }
+  //   });
+  //   // Listen for all vouchers
+
+  // }, [user]);
 
   const formatDateTime = (created) => {
     const date = new Date(created);
@@ -180,12 +202,18 @@ export default function PetrolStationsMap() {
     if (voucher) return;
     const code =
       "PETRO-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+
     const newVoucher = {
       code,
       created: Date.now(),
+      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
       status: "Unused",
+      amount: 50,
+      incentive: "Gig Worker Data Completion",
+      description:
+        "Reward for completing your government-requested profile information.",
     };
-    await set(ref(getDatabase(), `voucher/${user.uid}`), newVoucher);
+    await set(ref(getDatabase(), `vouchers/${user.uid}`), newVoucher);
     setVoucher(newVoucher);
   };
 
@@ -384,7 +412,7 @@ export default function PetrolStationsMap() {
                   </Text>
                   <View
                     style={{
-                      backgroundColor: "#e0e0e0",
+                      backgroundColor: "grey",
                       marginTop: 15,
                       height: 15,
                       width: "100%",
@@ -392,7 +420,9 @@ export default function PetrolStationsMap() {
                       overflow: "hidden",
                     }}
                   >
-                    <View style={[styles.filler, { width: `${percent}%` }]} />
+                    <View
+                      style={[styles.filler, { width: `${percent.value}` }]}
+                    />
                   </View>
                 </View>
                 <View
@@ -505,9 +535,7 @@ export default function PetrolStationsMap() {
                     borderRadius: 15,
                     padding: 10,
                     justifyContent:
-                      Number(percent?.value || 0) < 100 || !voucher
-                        ? "center"
-                        : "flex-start",
+                      percent < 100 || !voucher ? "center" : "flex-start",
 
                     alignItems: "center",
                     shadowColor: "#000",
@@ -517,7 +545,7 @@ export default function PetrolStationsMap() {
                     elevation: 5,
                   }}
                 >
-                  {Number(percent.value) < 100 ? (
+                  {percent.value < 100 ? (
                     <View alignItems={"center"}>
                       <Icon name="lock" size={40} color={"#000"} />
                       <Text
@@ -580,6 +608,7 @@ export default function PetrolStationsMap() {
                     // If percent >= 100 and no voucher, show nothing or a button to generate voucher
 
                     // If percent >= 100 and voucher exists, show voucher details
+
                     <View
                       style={[
                         stylesHome.context,
@@ -621,7 +650,8 @@ export default function PetrolStationsMap() {
                             fontFamily: "Nunito-Bold",
                           }}
                         >
-                          {formatDateTime(voucher.created)}
+                          {/* {formatDateTime(voucher.created)} */}
+                          {voucher.status}
                         </Text>
                       </View>
                       <Text
@@ -630,10 +660,64 @@ export default function PetrolStationsMap() {
                           fontSize: 20,
                         }}
                       >
-                        {voucher.status}
+                        {/* {voucher.status} */}
+                        RM{voucher.amount} Voucher
+                      </Text>
+                      <Text
+                        style={{
+                          marginTop: 15,
+                          color: "grey",
+                          fontFamily: "Nunito-Bold",
+                        }}
+                      >
+                        {/* {formatDateTime(voucher.created)} */}
+                        Generated: {formatDateTime(voucher.created)}
+                        {"\n"}Expired : {formatDateTime(voucher.expiresAt)}
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: "Nunito-Regular",
+                          fontSize: 13,
+                          marginTop: 10,
+                        }}
+                      >
+                        {/* {voucher.status} */}
+                        <Text
+                          style={{
+                            fontFamily: "Nunito-Bold",
+                            color: "green",
+                            fontSize: 13,
+                            marginTop: 10,
+                          }}
+                        >
+                          Incentive: {voucher.incentive}
+                          {"\n"}
+                        </Text>
+                        {voucher.description}
+                        {"\n\n"}
+                        <Text
+                          style={{
+                            fontFamily: "Nunito-Regular",
+                            color: "green",
+                            fontSize: 13,
+                            marginTop: 10,
+                          }}
+                        >
+                          Show this code at the petrol station counter to redeem
+                          your voucher.{" "}
+                        </Text>
                       </Text>
                       <TouchableOpacity
-                        onPress={handleMarkUsed}
+                        onPress={() =>
+                          Alert.alert(
+                            "Confirm Redemption",
+                            "Are you sure you want to mark this voucher as used? This action cannot be undone.",
+                            [
+                              { text: "Cancel", style: "cancel" },
+                              { text: "OK", onPress: handleMarkUsed },
+                            ]
+                          )
+                        }
                         disabled={voucher.status === "Used"}
                         style={{
                           backgroundColor:

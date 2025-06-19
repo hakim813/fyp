@@ -448,132 +448,114 @@ export default function FinancialRecord() {
                     style={{ marginBottom: 50 }}
                     keyExtractor={(item) => item.date}
                     renderItem={({ item }) => {
+                      // Filter data for this date and user
+                      const filteredData = data.filter(
+                        (i) => i.date === item.date && i.email === user.email
+                      );
                       return (
                         <View style={{ padding: 5, borderRadius: 10 }}>
                           <Text
                             style={{
                               fontFamily: "Nunito-Bold",
                               fontSize: 25,
-                              // marginBottom: 10,
                             }}
                           >
                             {new Date(item.date).toLocaleDateString("en-GB", {
                               weekday: "short",
                               day: "2-digit",
                               month: "short",
-                              // year: "numeric",
                             })}
                           </Text>
 
                           <FlatList
-                            data={data}
+                            data={filteredData}
                             keyExtractor={(i) => i.id}
-                            renderItem={({ item: i }) => {
-                              if (
-                                i.date == item.date &&
-                                i.email === user.email
-                              ) {
-                                return (
+                            renderItem={({ item: i }) => (
+                              <View
+                                style={{
+                                  borderRadius: 10,
+                                }}
+                              >
+                                <View
+                                  style={{
+                                    paddingLeft: 10,
+                                    marginVertical: 5,
+                                    backgroundColor:
+                                      i.type === "Income"
+                                        ? "#3282F6"
+                                        : "#f44f4f",
+                                    borderRadius: 10,
+                                  }}
+                                >
                                   <View
                                     style={{
-                                      // paddingLeft: 10,
-                                      // marginVertical: 5,
-                                      // backgroundColor: "green",
-                                      borderRadius: 10,
+                                      alignItems: "center",
+                                      flexDirection: "row",
+                                      padding: 10,
+                                      backgroundColor: "#fdfdfd",
+                                      borderTopRightRadius: 10,
+                                      borderBottomRightRadius: 10,
                                     }}
                                   >
                                     <View
                                       style={{
-                                        paddingLeft: 10,
-                                        marginVertical: 5,
-                                        backgroundColor:
-                                          i.type === "Income"
-                                            ? "#3282F6"
-                                            : "#f44f4f",
-                                        borderRadius: 10,
+                                        height: 80,
+                                        flex: 1,
+                                        marginRight: 10,
                                       }}
                                     >
                                       <View
                                         style={{
-                                          alignItems: "center",
                                           flexDirection: "row",
-                                          padding: 10,
-                                          backgroundColor: "#fdfdfd",
-                                          borderTopRightRadius: 10,
-                                          borderBottomRightRadius: 10,
+                                          justifyContent: "flex-end",
                                         }}
                                       >
-                                        <View
+                                        <Text
                                           style={{
-                                            height: 80,
-                                            // backgroundColor: "yellow",
-                                            flex: 1,
-                                            marginRight: 10,
+                                            fontFamily: "Nunito-Bold",
+                                            fontSize: 20,
                                           }}
                                         >
-                                          <View
-                                            style={{
-                                              // backgroundColor: "red",
-                                              flexDirection: "row",
-                                              justifyContent: "flex-end",
-                                            }}
-                                          >
-                                            <Text
-                                              style={{
-                                                fontFamily: "Nunito-Bold",
-                                                fontSize: 20,
-                                              }}
-                                            >
-                                              {i.type}
-                                            </Text>
-                                            <Text
-                                              style={{
-                                                fontFamily: "Nunito-Bold",
-                                                fontSize: 20,
-                                                marginLeft: "auto",
-                                                color:
-                                                  i.type === "Income"
-                                                    ? "#28C76F"
-                                                    : "#EA5455",
-                                              }}
-                                            >
-                                              RM{" "}
-                                              {parseFloat(i.value).toFixed(2)}
-                                            </Text>
-                                          </View>
-
-                                          <Text
-                                            style={{
-                                              fontFamily: "Nunito",
-                                              fontSize: 20,
-                                            }}
-                                          >
-                                            {i.notes}
-                                          </Text>
-                                          <Text
-                                            style={{
-                                              marginTop: "auto",
-                                              fontStyle: "italic",
-                                              fontFamily: "Nunito",
-                                              fontSize: 15,
-                                            }}
-                                          >
-                                            {/* {new Date(
-                                              item.date
-                                            ).toLocaleDateString("en-GB", {
-                                              weekday: "short",
-                                              day: "2-digit",
-                                              month: "short",
-                                              // year: "numeric",
-                                            })} */}
-                                          </Text>
-                                        </View>
+                                          {i.type}
+                                        </Text>
+                                        <Text
+                                          style={{
+                                            fontFamily: "Nunito-Bold",
+                                            fontSize: 20,
+                                            marginLeft: "auto",
+                                            color:
+                                              i.type === "Income"
+                                                ? "#28C76F"
+                                                : "#EA5455",
+                                          }}
+                                        >
+                                          RM {parseFloat(i.value).toFixed(2)}
+                                        </Text>
                                       </View>
+
+                                      <Text
+                                        style={{
+                                          fontFamily: "Nunito",
+                                          fontSize: 20,
+                                        }}
+                                      >
+                                        {i.notes}
+                                      </Text>
+                                      <Text
+                                        style={{
+                                          marginTop: "auto",
+                                          fontStyle: "italic",
+                                          fontFamily: "Nunito",
+                                          fontSize: 15,
+                                        }}
+                                      >
+                                        {/* Optionally show date info here */}
+                                      </Text>
                                     </View>
                                   </View>
-                                );
-                              }
-                            }}
+                                </View>
+                              </View>
+                            )}
                           />
                         </View>
                       );

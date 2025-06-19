@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import {
   Alert,
   Text,
@@ -12,16 +12,16 @@ import {
   ImageBackground,
 } from "react-native";
 import styles from "../../styles";
-import { auth } from "../../firebase"; // Going up one folder to access firebase.js
+import { auth } from "../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../../UserContext";
-import { LinearGradient } from "expo-linear-gradient";
+// import { LinearGradient } from "expo-linear-gradient";
 
 export default function Login() {
-  const [email, setEmail] = useState("hakimkvip1@gmail.com");
-  const [pw, setPw] = useState("hakimTest1234");
+  const [email, setEmail] = useState("sukmum8hakim2@gmail.com");
+  const [pw, setPw] = useState("hakimTest123");
   const navi = useNavigation();
   const { user, setUser } = useContext(UserContext);
 
@@ -95,7 +95,7 @@ export default function Login() {
                 value={pw}
                 onChangeText={setPw}
               />
-              {/* <Button title="Click Me"></Button> */}
+
               <TouchableOpacity
                 style={[
                   styles.button,
@@ -140,15 +140,7 @@ export default function Login() {
                   alignItems: "center",
                   marginTop: "auto",
                 }}
-              >
-                {/* <Image
-                  source={require("../../assets/WeGig.png")} // local image
-                  style={[styles.image]}
-                  resizeMode="center" // or 'cover', 'stretch', etc.
-                  maxHeight={200} // set a max height for the image
-                  maxWidth={300} // set a max width for the image
-                /> */}
-              </View>
+              ></View>
             </View>
           </ImageBackground>
         </View>

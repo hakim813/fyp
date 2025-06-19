@@ -25,7 +25,7 @@ export default function Profile() {
   const navi = useNavigation();
 
   const sections = [
-    { fields: ["fullName", "email", "phone", "dob", "address"] },
+    { fields: ["fullName", "email", "phone", "dob", "address", "gender"] },
     { fields: ["nricId", "icPhotos", "profilePhoto"] },
     {
       fields: [
@@ -37,7 +37,7 @@ export default function Profile() {
       ],
     },
     { fields: ["workStatus", "workPermit", "workCategory", "experience"] },
-    { fields: ["languages", "licenses", "voucherCode"] },
+    { fields: ["languages", "licenses", "gdl", "platforms"] },
   ];
 
   useEffect(() => {
@@ -53,6 +53,7 @@ export default function Profile() {
           const existingUser = user
             ? Object.values(users).find((u) => u.email === user.email)
             : null; // Match email
+          if (!existingUser) return;
           console.log("Existing user: ", existingUser);
           setDetail(existingUser);
         } else {
@@ -72,12 +73,39 @@ export default function Profile() {
     }
   }, [user]);
 
-  const allFields = sections.flatMap((s) => s.fields);
+  // const allFields = sections.flatMap((s) => s.fields);
+
+  // const filledCount = detail
+  //   ? allFields.filter((f) => {
+  //       const v = detail[f];
+  //       if (Array.isArray(v)) return v.length > 0;
+  //       return v !== undefined && v !== null && v !== "";
+  //     }).length
+  //   : 0;
+
+  // const percent = detail
+  //   ? Math.round((filledCount / allFields.length) * 100)
+  //   : 0;
+
+  let allFields = sections.flatMap((s) => s.fields);
+
+  if (detail && detail.gdl === "Yes") {
+    allFields.push("gdlDocument");
+  }
 
   const filledCount = detail
     ? allFields.filter((f) => {
         const v = detail[f];
-        if (Array.isArray(v)) return v.length > 0;
+        if (f === "platforms")
+          return (
+            Array.isArray(v) && v.length > 0 && v.every((p) => p.name && p.id)
+          );
+        if (
+          ["languages", "insuranceCoverage", "licenses", "icPhotos"].includes(f)
+        )
+          return Array.isArray(v) && v.length > 0;
+        if (f === "gdl") return v === "Yes" || v === "No";
+        if (f === "gdlDocument") return !!v;
         return v !== undefined && v !== null && v !== "";
       }).length
     : 0;
@@ -86,11 +114,27 @@ export default function Profile() {
     ? Math.round((filledCount / allFields.length) * 100)
     : 0;
 
+  // const allFields = sections.flatMap((s) => s.fields);
+  // if (detail?.hasGDL === "Yes") {
+  //   allFields.push("gdlDocument");
+  // }
+  // const filledCount = allFields.filter((f) => {
+  //   const v = detail[f];
+  //   if (f === "platforms")
+  //     return Array.isArray(v) && v.length > 0 && v.every((p) => p.name && p.id);
+  //   if (["languages", "insuranceCoverage", "licenses", "icPhotos"].includes(f))
+  //     return Array.isArray(v) && v.length > 0;
+  //   if (f === "gdl") return v === "Yes" || v === "No";
+  //   if (f === "gdlDocument") return !!v;
+  //   return v !== undefined && v !== null && v !== "";
+  // }).length;
+  // const percent = Math.round((filledCount / allFields.length) * 100);
+
   const handleLogout = () => {
     navi.navigate("LandingPage");
-    auth.signOut(); // Sign out from Firebase
-    setUser(null); // Clear user data from context
-    setDetail(null);
+    // auth.signOut(); // Sign out from Firebase
+    // setUser(null); // Clear user data from context
+    // setDetail(null);
   };
 
   return (
@@ -409,6 +453,25 @@ export default function Profile() {
                 }}
               >
                 {detail?.dob ? detail.dob : "Not Provided"}
+              </Text>
+
+              <Text
+                style={{
+                  marginTop: 5,
+                  fontSize: 18,
+                  fontFamily: "Nunito-Bold",
+                }}
+              >
+                Gender
+              </Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontFamily: "Nunito-Regular",
+                  marginBottom: 3,
+                }}
+              >
+                {detail?.gender ? detail.gender : "Not Provided"}
               </Text>
 
               <Text
@@ -846,13 +909,49 @@ export default function Profile() {
                 }}
               >
                 {detail?.languages && detail.languages.length > 0 ? (
-                  detail.languages.map((lang, index) => (
-                    <Text key={index}>{lang} </Text>
-                  ))
+                  <Text>{detail.languages.join(", ")}</Text>
                 ) : (
                   <Text>Not Provided</Text>
                 )}
               </Text>
+              {detail?.platforms &&
+              Array.isArray(detail.platforms) &&
+              detail.platforms.length > 0 ? (
+                <View style={{ marginTop: 5 }}>
+                  <Text style={{ fontSize: 18, fontFamily: "Nunito-Bold" }}>
+                    Platforms
+                  </Text>
+                  {detail.platforms.map((p, idx) => (
+                    <View
+                      key={idx}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginBottom: 2,
+                      }}
+                    >
+                      <Text
+                        style={{ fontSize: 16, fontFamily: "Nunito-Regular" }}
+                      >
+                        {p.name}
+                        {p.id ? (
+                          <Text style={{ color: "#888" }}> (ID: {p.id})</Text>
+                        ) : null}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontFamily: "Nunito-Regular",
+                    color: "grey",
+                  }}
+                >
+                  Platforms: Not Provided
+                </Text>
+              )}
             </View>
           </View>
           <View
@@ -1048,9 +1147,12 @@ export default function Profile() {
                   marginBottom: 3,
                 }}
               >
-                {detail?.insuranceCoverage
-                  ? detail.insuranceCoverage
-                  : "Not Provided"}
+                {detail?.insuranceCoverage &&
+                detail.insuranceCoverage.length > 0 ? (
+                  <Text>{detail.insuranceCoverage.join(", ")}</Text>
+                ) : (
+                  <Text>Not Provided</Text>
+                )}
               </Text>
 
               <Text
@@ -1090,8 +1192,121 @@ export default function Profile() {
                   marginBottom: 3,
                 }}
               >
-                {detail?.licenses ? detail.licenses : "Not Provided"}
+                {/* {detail?.licenses ? detail.licenses : "Not Provided"} */}
+                {detail?.licenses && detail.licenses.length > 0 ? (
+                  <Text>{detail.licenses.join(", ")}</Text>
+                ) : (
+                  <Text>Not Provided</Text>
+                )}
               </Text>
+              <Modal
+                visible={mediaModalVisible}
+                transparent
+                animationType="slide"
+                onRequestClose={() => setMediaModalVisible(false)}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: "rgba(0,0,0,0.2)",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      height: "50%",
+                      width: "100%",
+                      backgroundColor: "rgba(0,0,0,0.3)",
+                      justifyContent: "center",
+                      // alignItems: "center",
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => setMediaModalVisible(false)} // Close the modal
+                    >
+                      <Text
+                        style={{
+                          marginRight: 15,
+                          marginLeft: "auto",
+                          color: "#fdfdfd",
+                          fontSize: 30,
+                        }}
+                      >
+                        x
+                      </Text>
+                    </TouchableOpacity>
+                    <ScrollView horizontal>
+                      {selectedMedia.map((uri, idx) => (
+                        <Image
+                          key={idx}
+                          source={{ uri }}
+                          style={{
+                            width: 400,
+                            height: 400,
+                            margin: 10,
+                            // borderRadius: 10
+                            // borderWidth: 0.5,
+                            // borderColor: "#fff",
+                            backgroundColor: "rgba(0,0,0,0)",
+                          }}
+                          resizeMode="contain"
+                        />
+                      ))}
+                    </ScrollView>
+                  </View>
+                </View>
+              </Modal>
+              <Text
+                style={{
+                  marginTop: 5,
+                  fontSize: 18,
+                  fontFamily: "Nunito-Bold",
+                }}
+              >
+                GDL Document
+              </Text>
+              {detail?.gdl === "Yes" && detail.gdlDocument ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    // Ensure selectedMedia is always an array
+                    setSelectedMedia(
+                      Array.isArray(detail.gdlDocument)
+                        ? detail.gdlDocument
+                        : [detail.gdlDocument]
+                    );
+                    setMediaModalVisible(true);
+                  }}
+                  style={{
+                    backgroundColor: "#efefef",
+                    borderWidth: 0.3,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    marginTop: 5,
+                    borderRadius: 50,
+                    marginRight: "auto",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontFamily: "Nunito-Regular",
+                    }}
+                  >
+                    View Document
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontFamily: "Nunito-Regular",
+                    color: "grey",
+                  }}
+                >
+                  None
+                </Text>
+              )}
             </View>
           </View>
           {/* <View

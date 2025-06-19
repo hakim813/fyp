@@ -40,7 +40,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const passwordRule = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+  const passwordRule = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
   // At least 8 characters, one uppercase letter, one number
   const navi = useNavigation();
 
@@ -63,7 +63,7 @@ export default function Register() {
 
       if (!passwordRule.test(password)) {
         Alert.alert(
-          "Password must be at least 8 characters, include an uppercase letter and a number."
+          "Password must be at least 6 characters, include an uppercase letter and a number."
         );
         return;
       }
