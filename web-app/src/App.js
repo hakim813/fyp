@@ -34,6 +34,11 @@ import ContributionRecord from "./modules/SocialProtection/ContributionRecord";
 import RecordContribution from "./modules/SocialProtection/RecordContribution";
 import NotiReminder from "./modules/SocialProtection/NotiReminder";
 
+import AdminDashboard from "./modules/Admin/AdminDashboard";
+import AdminProfileVerification from "./modules/Admin/AdminProfileVerification";
+
+
+
 function App() {
   return (
     <UserProvider>
@@ -74,9 +79,10 @@ function App() {
           <Route path="/social/record-contribution" element={<RecordContribution />} />
           <Route path="/social/reminder" element={<NotiReminder />} />
 
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/profile-verification" element={<AdminProfileVerification />} />
 
-          {/* Sidebar for all routes except Login and Signup */}
-          
+
 
         </Routes>
       </Router>

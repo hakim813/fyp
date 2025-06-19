@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { getAuth, signOut } from "firebase/auth";
 import { getDatabase, ref, get } from "firebase/database";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import './profile.css';
 import Navbar from '../../components/Navbar';
-import { useNavigate } from "react-router-dom";
 
 const fieldLabels = {
   fullName: "Full Name",
@@ -32,45 +31,23 @@ const fieldLabels = {
 };
 
 const sections = [
-  {
-    name: "Personal",
-    fields: ["fullName", "dob", "gender", "email", "phone", "address"]
-  },
-  {
-    name: "Identification",
-    fields: ["nricId", "icPhotos", "taxId", "workPermit"]
-  },
-  {
-    name: "Professional",
-    fields: ["workStatus", "workCategory", "experience", "languages", "platforms"]
-  },
-  {
-    name: "Finance",
-    fields: ["bank", "bankAccountNumber"]
-  },
-  {
-    name: "Compliance",
-    fields: ["insuranceCoverage", "socialSecurity", "licenses", "gdl"]
-  }
+  { name: "Personal", fields: ["fullName", "dob", "gender", "email", "phone", "address"] },
+  { name: "Identification", fields: ["nricId", "icPhotos", "taxId", "workPermit"] },
+  { name: "Professional", fields: ["workStatus", "workCategory", "experience", "languages", "platforms"] },
+  { name: "Finance", fields: ["bank", "bankAccountNumber"] },
+  { name: "Compliance", fields: ["insuranceCoverage", "socialSecurity", "licenses", "gdl"] }
 ];
 
-const Profile = () => {
+export default function Profile() {
   const [userData, setUserData] = useState({});
   const [activeSection, setActiveSection] = useState(sections[0].name);
-  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [modalImage, setModalImage] = useState(null);
   const [showGdlModal, setShowGdlModal] = useState(false);
 
   const auth = getAuth();
   const user = auth.currentUser;
   const db = getDatabase();
-
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => navigate("/landing"))
-      .catch((err) => console.error("Logout error:", err));
-  };
 
   useEffect(() => {
     if (user) {
@@ -79,18 +56,21 @@ const Profile = () => {
         .then((snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.val();
-            setUserData({ ...data, email: user.email });
+            setUserData({ ...data, email: user.email, verified: data.verified || false });
           }
         })
         .catch((error) => console.error("Error fetching user data:", error));
     }
   }, [user]);
 
-  // Profile completion calculation
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => navigate("/landing"))
+      .catch((err) => console.error("Logout error:", err));
+  };
+
   const allFields = sections.flatMap(s => s.fields);
-    if (userData.gdl === "Yes") {
-    allFields.push("gdlDocument");
-  }
+  if (userData.gdl === "Yes") allFields.push("gdlDocument");
   const filledCount = allFields.filter(f => {
     const v = userData[f];
     if (f === "platforms") return Array.isArray(v) && v.length > 0 && v.every(p => p.name && p.id);
@@ -103,22 +83,7 @@ const Profile = () => {
 
   const renderField = (field) => {
     const value = userData[field];
-    if (field === "profilePhoto") {
-      return (
-        <div className="detail-row" key={field}>
-          <strong>{fieldLabels[field]}:</strong>
-          <br />
-          <img
-            src={value || "/default-profile.png"}
-            alt="Profile"
-            className="profile-avatar"
-            style={{ width: 100, height: 100, objectFit: "cover", borderRadius: "50%", cursor: "pointer" }}
-            onClick={() => setShowPhotoModal(true)}
-          />
-        </div>
-      );
-    }
-    if (field === "icPhotos" && Array.isArray(value) && value.length > 0) {
+    if (field === "icPhotos" && Array.isArray(value)) {
       return (
         <div className="detail-row" key={field}>
           <strong>{fieldLabels[field]}:</strong>
@@ -129,53 +94,26 @@ const Profile = () => {
                 src={url}
                 alt={`IC Photo ${idx + 1}`}
                 className="ic-photo"
-                style={{ width: 80, height: 50, objectFit: "cover", marginRight: 8, borderRadius: 4 }}
+                style={{ width: 80, height: 50, objectFit: "cover", marginRight: 8, borderRadius: 4, cursor: "pointer" }}
+                onClick={() => setModalImage(url)}
               />
             ))}
           </div>
         </div>
       );
     }
-    if (field === "languages" && Array.isArray(value)) {
-      return (
-        <div className="detail-row" key={field}>
-          <strong>{fieldLabels[field]}:</strong> {value.length > 0 ? value.join(", ") : "Not provided"}
-        </div>
-      );
-    }
-    if (field === "platforms" && Array.isArray(value) && value.length > 0) {
+    if (field === "platforms" && Array.isArray(value)) {
       return (
         <div className="detail-row" key={field}>
           <strong>{fieldLabels[field]}:</strong>
-          <ul style={{ margin: "6px 0 0 0", paddingLeft: 18 }}>
-            {value.map((p, idx) => (
-              <li key={idx}>
-                <span style={{ fontWeight: 500 }}>{p.name}</span>
-                {p.id ? <> (ID: {p.id})</> : null}
-              </li>
-            ))}
-          </ul>
+          <ul>{value.map((p, idx) => <li key={idx}>{p.name} (ID: {p.id})</li>)}</ul>
         </div>
       );
     }
-    if (field === "insuranceCoverage" && Array.isArray(value)) {
+    if (Array.isArray(value)) {
       return (
         <div className="detail-row" key={field}>
-          <strong>{fieldLabels[field]}:</strong> {value.length > 0 ? value.join(", ") : "Not provided"}
-        </div>
-      );
-    }
-    if (field === "licenses" && Array.isArray(value)) {
-      return (
-        <div className="detail-row" key={field}>
-          <strong>{fieldLabels[field]}:</strong> {value.length > 0 ? value.join(", ") : "Not provided"}
-        </div>
-      );
-    }
-    if (field === "gdl") {
-      return (
-        <div className="detail-row" key={field}>
-          <strong>{fieldLabels[field]}:</strong> {value || "Not provided"}
+          <strong>{fieldLabels[field]}:</strong> {value.join(", ")}
         </div>
       );
     }
@@ -183,13 +121,16 @@ const Profile = () => {
       return (
         <div className="detail-row" key={field}>
           <strong>{fieldLabels[field]}:</strong>{" "}
-          <span
-            className="gdl-doc-link"
-            style={{ color: "#0984e3", textDecoration: "underline", cursor: "pointer" }}
-            onClick={() => setShowGdlModal(true)}
-          >
-            View GDL Document
-          </span>
+          {value.endsWith(".pdf") ? (
+            <span className="gdl-doc-link" style={{ color: "#0984e3", textDecoration: "underline", cursor: "pointer" }} onClick={() => setShowGdlModal(true)}>View GDL Document</span>
+          ) : (
+            <img
+              src={value}
+              alt="GDL Document"
+              style={{ width: 100, cursor: "pointer", borderRadius: 6, border: "1px solid #ccc" }}
+              onClick={() => setModalImage(value)}
+            />
+          )}
         </div>
       );
     }
@@ -211,14 +152,20 @@ const Profile = () => {
               alt="Profile"
               className="profile-avatar"
               style={{ cursor: "pointer" }}
-              onClick={() => setShowPhotoModal(true)}
+              onClick={() => setModalImage(userData.profilePhoto || "/default-profile.png")}
             />
-            <h2>{userData.fullName || "Unnamed User"}</h2>
+            <h2>
+              {userData.fullName || "Unnamed User"}{" "}
+              {userData.verified ? (
+                <span style={{ color: "green", fontSize: "16px", marginLeft: "8px" }}>✅ Verified</span>
+              ) : (
+                <span style={{ color: "gray", fontSize: "14px", marginLeft: "8px" }}>⏳ Pending Verification</span>
+              )}
+            </h2>
             <p>{userData.email}</p>
-            <Link to="/edit-profile">
-              <button className="edit-btn">Edit Profile</button>
-            </Link>
+            <Link to="/edit-profile"><button className="edit-btn">Edit Profile</button></Link>
           </div>
+
           <div className="profile-body">
             <div className="profile-sidebar">
               {sections.map((section) => (
@@ -231,77 +178,37 @@ const Profile = () => {
                 </button>
               ))}
               <div className="completion-wrapper">
-                <div className="completion-bar">
-                  <div className="completion-fill" style={{ width: `${percent}%` }} />
-                </div>
+                <div className="completion-bar"><div className="completion-fill" style={{ width: `${percent}%` }} /></div>
                 <div className="completion-label">{percent}% Profile Completion</div>
               </div>
-              <button className="logout-btn" onClick={handleLogout}>
-                Log Out
-              </button>
+              <button className="logout-btn" onClick={handleLogout}>Log Out</button>
             </div>
+
             <div className="profile-content">
               <h3>{activeSection} Information</h3>
-              {sections
-                .find((section) => section.name === activeSection)
-                .fields.map(renderField)}
-              {/* Show GDL Document if GDL is Yes and document exists */}
-              {activeSection === "Compliance" && userData.gdl === "Yes" && userData.gdlDocument && (
-                <div className="detail-row">
-                  <strong>{fieldLabels.gdlDocument}:</strong>{" "}
-                  <span
-                    className="gdl-doc-link"
-                    style={{ color: "#0984e3", textDecoration: "underline", cursor: "pointer" }}
-                    onClick={() => setShowGdlModal(true)}
-                  >
-                    View GDL Document
-                  </span>
-                </div>
-              )}
+              {sections.find((section) => section.name === activeSection).fields.map(renderField)}
             </div>
           </div>
         </div>
       </div>
-      {showPhotoModal && (
-        <div className="profile-photo-modal-overlay" onClick={() => setShowPhotoModal(false)}>
+
+      {modalImage && (
+        <div className="profile-photo-modal-overlay" onClick={() => setModalImage(null)}>
           <div className="profile-photo-modal-content" onClick={e => e.stopPropagation()}>
-            <img
-              src={userData.profilePhoto || "/default-profile.png"}
-              alt="Profile Full"
-              className="profile-photo-full"
-            />
-            <button className="profile-photo-modal-close" onClick={() => setShowPhotoModal(false)}>
-              &times;
-            </button>
+            <img src={modalImage} alt="Full Preview" className="profile-photo-full" style={{ maxWidth: "90vw", maxHeight: "90vh", borderRadius: 10 }} />
+            <button className="profile-photo-modal-close" onClick={() => setModalImage(null)}>&times;</button>
           </div>
         </div>
       )}
+
       {showGdlModal && userData.gdlDocument && (
         <div className="profile-photo-modal-overlay" onClick={() => setShowGdlModal(false)}>
           <div className="profile-photo-modal-content" onClick={e => e.stopPropagation()}>
-            {
-              userData.gdlDocument.endsWith(".pdf") ? (
-                <iframe
-                  src={userData.gdlDocument}
-                  title="GDL Document"
-                  style={{ width: "70vw", height: "70vh", border: "none" }}
-                />
-              ) : (
-                <img
-                  src={userData.gdlDocument}
-                  alt="GDL Document"
-                  className="profile-photo-full"
-                />
-              )
-            }
-            <button className="profile-photo-modal-close" onClick={() => setShowGdlModal(false)}>
-              &times;
-            </button>
+            <iframe src={userData.gdlDocument} title="GDL Document" style={{ width: "70vw", height: "70vh", border: "none" }} />
+            <button className="profile-photo-modal-close" onClick={() => setShowGdlModal(false)}>&times;</button>
           </div>
         </div>
       )}
     </>
   );
-};
-
-export default Profile;
+}

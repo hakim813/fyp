@@ -101,6 +101,34 @@ function isFieldFilled(field, data) {
   return v !== undefined && v !== null && v !== "";
 }
 
+const calculateCompletion = (data) => {
+  const fields = [
+    "fullName", "dob", "gender", "phone", "email", "address", "profilePhoto",
+    "nricId", "icPhotos", "taxId", "workPermit", "workStatus", "workCategory",
+    "experience", "languages", "platforms", "bank", "bankAccountNumber",
+    "insuranceCoverage", "socialSecurity", "licenses", "gdl", "gdlDocument"
+  ];
+
+  const isFilled = (key, val) => {
+    if (["languages", "insuranceCoverage", "licenses", "icPhotos"].includes(key))
+      return Array.isArray(val) && val.length > 0;
+    if (key === "platforms")
+      return Array.isArray(val) && val.every(p => p.name && p.id);
+    if (key === "gdl")
+      return val === "Yes" || val === "No";
+    if (key === "gdlDocument" && data.gdl === "Yes")
+      return !!val;
+    if (key === "email")
+      return !!val && /\S+@\S+\.\S+/.test(val);
+    return val !== undefined && val !== null && val !== "";
+  };
+
+  const filtered = fields.filter(f => !(f === "gdlDocument" && data.gdl !== "Yes"));
+  const filled = filtered.filter(f => isFilled(f, data[f]));
+  return Math.round((filled.length / filtered.length) * 100);
+};
+
+
 export default function EditProfile() {
   const navigate = useNavigate();
   const auth = getAuth();
@@ -329,7 +357,9 @@ export default function EditProfile() {
       updated.gdlDocument = null;
     }
 
+    updated.completion = calculateCompletion(updated);
     await update(dbRef(db, `users/${u.uid}`), updated);
+
     navigate("/profile");
   };
 

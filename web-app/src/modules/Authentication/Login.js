@@ -1,21 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useUser } from "../../utils/UserContext";
 import "./login.css";
 
 function Login() {
   const navigate = useNavigate();
+  const { user } = useUser(); // Get user from context
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberPassword, setRememberPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [submitted, setSubmitted] = useState(false); // To track login attempt
 
   const handleLogin = (e) => {
     e.preventDefault();
+    setSubmitted(true);
     signInWithEmailAndPassword(auth, email, password)
-      .then(() => navigate("/home"))
       .catch((error) => {
+        setSubmitted(false); // allow retry if login fails
         if (
           error.code === "auth/user-not-found" ||
           error.code === "auth/wrong-password" ||
@@ -27,6 +31,17 @@ function Login() {
         }
       });
   };
+
+  // Redirect after user info is loaded
+  useEffect(() => {
+    if (!submitted || !user) return;
+
+    if (user.isAdmin) {
+      navigate("/admin");
+    } else {
+      navigate("/home");
+    }
+  }, [user, submitted, navigate]);
 
   return (
     <div className="login-page">
