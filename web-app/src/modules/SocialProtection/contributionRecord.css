@@ -1,0 +1,135 @@
+/* contributionRecord.css */
+
+.contribution-container {
+  max-width: 880px;
+  width: 100%;
+  margin: 40px auto;         /* ✅ Center horizontally */
+  margin-top: 80px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;    /* ✅ Include padding in width */
+}
+.contribution-container h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #2d3436;
+}
+
+.contribution-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.toggle-btn {
+  padding: 10px 24px;
+  font-size: 15px;
+  border: 2px solid #27ae60;
+  border-radius: 6px;
+  background: transparent;
+  color: #27ae60;
+  cursor: pointer;
+  transition: 0.3s ease all;
+}
+
+.toggle-btn.active,
+.toggle-btn:hover {
+  background-color: #27ae60;
+  color: white;
+}
+
+.contribution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contribution-card {
+  background: #f9f9f9;
+  border-left: 5px solid #27ae60;
+  padding: 16px 20px;
+  border-radius: 10px;
+}
+
+.contribution-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #2c3e50;
+}
+
+.contribution-plan {
+  color: #6c5ce7;
+  font-weight: 600;
+}
+
+.contribution-date {
+  font-size: 14px;
+  color: #636e72;
+  margin-bottom: 10px;
+}
+
+.contribution-label {
+  font-size: 14px;
+  color: #b2bec3;
+  margin-top: 8px;
+}
+
+.contribution-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3436;
+}
+
+.contribution-empty {
+  text-align: center;
+  font-size: 16px;
+  color: #b2bec3;
+  padding: 30px 0;
+}
+
+.form-actions {
+  text-align: center;
+}
+
+.btn.btn-back {
+  padding: 10px 24px;
+  background-color: #d63031;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn.btn-back:hover {
+  background-color: #c0392b;
+}
+
+@media (max-width: 600px) {
+  .contribution-header,
+  .contribution-date,
+  .contribution-value,
+  .contribution-label {
+    font-size: 14px;
+  }
+
+  .contribution-container {
+    padding: 16px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+  }
+}

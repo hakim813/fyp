@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 import { getDatabase, ref, get } from "firebase/database";
 import { Link } from "react-router-dom";
 import './profile.css';
 import Navbar from '../../components/Navbar';
+import { useNavigate } from "react-router-dom";
 
 const fieldLabels = {
   fullName: "Full Name",
@@ -62,6 +63,14 @@ const Profile = () => {
   const auth = getAuth();
   const user = auth.currentUser;
   const db = getDatabase();
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => navigate("/landing"))
+      .catch((err) => console.error("Logout error:", err));
+  };
 
   useEffect(() => {
     if (user) {
@@ -227,6 +236,9 @@ const Profile = () => {
                 </div>
                 <div className="completion-label">{percent}% Profile Completion</div>
               </div>
+              <button className="logout-btn" onClick={handleLogout}>
+                Log Out
+              </button>
             </div>
             <div className="profile-content">
               <h3>{activeSection} Information</h3>

@@ -229,3 +229,19 @@
 .gdl-doc-link:hover {
   color: #00b894;
 }
+
+.logout-btn {
+  margin-top: 24px;
+  padding: 10px 18px;
+  font-size: 14px;
+  background: #d63031;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background: #c0392b;
+}

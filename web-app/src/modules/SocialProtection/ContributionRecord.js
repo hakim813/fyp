@@ -3,7 +3,7 @@ import Navbar from "../../components/Navbar";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { useUser } from "../../utils/UserContext";
 import { useNavigate } from "react-router-dom";
-import "./contribution.css";
+import "./contributionRecord.css";
 
 export default function ContributionRecord() {
   const [socsoRecords, setSocsoRecords] = useState([]);
