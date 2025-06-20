@@ -36,7 +36,7 @@ import NotiReminder from "./modules/SocialProtection/NotiReminder";
 
 import AdminDashboard from "./modules/Admin/AdminDashboard";
 import AdminProfileVerification from "./modules/Admin/AdminProfileVerification";
-
+import AdminHelpdesk from './modules/Admin/AdminHelpdesk';
 
 
 function App() {
@@ -81,6 +81,7 @@ function App() {
 
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/profile-verification" element={<AdminProfileVerification />} />
+          <Route path="/admin-helpdesk" element={<AdminHelpdesk />} />
 
 
 

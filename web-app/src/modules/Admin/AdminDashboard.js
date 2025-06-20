@@ -1,14 +1,11 @@
-import React from "react";
-import Navbar from "../../components/Navbar"; // optional if you want the same navbar
+import React, { useEffect } from "react";
 import { useUser } from "../../utils/UserContext";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 export default function AdminDashboard() {
   const { user } = useUser();
   const navigate = useNavigate();
 
-  // Optional: block non-admins from accessing
   useEffect(() => {
     if (!user) return;
     if (!user.isAdmin) {
@@ -17,14 +14,16 @@ export default function AdminDashboard() {
   }, [user, navigate]);
 
   return (
-    <div className="container">
-      <h1>Admin Dashboard</h1>
-      <p>Welcome, Admin {user?.fullName}</p>
+    <>
+      <div className="container" style={{ padding: "20px" }}>
+        <h1>Admin Dashboard</h1>
+        <p>Welcome, Admin {user?.fullName}</p>
 
-      <div style={{ marginTop: "20px" }}>
-        <button onClick={() => navigate("/admin/helpdesk")}>📨 View Complaints</button>
-        <button onClick={() => navigate("/admin/profile-verification")}>🧾 Verify Profiles</button>
+        <div style={{ marginTop: "30px", display: "flex", flexDirection: "column", gap: "12px" }}>
+          <button onClick={() => navigate("/admin-helpdesk")}>📨 View Complaints</button>
+          <button onClick={() => navigate("/admin/profile-verification")}>🧾 Verify Profiles</button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
