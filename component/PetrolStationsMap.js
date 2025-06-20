@@ -51,6 +51,7 @@ export default function PetrolStationsMap() {
   const [isOngoingPage, setIsOngoingPage] = useState(true);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [percent, setPercent] = useState(0);
+  const [progress, setProgress] = useState(0);
   // const percentValue = percent.percent ?? percent;
 
   const { user } = useContext(UserContext);
@@ -147,10 +148,12 @@ export default function PetrolStationsMap() {
         const data = snap.val();
         setUserData(data);
         setPercent(getProfileCompletion(data));
+        setProgress(getProfileCompletion(data));
+        console.log("Progress");
         console.log("Percent", percent);
       }
     });
-    get(ref(db, `voucher/${user.uid}`)).then((snap) => {
+    get(ref(db, `vouchers/${user.uid}`)).then((snap) => {
       if (snap.exists()) {
         setVoucher(snap.val());
       }
@@ -193,7 +196,7 @@ export default function PetrolStationsMap() {
 
   const handleMarkUsed = async () => {
     if (!voucher) return;
-    await set(ref(getDatabase(), `voucher/${user.uid}/status`), "Used");
+    await set(ref(getDatabase(), `vouchers/${user.uid}/status`), "Used");
     setVoucher({ ...voucher, status: "Used" });
     setShowConfirm(false);
   };
@@ -421,7 +424,7 @@ export default function PetrolStationsMap() {
                     }}
                   >
                     <View
-                      style={[styles.filler, { width: `${percent.value}` }]}
+                      style={[styles.filler, { width: `${percent.value}%` }]}
                     />
                   </View>
                 </View>
@@ -535,7 +538,9 @@ export default function PetrolStationsMap() {
                     borderRadius: 15,
                     padding: 10,
                     justifyContent:
-                      percent < 100 || !voucher ? "center" : "flex-start",
+                      percent < 100 || percent.value < 100 || !voucher
+                        ? "center"
+                        : "flex-start",
 
                     alignItems: "center",
                     shadowColor: "#000",
@@ -545,7 +550,7 @@ export default function PetrolStationsMap() {
                     elevation: 5,
                   }}
                 >
-                  {percent.value < 100 ? (
+                  {percent.value < 100 || percent < 100 ? (
                     <View alignItems={"center"}>
                       <Icon name="lock" size={40} color={"#000"} />
                       <Text

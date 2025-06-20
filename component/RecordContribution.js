@@ -50,7 +50,15 @@ export default function RecordContribution({ route }) {
     if (month <= 0 && scheme !== "i-Saraan KWSP") {
       Alert.alert(
         "Missing field data",
-        "Please state hwo many months to cover for SOCSO plan."
+        "Please state how many months to cover for SOCSO plan."
+      );
+      return;
+    }
+
+    if (month > 12 && scheme !== "i-Saraan KWSP") {
+      Alert.alert(
+        "Month Contribution Limit",
+        "You can only choose from 1 to 12 months."
       );
       return;
     }
@@ -62,6 +70,7 @@ export default function RecordContribution({ route }) {
 
     const socialContriRef = ref(database, "SPcontribution/"); // Parent path where data will be stored
     const newSocialContriRef = push(socialContriRef);
+    const lastContributionId = newSocialContriRef.key;
     console.log("Fetching user data...");
 
     const sp = snapshot.val();
@@ -87,7 +96,6 @@ export default function RecordContribution({ route }) {
     const spRef = ref(database, `socialplan/${id}`); // Parent path where data will be stored
     // const updatedSPRef = push(spRef);
 
-    console.log("Passed here...");
     try {
       if (scheme !== "i-Saraan KWSP") {
         await set(newSocialContriRef, {
@@ -109,20 +117,15 @@ export default function RecordContribution({ route }) {
         });
         console.log("Data written for KWSP successfully!");
       }
-
-      navi.navigate("Home");
-      console.log("Passed here too...");
     } catch (error) {
       console.error("Error writing data: ", error);
     }
 
-    console.log("Passed here too...");
-
     update(spRef, {
       totalContribution: newTotalContribution,
+      lastContributionId: lastContributionId,
     })
       .then(() => {
-        console.log("Done.");
         navi.navigate("SPHome");
       })
       .catch((error) => console.error("Error writing data: ", error));

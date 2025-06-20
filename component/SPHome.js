@@ -14,9 +14,11 @@ import {
 import { styles } from "../styles";
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../UserContext";
-import { ref, getDatabase, onValue } from "firebase/database";
+import { ref, getDatabase, onValue, update } from "firebase/database";
 import BottomBar from "./BottomBar";
 import { LinearGradient } from "expo-linear-gradient";
+import { Modal } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 
 const { width } = Dimensions.get("window");
 
@@ -30,6 +32,12 @@ export default function SPHome({ route }) {
   const [isEnabled, setIsEnabled] = useState(false);
   const flatListRef = useRef(null);
   const { pDate, pTime } = route.params || {};
+  const [lastId, setLastId] = useState([]);
+  const [SOCSOplan, setSOCSOplan] = useState([]);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("Plan 1");
+  const [changingSchemeId, setChangingSchemeId] = useState(null);
 
   const benefitKWSP = [
     "Receive a special incentive of 20% (up to a maximum of RM500) of the total voluntary contribution in the current year",
@@ -81,11 +89,157 @@ export default function SPHome({ route }) {
 
   const navi = useNavigation();
 
-  // const { rDate, rTime } = route.params || {};
+  const isLocked =
+    SOCSOplan &&
+    SOCSOplan[0] &&
+    SOCSOplan[0].scheme !== "i-Saraan KWSP" &&
+    (() => {
+      const created = new Date(SOCSOplan[0].createdAt);
+      const unlockDate = new Date(created);
+      unlockDate.setMonth(
+        unlockDate.getMonth() + (SOCSOplan[0].monthsCovered || 0)
+      );
+      const now = new Date();
+      console.log(now <= unlockDate);
+      return now <= unlockDate;
+    })();
+
+  const unlockDate =
+    SOCSOplan && SOCSOplan[0]
+      ? (() => {
+          const createdAt = Number(SOCSOplan[0].createdAt); // Ensure it's a number
+          const monthsToAdd = Number(SOCSOplan[0].monthsCovered) || 0;
+          const created = new Date(createdAt);
+          const d = new Date(created);
+          d.setMonth(created.getMonth() + monthsToAdd); // Always use the original month
+          // console.log("Created month: ", created.getMonth());
+          // console.log("Created Year: ", created.getFullYear());
+          // console.log("New month: ", d.getMonth());
+          // console.log("New Year: ", d.getFullYear());
+          return d;
+        })()
+      : null;
+
+  const hasReset = useRef(false);
+
+  useEffect(() => {
+    // Find the first plan that matches the user and is not "i-Saraan KWSP"
+    const planToReset = data.find(
+      (plan) =>
+        plan.email === user.email &&
+        plan.scheme !== "i-Saraan KWSP" &&
+        plan.totalContribution !== 0 // Only reset if not already 0
+    );
+
+    // Only reset if unlocked, plan exists, and not already reset
+    if (!isLocked && planToReset && !hasReset.current) {
+      const db = getDatabase();
+      update(ref(db, `socialplan/${planToReset.id}`), {
+        totalContribution: 0,
+      });
+      hasReset.current = true;
+      console.log("totalContribution reset to 0 for plan:", planToReset.id);
+    }
+    // Reset the flag if it gets locked again (optional)
+    if (isLocked) {
+      hasReset.current = false;
+    }
+  }, [isLocked, data, user.email]);
+
+  // useEffect(() => {
+  //   // Find the first plan that matches the user and is not "i-Saraan KWSP"
+  //   const planToReset = data.find(
+  //     (plan) =>
+  //       plan.email === user.email &&
+  //       plan.scheme !== "i-Saraan KWSP"
+  //   );
+
+  //   // Only reset if unlocked, plan exists, and not already reset
+  //   if (isLocked) {
+  //     const db = getDatabase();
+  //     update(ref(db, `socialplan/${planToReset.id}`), {
+  //       rdate: ,
+  //       rtime:
+  //     });
+  //   }
+
+  // }, [isLocked]);
+
+  useEffect(() => {
+    if (isLocked && SOCSOplan && SOCSOplan[0]) {
+      const contribution = SOCSOplan[0]; // The user's first valid contribution record
+      const db = getDatabase();
+
+      // Calculate reminder date based on createdAt + monthsCovered
+      const createdAt = new Date(Number(contribution.createdAt));
+      const monthsToAdd = Number(contribution.monthsCovered) || 0;
+      const reminderDate = new Date(createdAt);
+      reminderDate.setMonth(reminderDate.getMonth() + monthsToAdd);
+
+      const formattedDate = reminderDate.toLocaleDateString("en-GB"); // dd/mm/yyyy
+      const formattedTime = reminderDate.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      }); // hh.mm AM/PM
+
+      // Update the plan reminder fields in Firebase
+      const updateReminder = data.find(
+        (plan) => plan.email === user.email && plan.scheme !== "i-Saraan KWSP"
+      );
+
+      if (updateReminder) {
+        update(ref(db, `socialplan/${updateReminder.id}`), {
+          rdate: formattedDate,
+          rtime: formattedTime,
+        });
+        console.log("Reminder set to:", formattedDate, formattedTime);
+      }
+    }
+  }, [isLocked]);
+
+  useEffect(() => {
+    const db = getDatabase();
+    // const postsRef = ref(db, "socialplan");
+    const recordRef = ref(db, `SPcontribution`);
+
+    onValue(recordRef, (snapshot) => {
+      const data = snapshot.val();
+
+      let fetchedRecord = [];
+
+      if (data) {
+        // Convert the object to an array of posts
+        fetchedRecord = Object.keys(data)
+          .map((key) => ({
+            key: key,
+            monthsCovered: data[key].monthsCovered,
+            scheme: data[key].scheme,
+            chosenPlan: data[key].chosenPlan,
+            createdAt: data[key].createdAt,
+            email: data[key].email, // Add this
+            // lastContributionId: data[key].lastContributionId, // And this
+          }))
+          .filter(
+            (item) =>
+              item.email === user.email &&
+              // item.key === lastId &&
+              item.scheme !== "i-Saraan KWSP"
+          ); // Filter here;
+      } else {
+        console.log("No data found in the database.");
+      }
+
+      setSOCSOplan(fetchedRecord);
+      console.log("iaiaia: ", lastId);
+      console.log("SPCSP Plan:", SOCSOplan);
+    });
+  }, []);
 
   useEffect(() => {
     const db = getDatabase();
     const postsRef = ref(db, "socialplan");
+    const recordRef = ref(db, `SPcontribution`);
 
     onValue(postsRef, (snapshot) => {
       const data = snapshot.val();
@@ -102,6 +256,7 @@ export default function SPHome({ route }) {
             scheme: data[key].scheme,
             chosenPlan: data[key].chosenPlan,
             totalContribution: data[key].totalContribution,
+            lastContributionId: data[key].lastContributionId ?? null,
             rdate: data[key].rdate ?? null,
             rtime: data[key].rtime ?? null,
           }))
@@ -109,13 +264,21 @@ export default function SPHome({ route }) {
       } else {
         console.log("No data found in the database.");
       }
+      // Get lastContributionId from the last real plan (if any)
+      const firstPlanWithId = fetchedPlans.find(
+        (plan) => plan.lastContributionId
+      );
+      const lastId = firstPlanWithId
+        ? firstPlanWithId.lastContributionId
+        : null;
 
       // Always add the 'Add New Plan' dummy card at the end
       fetchedPlans.push({ isAddButton: true });
 
       // console.log(pDate);
-      // console.log(pTime);
+      setLastId(lastId);
       setData(fetchedPlans);
+      console.log("Last ID: ", lastId);
     });
   }, []);
 
@@ -135,6 +298,96 @@ export default function SPHome({ route }) {
           ]}
           resizeMode="cover"
         >
+          <Modal
+            visible={modalVisible}
+            transparent
+            animationType="slide"
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(0,0,0,0.5)",
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  borderRadius: 20,
+                  padding: 20,
+                  width: "80%",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Nunito-Bold",
+                    fontSize: 18,
+                    marginBottom: 10,
+                  }}
+                >
+                  Select New Plan
+                </Text>
+                <Picker
+                  selectedValue={selectedPlan}
+                  style={{ width: "100%" }}
+                  onValueChange={(itemValue) => setSelectedPlan(itemValue)}
+                >
+                  <Picker.Item label="Plan 1" value="Plan 1" color="black" />
+                  <Picker.Item label="Plan 2" value="Plan 2" color="black" />
+                  <Picker.Item label="Plan 3" value="Plan 3" color="black" />
+                  <Picker.Item label="Plan 4" value="Plan 4" color="black" />
+                </Picker>
+                <View style={{ flexDirection: "row", marginTop: 20 }}>
+                  <TouchableOpacity
+                    onPress={() => setModalVisible(false)}
+                    style={{
+                      backgroundColor: "#ccc",
+                      padding: 10,
+                      borderRadius: 10,
+                      marginRight: 10,
+                    }}
+                  >
+                    <Text style={{ color: "#333" }}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      console.log("Changing scheme ID:", changingSchemeId);
+                      console.log("Selected plan:", selectedPlan);
+                      if (changingSchemeId) {
+                        try {
+                          const db = getDatabase();
+                          await update(
+                            ref(db, `socialplan/${changingSchemeId}`),
+                            { chosenPlan: selectedPlan }
+                          );
+                          console.log("Plan updated successfully!");
+                        } catch (error) {
+                          console.error("Error updating plan:", error);
+                          Alert.alert(
+                            "Update failed",
+                            "Could not update the plan. Please try again."
+                          );
+                        }
+                      } else {
+                        console.warn("No scheme ID selected!");
+                      }
+                      setModalVisible(false);
+                    }}
+                    style={{
+                      backgroundColor: "#20734f",
+                      padding: 10,
+                      borderRadius: 10,
+                    }}
+                  >
+                    <Text style={{ color: "#fff" }}>Save</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
           <Text style={[styles.text]}>Social Protection</Text>
           <ScrollView
             style={[
@@ -244,6 +497,54 @@ export default function SPHome({ route }) {
                       </Text>
                       {/* <Text>{item.chosenPlan}</Text> */}
 
+                      {/* {isLocked && unlockDate ? (
+                        <Text
+                          style={{
+                            fontFamily: "Nunito-Regular",
+                            color: "grey",
+                          }}
+                        >
+                          Plan is locked unaatil{" "}
+                          {unlockDate.toLocaleDateString("en-GB")}
+                        </Text>
+                      ) : (
+                        <Text
+                          style={{
+                            fontFamily: "Nunito-Regular",
+                            color: "green",
+                          }}
+                        >
+                          Plan is unlocked and available!
+                        </Text>
+                      )} */}
+
+                      {item.scheme !== "i-Saraan KWSP" &&
+                        (isLocked && unlockDate ? (
+                          <Text
+                            style={{
+                              fontFamily: "Nunito-Regular",
+                              color: "grey",
+                            }}
+                          >
+                            Plan is locked until{" "}
+                            {unlockDate.toLocaleDateString("en-GB")}
+                          </Text>
+                        ) : (
+                          <Text
+                            style={{
+                              fontFamily: "Nunito-Regular",
+                              color: "green",
+                            }}
+                            onPress={() => {
+                              setChangingSchemeId(item.id); // Save the scheme id to update
+                              setSelectedPlan(item.chosenPlan || "Plan 1"); // Default to current plan
+                              setModalVisible(true);
+                            }}
+                          >
+                            Change Plan?
+                          </Text>
+                        ))}
+
                       <View
                         style={{
                           flexDirection: "row",
@@ -252,6 +553,8 @@ export default function SPHome({ route }) {
                         }}
                       >
                         <TouchableOpacity
+                          disabled={item.scheme !== "i-Saraan KWSP" && isLocked} // or disabled={someCondition}
+                          // style={{ opacity: 0.5 }} // Optional: visually indicate it's disabled
                           onPress={() =>
                             navi.navigate("RecordContribution", {
                               scheme: data[index].scheme,
@@ -263,7 +566,10 @@ export default function SPHome({ route }) {
                             minWidth: Platform.OS === "ios" ? 150 : 120,
                             padding: 15,
                             margin: 5,
-                            backgroundColor: "#20734f",
+                            backgroundColor:
+                              item.scheme !== "i-Saraan KWSP" && isLocked
+                                ? "grey"
+                                : "#20734f",
                             borderRadius: 50,
                             alignItems: "center",
                             justifyContent: "center",
