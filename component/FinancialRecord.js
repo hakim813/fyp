@@ -411,18 +411,78 @@ export default function FinancialRecord() {
                                               >
                                                 {i.notes}
                                               </Text>
-                                              <Text
+                                              <View
                                                 style={{
-                                                  marginTop: "auto",
-                                                  fontStyle: "italic",
-                                                  fontFamily: "Nunito",
-                                                  fontSize: 15,
+                                                  flexDirection: "row",
+                                                  justifyContent:
+                                                    "space-between",
                                                 }}
                                               >
-                                                {new Date(
-                                                  i.date
-                                                ).toDateString()}
-                                              </Text>
+                                                <Text
+                                                  style={{
+                                                    marginTop: "auto",
+                                                    fontStyle: "italic",
+                                                    fontFamily: "Nunito",
+                                                    fontSize: 15,
+                                                  }}
+                                                >
+                                                  {new Date(
+                                                    i.date
+                                                  ).toDateString()}
+                                                </Text>
+                                                <View
+                                                  style={{
+                                                    flexDirection: "row",
+                                                    marginTop: 10,
+                                                  }}
+                                                >
+                                                  <TouchableOpacity
+                                                    onPress={() => {
+                                                      navi.navigate(
+                                                        "CreateFinanceRecord",
+                                                        {
+                                                          type: i.type,
+                                                          id: i.id,
+                                                        }
+                                                      );
+                                                    }}
+                                                    style={{ marginRight: 15 }}
+                                                  >
+                                                    <Icon
+                                                      name="pencil"
+                                                      size={20}
+                                                      color="#20734f"
+                                                    />
+                                                  </TouchableOpacity>
+                                                  <TouchableOpacity
+                                                    onPress={() => {
+                                                      Alert.alert(
+                                                        "Delete Record",
+                                                        "Are you sure you want to delete this record?",
+                                                        [
+                                                          {
+                                                            text: "Cancel",
+                                                            style: "cancel",
+                                                          },
+                                                          {
+                                                            text: "Delete",
+                                                            style:
+                                                              "destructive",
+                                                            onPress: () =>
+                                                              deleteData(i.id),
+                                                          },
+                                                        ]
+                                                      );
+                                                    }}
+                                                  >
+                                                    <Icon
+                                                      name="trash"
+                                                      size={20}
+                                                      color="#f44f4f"
+                                                    />
+                                                  </TouchableOpacity>
+                                                </View>
+                                              </View>
                                             </View>
                                           </View>
                                         </View>
@@ -541,16 +601,58 @@ export default function FinancialRecord() {
                                       >
                                         {i.notes}
                                       </Text>
-                                      <Text
+                                      <View
                                         style={{
-                                          marginTop: "auto",
-                                          fontStyle: "italic",
-                                          fontFamily: "Nunito",
-                                          fontSize: 15,
+                                          flexDirection: "row",
+                                          marginTop: 10,
+                                          justifyContent: "flex-end",
                                         }}
                                       >
-                                        {/* Optionally show date info here */}
-                                      </Text>
+                                        <TouchableOpacity
+                                          onPress={() => {
+                                            navi.navigate(
+                                              "CreateFinanceRecord",
+                                              {
+                                                type: i.type,
+                                                id: i.id,
+                                              }
+                                            );
+                                          }}
+                                          style={{ marginRight: 15 }}
+                                        >
+                                          <Icon
+                                            name="pencil"
+                                            size={20}
+                                            color="#20734f"
+                                          />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                          onPress={() => {
+                                            Alert.alert(
+                                              "Delete Record",
+                                              "Are you sure you want to delete this record?",
+                                              [
+                                                {
+                                                  text: "Cancel",
+                                                  style: "cancel",
+                                                },
+                                                {
+                                                  text: "Delete",
+                                                  style: "destructive",
+                                                  onPress: () =>
+                                                    deleteData(i.id),
+                                                },
+                                              ]
+                                            );
+                                          }}
+                                        >
+                                          <Icon
+                                            name="trash"
+                                            size={20}
+                                            color="#f44f4f"
+                                          />
+                                        </TouchableOpacity>
+                                      </View>
                                     </View>
                                   </View>
                                 </View>

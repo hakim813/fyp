@@ -55,6 +55,14 @@ export default function RecordContribution({ route }) {
       return;
     }
 
+    if (total < 1 && scheme === "i-Saraan KWSP") {
+      Alert.alert(
+        "Missing field data",
+        "Please state the value of the contribution, minimum at RM1"
+      );
+      return;
+    }
+
     if (month > 12 && scheme !== "i-Saraan KWSP") {
       Alert.alert(
         "Month Contribution Limit",
