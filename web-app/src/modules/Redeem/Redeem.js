@@ -328,15 +328,15 @@ export default function Redeem() {
             </div>
             <span className="redeem-glass-progress-label">{profilePercent}% Profile Completed</span>
           </div>
-          {profilePercent < 100 && (
+          {(profilePercent < 100 || userData.verified !== true) && (
             <div className="redeem-glass-blocked">
-              <p>Complete your profile to access voucher redemption.</p>
+              <p>Complete your profile and wait for admin verification to access voucher redemption.</p>
               <Link to="/edit-profile"><button className="redeem-glass-btn">Complete Profile</button></Link>
             </div>
           )}
         </div>
 
-        {profilePercent === 100 && (
+        {profilePercent === 100 && userData.verified === true &&  (
           <>
             <div className="redeem-glass-tabs">
               <button className={tab === "voucher" ? "tab active" : "tab"} onClick={() => handleTabChange("voucher")}>My Voucher</button>

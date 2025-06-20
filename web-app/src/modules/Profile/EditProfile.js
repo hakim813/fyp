@@ -324,44 +324,48 @@ export default function EditProfile() {
     setErrors(err);
     if (Object.keys(err).length > 0) return;
 
-    const updated = { ...formData };
+  const updated = { ...formData };
+  delete updated.verified; // Ensure old value doesn't carry over
+  updated.verified = false; // Force unverified after edit
 
-    // Upload profile photo
-    if (formData.profilePhoto instanceof File) {
-      const r = storageRef(storage, `profilePhotos/${u.uid}`);
-      await uploadBytes(r, formData.profilePhoto);
-      updated.profilePhoto = await getDownloadURL(r);
-    }
+  // Upload profile photo
+  if (formData.profilePhoto instanceof File) {
+    const r = storageRef(storage, `profilePhotos/${u.uid}`);
+    await uploadBytes(r, formData.profilePhoto);
+    updated.profilePhoto = await getDownloadURL(r);
+  }
 
-    // Upload IC Photos
-    if (Array.isArray(formData.icPhotos)) {
-      const urls = [];
-      for (let f of formData.icPhotos) {
-        if (f instanceof File) {
-          const r2 = storageRef(storage, `icPhotos/${u.uid}_${f.name}`);
-          await uploadBytes(r2, f);
-          urls.push(await getDownloadURL(r2));
-        } else {
-          urls.push(f);
-        }
+  // Upload IC Photos
+  if (Array.isArray(formData.icPhotos)) {
+    const urls = [];
+    for (let f of formData.icPhotos) {
+      if (f instanceof File) {
+        const r2 = storageRef(storage, `icPhotos/${u.uid}_${f.name}`);
+        await uploadBytes(r2, f);
+        urls.push(await getDownloadURL(r2));
+      } else {
+        urls.push(f);
       }
-      updated.icPhotos = urls;
     }
+    updated.icPhotos = urls;
+  }
 
-    // Upload GDL Document
-    if (formData.gdl === "Yes" && formData.gdlDocument instanceof File) {
-      const r3 = storageRef(storage, `gdlDocuments/${u.uid}_${formData.gdlDocument.name}`);
-      await uploadBytes(r3, formData.gdlDocument);
-      updated.gdlDocument = await getDownloadURL(r3);
-    } else if (formData.gdl === "No") {
-      updated.gdlDocument = null;
-    }
+  // Upload GDL Document
+  if (formData.gdl === "Yes" && formData.gdlDocument instanceof File) {
+    const r3 = storageRef(storage, `gdlDocuments/${u.uid}_${formData.gdlDocument.name}`);
+    await uploadBytes(r3, formData.gdlDocument);
+    updated.gdlDocument = await getDownloadURL(r3);
+  } else if (formData.gdl === "No") {
+    updated.gdlDocument = null;
+  }
 
-    updated.completion = calculateCompletion(updated);
-    await update(dbRef(db, `users/${u.uid}`), updated);
+  updated.completion = calculateCompletion(updated);
+  updated.verified = false; // ✅ Reset verification
+  await update(dbRef(db, `users/${u.uid}`), updated);
 
-    navigate("/profile");
-  };
+  navigate("/profile");
+};
+
 
   // For file/image preview modal
   const handleFileClick = (src) => setShowImage(src);

@@ -42,7 +42,7 @@ export default function Helpdesk() {
     const unsubscribe = onValue(userComplaintsQuery, snapshot => {
       const data = snapshot.val() || {};
       const filtered = Object.entries(data)
-        .filter(([_, complaint]) => complaint.status?.toLowerCase() === 'ongoing')
+        .filter(([_, complaint]) => complaint.status === 'Ongoing')
         .map(([key, complaint]) => ({ id: key, ...complaint }));
       setOngoingComplaints(filtered);
       setLoading(false);

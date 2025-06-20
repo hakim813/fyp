@@ -67,7 +67,7 @@ const ComplaintForm = ({ onClose }) => {
       description,
       category,
       photoURL,
-      status: 'ongoing',
+      status: 'Ongoing',
       createdAt: Date.now(),
     };
 

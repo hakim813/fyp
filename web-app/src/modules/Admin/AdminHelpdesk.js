@@ -50,7 +50,7 @@ export default function AdminHelpdesk() {
 
   const filtered = complaints.filter((c) => {
     if (filter === "ongoing") return c.status === "ongoing";
-    if (filter === "resolved") return c.status === "resolved";
+    if (filter === "resolved") return c.status === "Resolved";
     return true;
   });
 
