@@ -167,7 +167,7 @@ export default function AdminProfileVerification() {
                   style={{ cursor: "pointer", color: "#0984e3" }}
                   onClick={() => setExpandedUserId(expanded ? null : u.uid)}
                 >
-                  {expanded ? "➖" : "➕"} {u.fullName}
+                  {expanded ? "-" : "+"} {u.fullName}
                 </h3>
                 <p><strong>Email:</strong> {u.email}</p>
                 <p>

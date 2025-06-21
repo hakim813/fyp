@@ -22,6 +22,8 @@ export default function AdminDashboard() {
         <div style={{ marginTop: "30px", display: "flex", flexDirection: "column", gap: "12px" }}>
           <button onClick={() => navigate("/admin-helpdesk")}>📨 View Complaints</button>
           <button onClick={() => navigate("/admin/profile-verification")}>🧾 Verify Profiles</button>
+          <button onClick={() => navigate("/admin/admin-voucher")}>🎁 Generate Voucher</button>
+
         </div>
       </div>
     </>

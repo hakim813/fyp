@@ -35,8 +35,13 @@ function getDistance(loc1, loc2) {
 function formatDate(ts) {
   if (!ts) return "-";
   const d = new Date(ts);
-  return d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return `${dd}/${mm}/${yyyy} ${time}`;
 }
+
 
 // Updated expiry countdown to always show days, hours, minutes, seconds
 function getExpiryCountdown(expiresAt) {

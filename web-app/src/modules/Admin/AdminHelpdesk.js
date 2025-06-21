@@ -101,7 +101,7 @@ export default function AdminHelpdesk() {
         ← Back to Dashboard
       </button>
 
-      <h2>🛠️ Helpdesk Complaints (Admin View)</h2>
+      <h2>Helpdesk Complaints (Admin View)</h2>
 
       <div style={{ margin: "10px 0" }}>
         <label><strong>Filter by status:</strong>{" "}</label>
