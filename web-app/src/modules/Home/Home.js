@@ -236,9 +236,6 @@ function Home() {
               <Link to="/redeem">
                 <button className="action-btn"> Redeem Voucher</button>
               </Link>
-              <Link to="/find-station">
-                <button className="action-btn"> Find Petrol Station</button>
-              </Link>
               <Link to="/edit-profile">
                 <button className="action-btn"> Edit Profile</button>
               </Link>
