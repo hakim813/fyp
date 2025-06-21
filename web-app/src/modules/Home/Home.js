@@ -87,12 +87,31 @@ function Home() {
           setRecentVouchers(arr);
           setLoading(false);
         });
-        // Fetch today's finance summary (dummy, replace with real logic if available)
-        get(ref(db, `finance/${firebaseUser.uid}/summary`)).then(snap => {
-          if (snap.exists()) {
-            setFinance(snap.val());
+        // Fetch today's finance summary
+        const financeRef = ref(db, "financeRecords");
+        onValue(financeRef, (snap) => {
+          const data = snap.val();
+          if (data) {
+            const today = new Date();
+            const todayStr = today.toDateString();
+            let income = 0;
+            let expense = 0;
+            Object.values(data).forEach((rec) => {
+              if (rec.email === firebaseUser.email) {
+                const recordDate = new Date(rec.date).toDateString();
+                if (recordDate === todayStr) {
+                  if (rec.type === "Income") {
+                    income += parseFloat(rec.value);
+                  } else if (rec.type === "Expense") {
+                    expense += parseFloat(rec.value);
+                  }
+                }
+              }
+            });
+            setFinance({ income, expense });
           }
         });
+
         // Fetch recent activity feed (dummy, replace with real logic if available)
         get(ref(db, `activity/${firebaseUser.uid}`)).then(snap => {
           if (snap.exists()) {
