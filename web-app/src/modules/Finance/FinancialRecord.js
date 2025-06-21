@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getDatabase, ref, onValue, remove } from "firebase/database";
+import { getDatabase, ref, onValue, remove, update } from "firebase/database";
 import { useUser } from "../../utils/UserContext";
 import { useNavigate } from "react-router-dom";
 import "./finance.css";
@@ -17,6 +17,20 @@ export default function FinancialRecord() {
   const [dailyData, setDailyData] = useState([]);
   const [isMonthlyView, setIsMonthlyView] = useState(false);
   const [detailedMonth, setDetailedMonth] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editValue, setEditValue] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+
+  const handleEdit = async (id) => {
+    if (!editValue) return alert("Value required");
+    const db = getDatabase();
+    await update(ref(db, `financeRecords/${id}`), {
+      value: parseFloat(editValue),
+      notes: editNotes,
+    });
+    setEditingId(null);
+  };
+
 
   useEffect(() => {
     if (!user) return;
@@ -145,7 +159,42 @@ export default function FinancialRecord() {
                                 <button className="btn btn-delete" onClick={() => handleDelete(rec.id)}>
                                   Delete
                                 </button>
+                                <button
+                                  className="btn btn-edit"
+                                  onClick={() => {
+                                    setEditingId(rec.id);
+                                    setEditValue(rec.value);
+                                    setEditNotes(rec.notes);
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                                {editingId === rec.id && (
+                                  <div style={{ marginTop: 8 }}>
+                                    <input
+                                      type="number"
+                                      value={editValue}
+                                      onChange={(e) => setEditValue(e.target.value)}
+                                      placeholder="Value"
+                                      style={{ width: 80, marginRight: 6 }}
+                                    />
+                                    <input
+                                      type="text"
+                                      value={editNotes}
+                                      onChange={(e) => setEditNotes(e.target.value)}
+                                      placeholder="Notes"
+                                      style={{ width: 120, marginRight: 6 }}
+                                    />
+                                    <button className="btn btn-save" onClick={() => handleEdit(rec.id)}>
+                                      Save
+                                    </button>
+                                    <button className="btn btn-cancel" onClick={() => setEditingId(null)}>
+                                      Cancel
+                                    </button>
+                                  </div>
+                                )}
                               </td>
+
                             </tr>
                           ))}
                         </tbody>
@@ -184,6 +233,41 @@ export default function FinancialRecord() {
                           <button className="btn btn-delete" onClick={() => handleDelete(rec.id)}>
                             Delete
                           </button>
+                          <button
+                            className="btn btn-edit"
+                            onClick={() => {
+                              setEditingId(rec.id);
+                              setEditValue(rec.value);
+                              setEditNotes(rec.notes);
+                            }}
+                          >
+                            Edit
+                          </button>
+                          {editingId === rec.id && (
+                            <div style={{ marginTop: 8 }}>
+                              <input
+                                type="number"
+                                value={editValue}
+                                onChange={(e) => setEditValue(e.target.value)}
+                                placeholder="Value"
+                                style={{ width: 80, marginRight: 6 }}
+                              />
+                              <input
+                                type="text"
+                                value={editNotes}
+                                onChange={(e) => setEditNotes(e.target.value)}
+                                placeholder="Notes"
+                                style={{ width: 120, marginRight: 6 }}
+                              />
+                              <button className="btn btn-save" onClick={() => handleEdit(rec.id)}>
+                                Save
+                              </button>
+                              <button className="btn btn-cancel" onClick={() => setEditingId(null)}>
+                                Cancel
+                              </button>
+                            </div>
+                          )}
+
                         </td>
                       </tr>
                     ))}
