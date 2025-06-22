@@ -24,6 +24,7 @@ export default function AdminVoucher() {
   const navigate = useNavigate();
   const db = getDatabase();
 
+  // Fetch users ONCE
   useEffect(() => {
     const fetchUsers = async () => {
       const snap = await get(ref(db, "users"));
@@ -39,9 +40,14 @@ export default function AdminVoucher() {
     };
 
     fetchUsers();
+  }, [db]);
+
+  // Fetch vouchers when users are ready
+  useEffect(() => {
+    if (users.length === 0) return; // Prevent running before users are loaded
 
     const voucherRef = ref(db, "vouchers");
-    onValue(voucherRef, (snapshot) => {
+    const unsubscribe = onValue(voucherRef, (snapshot) => {
       const data = snapshot.val() || {};
       const allVouchers = [];
 
@@ -60,7 +66,10 @@ export default function AdminVoucher() {
 
       setVoucherList(allVouchers);
     });
+
+    return () => unsubscribe();
   }, [db, users]);
+
 
   const handleGenerate = async () => {
     if (!amount || !expiryValue) return;
