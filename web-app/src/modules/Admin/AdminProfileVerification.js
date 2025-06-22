@@ -106,16 +106,34 @@ export default function AdminProfileVerification() {
       }
     }
 
-    if (field === "gdlDocument") {
-      return value.endsWith(".pdf") ? (
-        <iframe src={value} title="GDL Document" width="100%" height="300" style={{ border: "1px solid #ccc", borderRadius: 4 }} />
-      ) : (
-        <img
-          src={value}
-          alt="GDL Document"
-          style={{ width: "150px", borderRadius: 4, objectFit: "cover", border: "1px solid #ccc", cursor: "pointer" }}
-          onClick={() => setModalImage(value)}
-        />
+    if (field === "gdlDocument" && gdl === "Yes" && value) {
+      const isPdf = value.toLowerCase().includes(".pdf");
+      return (
+        <div style={{ marginBottom: 8 }}>
+          <strong>{fieldLabels[field]}:</strong><br />
+          {isPdf ? (
+            <span
+              style={{ color: "#0984e3", textDecoration: "underline", cursor: "pointer" }}
+              onClick={() => window.open(value, "_blank")}
+            >
+              📄 Open GDL Document (PDF)
+            </span>
+          ) : (
+            <img
+              src={value}
+              alt="GDL Document"
+              style={{
+                marginTop: 6,
+                width: "150px",
+                borderRadius: 4,
+                objectFit: "cover",
+                border: "1px solid #ccc",
+                cursor: "pointer",
+              }}
+              onClick={() => setModalImage(value)}
+            />
+          )}
+        </div>
       );
     }
 
@@ -136,19 +154,19 @@ export default function AdminProfileVerification() {
   };
 
   return (
-    <div className="container" style={{ padding: "20px" }}>
+    <div className="container" style={{ padding: "20px", maxWidth: "1000px", margin: "0 auto" }}>
       <button
         onClick={() => navigate("/admin")}
-        style={{ marginBottom: 15, padding: "8px 16px", backgroundColor: "#ccc", border: "none", borderRadius: 5 }}
+        style={{ marginBottom: 15, padding: "8px 16px", backgroundColor: "#ccc", border: "none", borderRadius: 5, cursor: "pointer" }}
       >
         ← Back to Dashboard
       </button>
 
-      <h2>100% Completed Profiles</h2>
+      <h2 style={{ marginBottom: 10 }}>✅ Completed Profiles</h2>
 
       <div style={{ marginBottom: "20px" }}>
         <label><strong>Filter:</strong> </label>
-        <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+        <select value={filter} onChange={(e) => setFilter(e.target.value)} style={{ padding: 6, borderRadius: 4 }}>
           <option value="all">Show All</option>
           <option value="verified">Verified Only</option>
           <option value="unverified">Unverified Only</option>
@@ -162,41 +180,63 @@ export default function AdminProfileVerification() {
           {filteredUsers.map((u) => {
             const expanded = expandedUserId === u.uid;
             return (
-              <li key={u.uid} style={{ listStyle: "none", border: "1px solid #ccc", padding: 15, marginBottom: 20, borderRadius: 8 }}>
+              <li key={u.uid} style={{ listStyle: "none", border: "1px solid #ccc", padding: 15, marginBottom: 20, borderRadius: 8, backgroundColor: "#fdfdfd" }}>
                 <h3
-                  style={{ cursor: "pointer", color: "#0984e3" }}
+                  style={{ cursor: "pointer", color: "#0984e3", marginBottom: 5 }}
                   onClick={() => setExpandedUserId(expanded ? null : u.uid)}
                 >
-                  {expanded ? "-" : "+"} {u.fullName}
+                  {expanded ? "▼" : "▶"} {u.fullName}
                 </h3>
-                <p><strong>Email:</strong> {u.email}</p>
-                <p>
+                <p style={{ margin: "4px 0" }}><strong>Email:</strong> {u.email}</p>
+                <p style={{ margin: "4px 0" }}>
                   <strong>Status:</strong>{" "}
                   {u.verified ? <span style={{ color: "green", fontWeight: "bold" }}>✅ Verified</span> : <span style={{ color: "red", fontWeight: "bold" }}>❌ Not Verified</span>}
                 </p>
 
                 {expanded && (
-                  <>
+                  <div style={{ marginTop: 10 }}>
                     {Object.entries(sectionFields).map(([section, fields]) => (
-                      <div key={section} style={{ marginTop: 12 }}>
-                        <h4>{section}</h4>
+                      <div key={section} style={{ border: "1px solid #ccc", borderRadius: 6, padding: 12, marginBottom: 16, backgroundColor: "#fafafa" }}>
+                        <div style={{
+                          backgroundColor: "#dfe6e9",
+                          padding: "6px 12px",
+                          borderRadius: "4px",
+                          marginBottom: "10px",
+                          fontWeight: "bold",
+                          fontSize: "15px"
+                        }}>
+                          {section}
+                        </div>
                         {fields.map((field) => (
                           <div key={field}>
-                            <strong>{fieldLabels[field]}:</strong>{" "}
-                            {renderField(field, u[field], u.gdl) || (
-                              <em style={{ color: "#aaa" }}>Not provided</em>
-                            )}
+                            {field === "gdlDocument"
+                              ? renderField(field, u[field], u.gdl)
+                              : <>
+                                  <strong>{fieldLabels[field]}:</strong>{" "}
+                                  {renderField(field, u[field], u.gdl) || (
+                                    <em style={{ color: "#aaa" }}>Not provided</em>
+                                  )}
+                                </>
+                            }
                           </div>
                         ))}
                       </div>
                     ))}
                     <button
-                      style={{ marginTop: 15 }}
+                      style={{
+                        marginTop: 5,
+                        padding: "6px 12px",
+                        backgroundColor: u.verified ? "#e74c3c" : "#27ae60",
+                        color: "white",
+                        border: "none",
+                        borderRadius: 5,
+                        cursor: "pointer"
+                      }}
                       onClick={() => toggleVerification(u.uid, u.verified === true)}
                     >
                       {u.verified ? "Unverify" : "Verify"}
                     </button>
-                  </>
+                  </div>
                 )}
               </li>
             );
@@ -226,4 +266,5 @@ export default function AdminProfileVerification() {
       )}
     </div>
   );
+
 }
