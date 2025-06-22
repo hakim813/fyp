@@ -264,6 +264,12 @@ function Home() {
               <Link to="/helpdesk">
                 <button className="action-btn"> Helpdesk</button>
               </Link>
+              <Link to="/finance/create">
+                <button className="action-btn"> Add Income</button>
+              </Link>
+              <Link to="/finance/scan">
+                <button className="action-btn"> Scan Receipt</button>
+              </Link>
             </div>
           </section>
 
