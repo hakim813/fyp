@@ -199,16 +199,31 @@ export default function EditProfile() {
         setFormData((p) => ({ ...p, profilePhoto: file }));
         setPreviews((pv) => ({ ...pv, profilePhoto: URL.createObjectURL(file) }));
       } else if (name === "icPhotos") {
-        let existing = formData.icPhotos || [];
-        existing = existing.filter(f => typeof f === "string");
-        let arr = Array.from(files);
-        let merged = [...existing, ...arr].slice(0, 2);
-        setFormData((p) => ({ ...p, icPhotos: merged }));
-        setPreviews((pv) => ({
-          ...pv,
-          icPhotos: merged.map(f =>
-            typeof f === "string" ? f : URL.createObjectURL(f)
-          ),
+        const newFiles = Array.from(files);
+        const existing = formData.icPhotos || [];
+
+        // Keep existing file references (either string URLs or File objects)
+        const total = existing.length + newFiles.length;
+
+        if (total > 2) {
+          alert("Maximum 2 IC photos allowed.");
+          return;
+        }
+
+        const updatedFiles = [...existing, ...newFiles];
+
+        setFormData((prev) => ({
+          ...prev,
+          icPhotos: updatedFiles,
+        }));
+
+        const updatedPreviews = updatedFiles.map((f) =>
+          typeof f === "string" ? f : URL.createObjectURL(f)
+        );
+
+        setPreviews((prev) => ({
+          ...prev,
+          icPhotos: updatedPreviews,
         }));
       } else if (name === "gdlDocument") {
         const file = files[0];
@@ -297,6 +312,21 @@ export default function EditProfile() {
       return { ...prev, platforms: updated };
     });
   };
+
+  const handleRemoveICPhoto = (index) => {
+    setFormData((prev) => {
+      const updatedPhotos = [...(prev.icPhotos || [])];
+      updatedPhotos.splice(index, 1);
+      return { ...prev, icPhotos: updatedPhotos };
+    });
+
+    setPreviews((prev) => {
+      const updatedPreviews = [...(prev.icPhotos || [])];
+      updatedPreviews.splice(index, 1);
+      return { ...prev, icPhotos: updatedPreviews };
+    });
+  };
+
 
   // Only validate format if field is filled, not required
   const validate = () => {
@@ -440,9 +470,29 @@ export default function EditProfile() {
               <input type="file" name="icPhotos" accept="image/*" multiple onChange={handleChange} />
               <ul className="file-list">
                 {(previews.icPhotos || []).map((src, i) => (
-                  <li key={i} onClick={() => handleFileClick(src)}>IC Photo {i + 1}</li>
+                  <li key={i}>
+                    <span onClick={() => handleFileClick(src)} style={{ cursor: "pointer", textDecoration: "underline" }}>
+                      IC Photo {i + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveICPhoto(i)}
+                      style={{
+                        marginLeft: 8,
+                        background: "crimson",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 4,
+                        padding: "2px 6px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </li>
                 ))}
               </ul>
+
               {errors.icPhotos && <div className="error">{errors.icPhotos}</div>}
             </div>
             <div className="input-group">
@@ -627,12 +677,23 @@ export default function EditProfile() {
                   onChange={handleChange}
                 />
                 {previews.gdlDocument && (
-                  <span
-                    className="gdl-doc-link"
-                    onClick={() => handleFileClick(previews.gdlDocument)}
-                  >
-                    View Uploaded GDL Document
-                  </span>
+                  <div style={{ marginTop: 10 }}>
+                    {previews.gdlDocument.toLowerCase().includes(".pdf") ? (
+                      <span
+                        style={{ color: "#0984e3", textDecoration: "underline", cursor: "pointer" }}
+                        onClick={() => window.open(previews.gdlDocument, "_blank")}
+                      >
+                        📄 View Uploaded GDL Document (PDF)
+                      </span>
+                    ) : (
+                      <span
+                        className="gdl-doc-link"
+                        onClick={() => handleFileClick(previews.gdlDocument)}
+                      >
+                        🖼️ View Uploaded GDL Document (Image)
+                      </span>
+                    )}
+                  </div>
                 )}
                 {errors.gdlDocument && <div className="error">{errors.gdlDocument}</div>}
               </div>

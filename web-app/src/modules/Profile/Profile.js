@@ -35,7 +35,7 @@ const sections = [
   { name: "Identification", fields: ["nricId", "icPhotos", "taxId", "workPermit"] },
   { name: "Professional", fields: ["workStatus", "workCategory", "experience", "languages", "platforms"] },
   { name: "Finance", fields: ["bank", "bankAccountNumber"] },
-  { name: "Compliance", fields: ["insuranceCoverage", "socialSecurity", "licenses", "gdl"] }
+  { name: "Compliance", fields: ["insuranceCoverage", "socialSecurity", "licenses", "gdl", "gdlDocument"] }
 ];
 
 export default function Profile() {
@@ -118,22 +118,35 @@ export default function Profile() {
       );
     }
     if (field === "gdlDocument" && userData.gdl === "Yes" && value) {
+      const isPdf = value.toLowerCase().includes(".pdf");
       return (
         <div className="detail-row" key={field}>
           <strong>{fieldLabels[field]}:</strong>{" "}
-          {value.endsWith(".pdf") ? (
-            <span className="gdl-doc-link" style={{ color: "#0984e3", textDecoration: "underline", cursor: "pointer" }} onClick={() => setShowGdlModal(true)}>View GDL Document</span>
+          {isPdf ? (
+            <span
+              style={{ color: "#0984e3", textDecoration: "underline", cursor: "pointer" }}
+              onClick={() => window.open(value, "_blank")}
+            >
+              📄 Open GDL Document (PDF)
+            </span>
           ) : (
             <img
               src={value}
               alt="GDL Document"
-              style={{ width: 100, cursor: "pointer", borderRadius: 6, border: "1px solid #ccc" }}
+              style={{
+                width: 100,
+                cursor: "pointer",
+                borderRadius: 6,
+                border: "1px solid #ccc",
+              }}
               onClick={() => setModalImage(value)}
             />
           )}
         </div>
       );
     }
+
+
     return (
       <div className="detail-row" key={field}>
         <strong>{fieldLabels[field]}:</strong> {value || "Not provided"}
