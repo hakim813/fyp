@@ -217,6 +217,21 @@ export default function Profile() {
             }}
             resizeMode="cover"
           />
+          <Text
+            style={[
+              // styles.text,
+              {
+                textAlign: "center",
+                marginBottom: 15,
+                fontSize: 18,
+                fontFamily: "Nunito-Bold",
+              },
+            ]}
+          >
+            {detail?.verified === true
+              ? "Verified User"
+              : "Verifircation Pending"}
+          </Text>
           <View
             flexDirection={"row"}
             justifyContent={"space-evenly"}

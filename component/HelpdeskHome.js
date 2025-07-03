@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   ScrollView,
+  TextInput,
   Modal,
   Image,
   Touchable,
@@ -27,6 +28,7 @@ import {
   update,
   set,
   remove,
+  push,
 } from "firebase/database";
 import BottomBar from "./BottomBar";
 import { LinearGradient } from "expo-linear-gradient";
@@ -46,9 +48,28 @@ export default function HelpdeskHome() {
   const [showHelp, setShowHelp] = useState(false);
   const [showStatus, setShowStatus] = useState(null);
   const [profilePercent, setProfilePercent] = useState(0);
+  const [replyModalId, setReplyModalId] = useState(null);
+  const [replyInputs, setReplyInputs] = useState({});
+
   //   const { pDate, pTime } = route.params || {};
 
   const navi = useNavigation();
+
+  const handleReply = async (complaintId) => {
+    const message = replyInputs[complaintId]?.trim();
+    if (!message) return;
+
+    const db = getDatabase(); // <-- Add this line
+
+    await push(ref(db, `complaints/${complaintId}/replies`), {
+      senderId: user.uid,
+      senderRole: "user",
+      message,
+      replyAt: Date.now(),
+    });
+
+    setReplyInputs((prev) => ({ ...prev, [complaintId]: "" }));
+  };
 
   // const { rDate, rTime } = route.params || {};
 
@@ -77,7 +98,7 @@ export default function HelpdeskHome() {
             userId: data[key].userId,
           }))
           .filter(
-            (item) => item.userId === user.uid && item.status === "ongoing"
+            (item) => item.userId === user.uid && item.status === "Ongoing"
           ); // Filter here;
 
         allComplaints = Object.keys(data)
@@ -88,6 +109,7 @@ export default function HelpdeskHome() {
             description: data[key].description,
             photoURL: data[key].photoURL,
             status: data[key].status,
+            replies: data[key].replies,
             ticketNumber: data[key].ticketNumber,
             title: data[key].title,
             userId: data[key].userId,
@@ -487,7 +509,18 @@ export default function HelpdeskHome() {
                           >
                             <TouchableOpacity
                               onPress={() => {
-                                setResolved(item.id);
+                                Alert.alert(
+                                  "Mark as Resolved",
+                                  "Mark this complaint as resolved?",
+                                  [
+                                    { text: "Cancel", style: "cancel" },
+                                    {
+                                      text: "Yes",
+                                      style: "default",
+                                      onPress: () => setResolved(item.id),
+                                    },
+                                  ]
+                                );
                               }}
                               style={{
                                 borderColor: item.status === "grey",
@@ -522,14 +555,14 @@ export default function HelpdeskHome() {
                                 marginTop: 5,
                                 borderRadius: 50,
                                 backgroundColor:
-                                  item.status === "ongoing"
+                                  item.status === "Ongoing"
                                     ? "yellow"
                                     : "green",
                               }}
                             >
                               <Icon
                                 name={
-                                  item.status === "ongoing"
+                                  item.status === "Ongoing"
                                     ? "frown-o"
                                     : "smile-o"
                                 }
@@ -586,6 +619,35 @@ export default function HelpdeskHome() {
                               </>
                             )}
                           </View>
+                          <View
+                            style={{
+                              borderTopWidth: 1,
+                              borderTopColor: "#e0e0e0",
+                              marginTop: 15,
+                              marginBottom: 5,
+                            }}
+                          />
+                          <TouchableOpacity
+                            onPress={() => setReplyModalId(item.id)}
+                            style={{
+                              paddingHorizontal: 10,
+                              paddingVertical: 5,
+                              marginRight: 10,
+                              marginTop: 5,
+                              borderRadius: 50,
+                              // backgroundColor: "#0984e3",
+                              alignSelf: "flex-end",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: "#222",
+                                fontFamily: "Nunito-Regular",
+                              }}
+                            >
+                              Replies
+                            </Text>
+                          </TouchableOpacity>
                         </View>
                       </View>
                     );
@@ -964,21 +1026,21 @@ export default function HelpdeskHome() {
                                 marginTop: 5,
                                 borderRadius: 50,
                                 backgroundColor:
-                                  item.status === "ongoing"
+                                  item.status === "Ongoing"
                                     ? "yellow"
                                     : "green",
                               }}
                             >
                               <Icon
                                 name={
-                                  item.status === "ongoing"
+                                  item.status === "Ongoing"
                                     ? "frown-o"
                                     : "smile-o"
                                 }
                                 size={18}
                                 style={{
                                   color:
-                                    item.status === "ongoing"
+                                    item.status === "Ongoing"
                                       ? "grey"
                                       : "#fdfdfd",
                                 }}
@@ -1027,7 +1089,7 @@ export default function HelpdeskHome() {
                                   }}
                                 >
                                   <Text style={{ color: "#222" }}>
-                                    {item.status === "ongoing"
+                                    {item.status === "Ongoing"
                                       ? "Status : Ongoing"
                                       : "Status : Resolved"}
                                   </Text>
@@ -1035,6 +1097,35 @@ export default function HelpdeskHome() {
                               </>
                             )}
                           </View>
+                          <View
+                            style={{
+                              borderTopWidth: 1,
+                              borderTopColor: "#e0e0e0",
+                              marginTop: 15,
+                              marginBottom: 5,
+                            }}
+                          />
+                          <TouchableOpacity
+                            onPress={() => setReplyModalId(item.id)}
+                            style={{
+                              paddingHorizontal: 10,
+                              paddingVertical: 5,
+                              marginRight: 10,
+                              marginTop: 5,
+                              borderRadius: 50,
+                              // backgroundColor: "#0984e3",
+                              alignSelf: "flex-end",
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: "#222",
+                                fontFamily: "Nunito-Regular",
+                              }}
+                            >
+                              Replies
+                            </Text>
+                          </TouchableOpacity>
                         </View>
                       </View>
                     );
@@ -1231,6 +1322,128 @@ export default function HelpdeskHome() {
           >
             <Text style={{ fontSize: 40, color: "#fdfdfd" }}>+</Text>
           </TouchableOpacity>
+
+          <Modal
+            visible={!!replyModalId}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setReplyModalId(null)}
+          >
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(30,40,60,0.6)",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 9999,
+              }}
+              activeOpacity={1}
+              onPress={() => setReplyModalId(null)}
+            >
+              <TouchableOpacity
+                activeOpacity={1}
+                style={{
+                  width: 320,
+                  maxHeight: "90%",
+                  backgroundColor: "#fff",
+                  borderRadius: 12,
+                  padding: 18,
+                  elevation: 8,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 6,
+                }}
+                onPress={(e) => e.stopPropagation()}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Nunito-Bold",
+                    fontSize: 20,
+                    marginBottom: 10,
+                  }}
+                >
+                  Replies
+                </Text>
+                <View style={{ marginBottom: 12 }}>
+                  {(() => {
+                    // Find the complaint in allData or data
+                    const found = (allData || data).find(
+                      (c) => c.id === replyModalId
+                    );
+                    if (found && found.replies) {
+                      return (
+                        <ScrollView style={{ maxHeight: 180 }}>
+                          {Object.values(found.replies).map((r, idx) => (
+                            <View key={idx} style={{ marginBottom: 6 }}>
+                              <Text style={{ fontFamily: "Nunito-Bold" }}>
+                                {r.senderRole === "admin"
+                                  ? "🛡️ Admin"
+                                  : "👤 You"}
+                                :
+                                <Text style={{ fontFamily: "Nunito-Regular" }}>
+                                  {" "}
+                                  {r.message}
+                                </Text>
+                              </Text>
+                              <Text
+                                style={{
+                                  fontSize: 12,
+                                  color: "#777",
+                                  fontFamily: "Nunito",
+                                }}
+                              >
+                                {" "}
+                                ({new Date(r.replyAt).toLocaleString()})
+                              </Text>
+                            </View>
+                          ))}
+                        </ScrollView>
+                      );
+                    } else {
+                      return (
+                        <Text style={{ fontStyle: "italic", color: "#888" }}>
+                          No replies yet.
+                        </Text>
+                      );
+                    }
+                  })()}
+                </View>
+                <TextInput
+                  placeholder="Write a reply..."
+                  value={replyInputs[replyModalId] || ""}
+                  onChangeText={(text) =>
+                    setReplyInputs((prev) => ({
+                      ...prev,
+                      [replyModalId]: text,
+                    }))
+                  }
+                  style={{
+                    width: "100%",
+                    padding: 8,
+                    borderRadius: 6,
+                    borderWidth: 1,
+                    borderColor: "#ccc",
+                    fontFamily: "Nunito",
+                    marginBottom: 8,
+                  }}
+                />
+                <TouchableOpacity
+                  onPress={() => handleReply(replyModalId)}
+                  style={{
+                    backgroundColor: "#0984e3",
+                    paddingVertical: 8,
+                    borderRadius: 6,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "#fff", fontFamily: "Nunito-Bold" }}>
+                    Send Reply
+                  </Text>
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          </Modal>
 
           <BottomBar></BottomBar>
         </ImageBackground>

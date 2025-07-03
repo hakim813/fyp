@@ -48,6 +48,7 @@ import {
 } from "firebase/database";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { Picker } from "@react-native-picker/picker";
 
 export default function EditProfile({ route }) {
@@ -260,6 +261,53 @@ export default function EditProfile({ route }) {
     return `${year}-${month}-${day}`;
   };
 
+  const calculateCompletion = (data) => {
+    const fields = [
+      "fullName",
+      "dob",
+      "gender",
+      "phone",
+      "email",
+      "address",
+      "profilePhoto",
+      "nricId",
+      "icPhotos",
+      "taxId",
+      "workPermit",
+      "workStatus",
+      "workCategory",
+      "experience",
+      "languages",
+      "platforms",
+      "bank",
+      "bankAccountNumber",
+      "insuranceCoverage",
+      "socialSecurity",
+      "licenses",
+      "gdl",
+      "gdlDocument",
+    ];
+
+    const isFilled = (key, val) => {
+      if (
+        ["languages", "insuranceCoverage", "licenses", "icPhotos"].includes(key)
+      )
+        return Array.isArray(val) && val.length > 0;
+      if (key === "platforms")
+        return Array.isArray(val) && val.every((p) => p.name && p.id);
+      if (key === "gdl") return val === "Yes" || val === "No";
+      if (key === "gdlDocument" && data.gdl === "Yes") return !!val;
+      if (key === "email") return !!val && /\S+@\S+\.\S+/.test(val);
+      return val !== undefined && val !== null && val !== "";
+    };
+
+    const filtered = fields.filter(
+      (f) => !(f === "gdlDocument" && data.gdl !== "Yes")
+    );
+    const filled = filtered.filter((f) => isFilled(f, data[f]));
+    return Math.round((filled.length / filtered.length) * 100);
+  };
+
   const updateData = async (existingId) => {
     const recordRef = ref(database, `financeRecords/${existingId}`); // Parent path where data will be stored
     // const newRecordRef = push(recordRef);
@@ -369,6 +417,11 @@ export default function EditProfile({ route }) {
           updates.gdlDocument = url;
         }
       }
+
+      const latestProfile = { ...detail, ...updates };
+      updates.completion = calculateCompletion(latestProfile);
+      updates.verified = false; // ✅ Reset verification
+      // await update(dbRef(db, `users/${u.uid}`), updated);
 
       await update(dbRef, updates);
       Alert.alert("Success", "Profile updated!");
@@ -1699,7 +1752,7 @@ export default function EditProfile({ route }) {
                             },
                           ]}
                         >
-                          Upload GDL Document (Image or PDF)
+                          Upload GDL Document
                         </Text>
                         <TouchableOpacity
                           onPress={pickGdlDocument}

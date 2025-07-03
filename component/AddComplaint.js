@@ -243,7 +243,7 @@ export default function AddComplaint() {
         description: description,
         category: category,
         createdAt: Date.now(),
-        status: "ongoing",
+        status: "Ongoing",
         photoURL: imgUrl.length > 0 ? imgUrl : [],
       })
         .then(() => {

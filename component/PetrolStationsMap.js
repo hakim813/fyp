@@ -29,6 +29,7 @@ import {
   update,
   set,
   remove,
+  push,
 } from "firebase/database";
 import * as Location from "expo-location";
 import BottomBar from "./BottomBar";
@@ -47,11 +48,13 @@ export default function PetrolStationsMap() {
   const [userData, setUserData] = useState({});
   const [allData, setAllData] = useState([]);
   const [radius, setRadius] = useState(0);
-  const [voucher, setVoucher] = useState(null);
+  const [voucher, setVoucher] = useState([]);
   const [isOngoingPage, setIsOngoingPage] = useState(true);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [percent, setPercent] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [verified, setVerified] = useState(false);
+  const [hasGeneratedVoucher, setHasGeneratedVoucher] = useState(false);
   // const percentValue = percent.percent ?? percent;
 
   const { user } = useContext(UserContext);
@@ -139,6 +142,7 @@ export default function PetrolStationsMap() {
     })();
   }, []);
 
+  // ...existing code...
   useEffect(() => {
     if (!user) return;
     const db = getDatabase();
@@ -149,16 +153,32 @@ export default function PetrolStationsMap() {
         setUserData(data);
         setPercent(getProfileCompletion(data));
         setProgress(getProfileCompletion(data));
-        console.log("Progress");
-        console.log("Percent", percent);
       }
     });
-    get(ref(db, `vouchers/${user.uid}`)).then((snap) => {
-      if (snap.exists()) {
-        setVoucher(snap.val());
+
+    // Listen for all vouchers (multiple per user)
+    const voucherRef = ref(db, `vouchers/${user.uid}`);
+    return onValue(voucherRef, (snap) => {
+      const data = snap.val();
+      let arr = [];
+      if (data) {
+        arr = Object.entries(data).map(([id, v]) => ({
+          id,
+          ...v,
+        }));
+        // Sort: Unused first, then Used, then Expired, then by date
+        arr.sort((a, b) => {
+          const order = { Unused: 0, Used: 1, Expired: 2 };
+          return order[a.status] - order[b.status] || b.created - a.created;
+        });
+        setHasGeneratedVoucher(arr.length > 0);
+      } else {
+        setHasGeneratedVoucher(false);
       }
+      setVoucher(arr); // voucher is now an array
     });
   }, [user]);
+  // ...existing code...
 
   // useEffect(() => {
   //   console.log("Hello");
@@ -194,30 +214,38 @@ export default function PetrolStationsMap() {
     return `${day}/${month}/${year}, ${hours}:${minutes} ${ampm}`;
   };
 
-  const handleMarkUsed = async () => {
-    if (!voucher) return;
-    await set(ref(getDatabase(), `vouchers/${user.uid}/status`), "Used");
-    setVoucher({ ...voucher, status: "Used" });
-    setShowConfirm(false);
+  const handleMarkUsed = async (id) => {
+    if (!voucher || !id) return;
+    await update(ref(getDatabase(), `vouchers/${user.uid}/${id}`), {
+      status: "Used",
+    });
+    // No need to update setVoucher here, onValue will update it automatically
   };
 
   const handleGenerateVoucher = async () => {
-    if (voucher) return;
+    // Only allow if user has never generated any voucher
+    if (hasGeneratedVoucher) {
+      Alert.alert(
+        "You have already generated your voucher. Only one voucher is allowed per user."
+      );
+      return;
+    }
     const code =
       "PETRO-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-
+    const now = Date.now();
+    const expiresAt = now + 1000 * 60 * 60 * 24 * 7; // 7 days expiry
     const newVoucher = {
       code,
-      created: Date.now(),
-      expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 7,
+      created: now,
+      expiresAt,
       status: "Unused",
       amount: 50,
       incentive: "Gig Worker Data Completion",
       description:
         "Reward for completing your government-requested profile information.",
     };
-    await set(ref(getDatabase(), `vouchers/${user.uid}`), newVoucher);
-    setVoucher(newVoucher);
+    await push(ref(getDatabase(), `vouchers/${user.uid}`), newVoucher);
+    // No need to update setVoucher here, onValue will update it automatically
   };
 
   const fetchNearbyStations = async (lat, lng, radius) => {
@@ -550,8 +578,10 @@ export default function PetrolStationsMap() {
                     elevation: 5,
                   }}
                 >
-                  {percent.value < 100 || percent < 100 ? (
-                    <View alignItems={"center"}>
+                  {percent.value < 100 ||
+                  percent < 100 ||
+                  !userData.verified ? (
+                    <View alignItems={"center"} marginTop={120}>
                       <Icon name="lock" size={40} color={"#000"} />
                       <Text
                         style={{
@@ -576,8 +606,8 @@ export default function PetrolStationsMap() {
                         Go to Profile
                       </Text>
                     </View>
-                  ) : !voucher ? (
-                    <View alignItems={"center"}>
+                  ) : voucher.length === 0 ? (
+                    <View alignItems={"center"} marginTop={120}>
                       <Text
                         style={{
                           fontFamily: "Nunito-Bold",
@@ -610,222 +640,152 @@ export default function PetrolStationsMap() {
                       </TouchableOpacity>
                     </View>
                   ) : (
-                    // If percent >= 100 and no voucher, show nothing or a button to generate voucher
-
-                    // If percent >= 100 and voucher exists, show voucher details
-
-                    <View
-                      style={[
-                        stylesHome.context,
-                        {
-                          minHeight: 10,
-                          paddingVertical: 10,
-                          marginBottom: 8,
-                          marginHorizontal: 8,
-                          backgroundColor: "#fafafa",
-                          borderRadius: 12,
-                          borderWidth: 0.1,
-                          shadowColor: "#000",
-                          shadowOffset: { width: 0, height: 1 },
-                          shadowOpacity: 0.25,
-                          shadowRadius: 3.84,
-                          elevation: 5,
-                          width: "100%",
-                        },
-                      ]}
-                    >
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "flex-start",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontFamily: "Nunito-Bold",
-                            fontSize: 20,
-                          }}
-                        >
-                          {voucher.code}
+                    <>
+                      {Array.isArray(voucher) && voucher.length > 0 ? (
+                        voucher.map((v, idx) => (
+                          <View
+                            key={v.id || idx}
+                            style={[
+                              stylesHome.context,
+                              {
+                                minHeight: 10,
+                                paddingVertical: 10,
+                                marginBottom: 8,
+                                marginHorizontal: 8,
+                                backgroundColor: "#fafafa",
+                                borderRadius: 12,
+                                borderWidth: 0.1,
+                                shadowColor: "#000",
+                                shadowOffset: { width: 0, height: 1 },
+                                shadowOpacity: 0.25,
+                                shadowRadius: 3.84,
+                                elevation: 5,
+                                width: "100%",
+                              },
+                            ]}
+                          >
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "flex-start",
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontFamily: "Nunito-Bold",
+                                  fontSize: 20,
+                                }}
+                              >
+                                {v.code}
+                              </Text>
+                              <Text
+                                style={{
+                                  marginLeft: "auto",
+                                  color: "grey",
+                                  fontFamily: "Nunito-Bold",
+                                }}
+                              >
+                                {v.status}
+                              </Text>
+                            </View>
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Regular",
+                                fontSize: 20,
+                              }}
+                            >
+                              RM{v.amount} Voucher
+                            </Text>
+                            <Text
+                              style={{
+                                marginTop: 15,
+                                color: "grey",
+                                fontFamily: "Nunito-Bold",
+                              }}
+                            >
+                              Generated: {formatDateTime(v.created)}
+                              {"\n"}Expired : {formatDateTime(v.expiresAt)}
+                            </Text>
+                            <Text
+                              style={{
+                                fontFamily: "Nunito-Regular",
+                                fontSize: 13,
+                                marginTop: 10,
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontFamily: "Nunito-Bold",
+                                  color: "green",
+                                  fontSize: 13,
+                                  marginTop: 10,
+                                }}
+                              >
+                                Incentive: {v.incentive}
+                                {"\n"}
+                              </Text>
+                              {v.description}
+                              {"\n\n"}
+                              <Text
+                                style={{
+                                  fontFamily: "Nunito-Regular",
+                                  color: "green",
+                                  fontSize: 13,
+                                  marginTop: 10,
+                                }}
+                              >
+                                Show this code at the petrol station counter to
+                                redeem your voucher.{" "}
+                              </Text>
+                            </Text>
+                            <TouchableOpacity
+                              onPress={() =>
+                                Alert.alert(
+                                  "Confirm Redemption",
+                                  "Are you sure you want to mark this voucher as used? This action cannot be undone.",
+                                  [
+                                    { text: "Cancel", style: "cancel" },
+                                    {
+                                      text: "OK",
+                                      onPress: () => handleMarkUsed(v.id),
+                                    },
+                                  ]
+                                )
+                              }
+                              disabled={
+                                v.status === "Used" || v.status === "Expired"
+                              }
+                              style={{
+                                backgroundColor:
+                                  v.status === "Used" || v.status === "Expired"
+                                    ? "#ccc"
+                                    : "#20734f",
+                                marginTop: 20,
+                                paddingHorizontal: 15,
+                                paddingVertical: 10,
+                                borderRadius: 15,
+                                alignSelf: "flex-end",
+                                alignItems: "flex-end",
+                                opacity: v.status === "Used" ? 0.6 : 1,
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontFamily: "Nunito-Bold",
+                                  color: "#fdfdfd",
+                                }}
+                              >
+                                Mark as Used
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        ))
+                      ) : (
+                        <Text style={{ color: "#888", marginTop: 24 }}>
+                          No vouchers yet.
                         </Text>
-                        <Text
-                          style={{
-                            marginLeft: "auto",
-                            color: "grey",
-                            fontFamily: "Nunito-Bold",
-                          }}
-                        >
-                          {/* {formatDateTime(voucher.created)} */}
-                          {voucher.status}
-                        </Text>
-                      </View>
-                      <Text
-                        style={{
-                          fontFamily: "Nunito-Regular",
-                          fontSize: 20,
-                        }}
-                      >
-                        {/* {voucher.status} */}
-                        RM{voucher.amount} Voucher
-                      </Text>
-                      <Text
-                        style={{
-                          marginTop: 15,
-                          color: "grey",
-                          fontFamily: "Nunito-Bold",
-                        }}
-                      >
-                        {/* {formatDateTime(voucher.created)} */}
-                        Generated: {formatDateTime(voucher.created)}
-                        {"\n"}Expired : {formatDateTime(voucher.expiresAt)}
-                      </Text>
-                      <Text
-                        style={{
-                          fontFamily: "Nunito-Regular",
-                          fontSize: 13,
-                          marginTop: 10,
-                        }}
-                      >
-                        {/* {voucher.status} */}
-                        <Text
-                          style={{
-                            fontFamily: "Nunito-Bold",
-                            color: "green",
-                            fontSize: 13,
-                            marginTop: 10,
-                          }}
-                        >
-                          Incentive: {voucher.incentive}
-                          {"\n"}
-                        </Text>
-                        {voucher.description}
-                        {"\n\n"}
-                        <Text
-                          style={{
-                            fontFamily: "Nunito-Regular",
-                            color: "green",
-                            fontSize: 13,
-                            marginTop: 10,
-                          }}
-                        >
-                          Show this code at the petrol station counter to redeem
-                          your voucher.{" "}
-                        </Text>
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() =>
-                          Alert.alert(
-                            "Confirm Redemption",
-                            "Are you sure you want to mark this voucher as used? This action cannot be undone.",
-                            [
-                              { text: "Cancel", style: "cancel" },
-                              { text: "OK", onPress: handleMarkUsed },
-                            ]
-                          )
-                        }
-                        disabled={voucher.status === "Used"}
-                        style={{
-                          backgroundColor:
-                            voucher.status === "Used" ? "#ccc" : "#20734f",
-                          marginTop: 20,
-                          paddingHorizontal: 15,
-                          paddingVertical: 10,
-                          borderRadius: 15,
-                          alignSelf: "flex-end", // ✅ Prevents full-width expansion
-                          alignItems: "flex-end",
-                          opacity: voucher.status === "Used" ? 0.6 : 1, // Slight transparency
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontFamily: "Nunito-Bold",
-                            color: "#fdfdfd",
-                          }}
-                        >
-                          Mark as Used
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    //                     <FlatList
-                    //   data={vouchers}
-                    //   keyExtractor={(item) => item.id}
-                    //   renderItem={({ item }) => (
-                    //     <View
-                    //       style={[
-                    //         stylesHome.context,
-                    //         {
-                    //           minHeight: 10,
-                    //           paddingVertical: 10,
-                    //           marginBottom: 8,
-                    //           marginHorizontal: 8,
-                    //           backgroundColor: "#fafafa",
-                    //           borderRadius: 12,
-                    //           borderWidth: 0.1,
-                    //           shadowColor: "#000",
-                    //           shadowOffset: { width: 0, height: 1 },
-                    //           shadowOpacity: 0.25,
-                    //           shadowRadius: 3.84,
-                    //           elevation: 5,
-                    //           width: "100%",
-                    //         },
-                    //       ]}
-                    //     >
-                    //       <View
-                    //         style={{
-                    //           flexDirection: "row",
-                    //           alignItems: "flex-start",
-                    //         }}
-                    //       >
-                    //         <Text
-                    //           style={{
-                    //             fontFamily: "Nunito-Bold",
-                    //             fontSize: 20,
-                    //           }}
-                    //         >
-                    //           {item.code}
-                    //         </Text>
-                    //         <Text
-                    //           style={{
-                    //             marginLeft: "auto",
-                    //             color: "grey",
-                    //             fontFamily: "Nunito-Bold",
-                    //           }}
-                    //         >
-                    //           {item.created}
-                    //         </Text>
-                    //       </View>
-                    //       <Text
-                    //         style={{
-                    //           fontFamily: "Nunito-Regular",
-                    //           fontSize: 20,
-                    //         }}
-                    //       >
-                    //         {item.status}
-                    //       </Text>
-                    //       <TouchableOpacity
-                    //         onPress={() => handleMarkAsUsed(item.id)} // 🔁 Update this function
-                    //         style={{
-                    //           backgroundColor: "#20734f",
-                    //           marginTop: 20,
-                    //           paddingHorizontal: 15,
-                    //           paddingVertical: 10,
-                    //           borderRadius: 15,
-                    //           alignSelf: "flex-start",
-                    //           alignItems: "center",
-                    //         }}
-                    //       >
-                    //         <Text
-                    //           style={{
-                    //             fontFamily: "Nunito-Bold",
-                    //             color: "#fdfdfd",
-                    //           }}
-                    //         >
-                    //           Mark as Used
-                    //         </Text>
-                    //       </TouchableOpacity>
-                    //     </View>
-                    //   )}
-                    // />
+                      )}
+                    </>
                   )}
                 </View>
               )}

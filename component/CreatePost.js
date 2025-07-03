@@ -56,14 +56,7 @@ export default function CreatePost() {
   // const [category, setCategory] = useState("");
   const [url, setUrl] = useState([]);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
-  const categoryList = [
-    "General",
-    "Platform Issue",
-    "Safety and Security",
-    "Vendor Issue",
-    "Incident",
-    "Others",
-  ];
+  const categoryList = ["General", "Announcement", "Accident", "Others"];
   const [category, setCategory] = useState("General");
   const navi = useNavigation();
   const storage = getStorage(); // Initialize Firebase Storage

@@ -14,19 +14,26 @@ import {
 import styles from "../../styles";
 import { auth } from "../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-
 import { useNavigation } from "@react-navigation/native";
 import { UserContext } from "../../UserContext";
 // import { LinearGradient } from "expo-linear-gradient";
 
 export default function Login() {
-  const [email, setEmail] = useState("sukmum8hakim2@gmail.com");
-  const [pw, setPw] = useState("hakimTest123");
+  const [email, setEmail] = useState("");
+  const [pw, setPw] = useState("");
   const navi = useNavigation();
   const { user, setUser } = useContext(UserContext);
 
+  const adminEmail = "admin@wegig.com";
+
   const handleSubmit = async () => {
     try {
+      // console.log(adminEmail);
+      if (email == adminEmail) {
+        Alert.alert(`Invalid credential`);
+        return;
+      }
+
       //verify no missing
       if (email == "" || pw == "") {
         Alert.alert(`Please fill in the field.`);
