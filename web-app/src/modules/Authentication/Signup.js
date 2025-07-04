@@ -15,7 +15,7 @@ function Signup() {
     const navigate = useNavigate();
 
     const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const passwordRule = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordRule = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -29,7 +29,7 @@ function Signup() {
             return;
         }
         if (!passwordRule.test(password)) {
-            setError('Password must be at least 8 characters, include an uppercase letter and a number.');
+            setError('Password must be at least 6 characters, include an uppercase letter and a number.');
             return;
         }
         if (password !== confirmPassword) {

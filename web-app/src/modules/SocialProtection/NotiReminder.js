@@ -9,7 +9,6 @@ export default function NotiReminder() {
   const { user } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
-  // Get scheme, chosenPlan, id from route state
   const { scheme = "", chosenPlan = "", id = "" } = location.state || {};
 
   const [date, setDate] = useState(() => {
@@ -21,7 +20,6 @@ export default function NotiReminder() {
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Load existing reminder if any
   useEffect(() => {
     if (!id) return;
     const db = getDatabase();
@@ -37,6 +35,15 @@ export default function NotiReminder() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const selectedDateTime = new Date(`${date}T${time}`);
+    const now = new Date();
+
+    if (selectedDateTime <= now) {
+      alert("You need to enter a future date/time.");
+      return;
+    }
+
     setLoading(true);
     const db = getDatabase();
     await update(ref(db, `socialplan/${id}`), {
@@ -51,59 +58,59 @@ export default function NotiReminder() {
 
   return (
     <>
-    <Navbar />
-        <div className="contribution-form-container">
+      <Navbar />
+      <div className="contribution-form-container">
         <h2>Set Contribution Reminder</h2>
         <form className="contribution-form" onSubmit={handleSubmit}>
-            <label>
+          <label>
             Scheme
             <input type="text" value={scheme} readOnly />
-            </label>
-            <label>
+          </label>
+          <label>
             Chosen Plan
             <input type="text" value={chosenPlan} readOnly />
-            </label>
-            <label>
+          </label>
+          <label>
             Reminder Notes
             <input
-                type="text"
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-                placeholder="Enter your notes..."
+              type="text"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Enter your notes..."
             />
-            </label>
-            <label>
+          </label>
+          <label>
             Reminder Date
             <input
-                type="date"
-                value={date}
-                onChange={e => setDate(e.target.value)}
-                required
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
             />
-            </label>
-            <label>
+          </label>
+          <label>
             Reminder Time
             <input
-                type="time"
-                value={time}
-                onChange={e => setTime(e.target.value)}
-                required
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              required
             />
-            </label>
-            <div className="form-actions">
+          </label>
+          <div className="form-actions">
             <button className="btn" type="submit" disabled={loading}>
-                {loading ? "Saving..." : "Set Reminder"}
+              {loading ? "Saving..." : "Set Reminder"}
             </button>
             <button
-                type="button"
-                className="btn btn-cancel"
-                onClick={() => navigate("/social")}
+              type="button"
+              className="btn btn-cancel"
+              onClick={() => navigate("/social")}
             >
-                Cancel
+              Cancel
             </button>
-            </div>
+          </div>
         </form>
-        </div>
+      </div>
     </>
   );
 }

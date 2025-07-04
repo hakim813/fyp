@@ -16,14 +16,12 @@ export default function RecordContribution() {
   const { user } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
-  // Get scheme, chosenPlan, id from route state
   const { scheme = "", chosenPlan = "", id = "" } = location.state || {};
 
   const [month, setMonth] = useState("");
   const [total, setTotal] = useState("");
+  const [reminder, setReminder] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Fetch current totalContribution for update
   const [currentTotalContribution, setCurrentTotalContribution] = useState(0);
 
   useEffect(() => {
@@ -38,10 +36,15 @@ export default function RecordContribution() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (reminder && new Date(reminder).getTime() <= Date.now()) {
+      alert("You need to enter a future date/time.");
+      return;
+    }
+
     setLoading(true);
     const db = getDatabase();
 
-    // Calculate new contribution
     const newContribution =
       scheme === "i-Saraan KWSP"
         ? parseFloat(total)
@@ -49,31 +52,35 @@ export default function RecordContribution() {
 
     const newTotalContribution = currentTotalContribution + parseFloat(newContribution);
 
-    // Write contribution record
     const newRef = push(ref(db, "SPcontribution"));
+    const contributionData = {
+      email: user.email,
+      chosenPlan,
+      scheme,
+      createdAt: Date.now(),
+      value: newContribution,
+    };
     if (scheme !== "i-Saraan KWSP") {
-      await set(newRef, {
-        email: user.email,
-        chosenPlan,
-        scheme,
-        createdAt: Date.now(),
-        monthsCovered: parseInt(month),
-        value: newContribution,
-      });
-    } else {
-      await set(newRef, {
-        email: user.email,
-        chosenPlan,
-        scheme,
-        createdAt: Date.now(),
-        value: newContribution,
-      });
+      contributionData.monthsCovered = parseInt(month);
     }
+    await set(newRef, contributionData);
 
-    // Update totalContribution in socialplan
     await update(ref(db, `socialplan/${id}`), {
       totalContribution: newTotalContribution,
     });
+
+    if (reminder) {
+      const reminderRef = push(ref(db, "SPreminder"));
+      await set(reminderRef, {
+        email: user.email,
+        scheme,
+        chosenPlan,
+        reminderAt: new Date(reminder).getTime(),
+        createdAt: Date.now(),
+        message: `Reminder to contribute to ${scheme}`,
+        type: "contribution",
+      });
+    }
 
     setLoading(false);
     navigate("/social/contributions");
@@ -81,71 +88,82 @@ export default function RecordContribution() {
 
   return (
     <>
-    <Navbar />
-        <div className="contribution-form-container">
+      <Navbar />
+      <div className="contribution-form-container">
         <h2>Record Social Protection Contribution</h2>
         <form className="contribution-form" onSubmit={handleSubmit}>
-            <label>
+          <label>
             Scheme
             <input type="text" value={scheme} readOnly />
-            </label>
-            <label>
+          </label>
+          <label>
             Chosen Plan
             <input type="text" value={chosenPlan} readOnly />
-            </label>
-            {scheme === "i-Saraan KWSP" ? (
+          </label>
+
+          {scheme === "i-Saraan KWSP" ? (
             <label>
-                Total (RM)
-                <input
+              Total (RM)
+              <input
                 type="number"
                 value={total}
                 onChange={e => setTotal(e.target.value)}
                 required
                 min="0"
                 step="0.01"
-                />
+              />
             </label>
-            ) : (
+          ) : (
             <>
-                <label>
+              <label>
                 Months Covered
                 <input
-                    type="number"
-                    value={month}
-                    onChange={e => setMonth(e.target.value)}
-                    required
-                    min="1"
-                    step="1"
+                  type="number"
+                  value={month}
+                  onChange={e => setMonth(e.target.value)}
+                  required
+                  min="1"
+                  step="1"
                 />
-                </label>
-                <label>
+              </label>
+              <label>
                 Overall Total (RM)
                 <input
-                    type="text"
-                    value={
+                  type="text"
+                  value={
                     month && socsoMonthlyValue[chosenPlan]
-                        ? (socsoMonthlyValue[chosenPlan] * parseInt(month)).toFixed(2)
-                        : ""
-                    }
-                    readOnly
+                      ? (socsoMonthlyValue[chosenPlan] * parseInt(month)).toFixed(2)
+                      : ""
+                  }
+                  readOnly
                 />
-                </label>
+              </label>
             </>
-            )}
-            <div className="form-actions">
+          )}
+
+          <label>
+            Set Reminder (Optional)
+            <input
+              type="datetime-local"
+              value={reminder}
+              onChange={(e) => setReminder(e.target.value)}
+            />
+          </label>
+
+          <div className="form-actions">
             <button className="btn" type="submit" disabled={loading}>
-                {loading ? "Saving..." : "Submit"}
+              {loading ? "Saving..." : "Submit"}
             </button>
             <button
-                type="button"
-                className="btn btn-cancel"
-                onClick={() => navigate("/social")}
+              type="button"
+              className="btn btn-cancel"
+              onClick={() => navigate("/social")}
             >
-                Cancel
+              Cancel
             </button>
-            </div>
+          </div>
         </form>
-        </div>
+      </div>
     </>
   );
 }
